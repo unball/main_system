@@ -1,10 +1,14 @@
 """World Module."""
 
+from game_elements.ball import Ball
+from game_elements.robot import Robot
+
+
 
 class World(object):
     """Docstring for the class."""
 
-    def __init__(self):
+    def __init__(self, formation):
         """Blank init."""
         pass
 

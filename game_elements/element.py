@@ -1,8 +1,8 @@
-"""Ball Module."""
+"""Element module."""
 
 
-class Ball(object):
-    """Docstring for the class."""
+class Element(object):
+    """Parent class of an element of game such as robot or ball."""
 
     def __init__(self):
         """Docstring for the method."""
