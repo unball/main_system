@@ -13,6 +13,17 @@ class Element(object):
         self.inst_vy = 0
         self.inst_w = 0
 
+    def __repr__(self):
+        """Docstring for the method."""
+        x = 'x: ' + str(self.inst_x) + '\n'
+        y = 'y: ' + str(self.inst_y) + '\n'
+        th = 'th: ' + str(self.inst_th) + '\n'
+        vx = 'vx: ' + str(self.inst_vx) + '\n'
+        vy = 'vy: ' + str(self.inst_vy) + '\n'
+        w = 'w: ' + str(self.inst_w)
+        info = x + y + th + vx + vy + w
+        return info
+
     def update(self, x=0, y=0, th=0):
         """Docstring for the method."""
         self.prev_x = self.inst_x
@@ -22,6 +33,7 @@ class Element(object):
         self.inst_y = y
         self.inst_th = th
         self.calc_velocities()
+        return self
 
     @property
     def pos(self):
