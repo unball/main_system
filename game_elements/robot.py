@@ -1,6 +1,6 @@
 """Robot class module."""
 
-from element import Element
+from game_elements.element import Element
 
 
 class Robot(Element):
@@ -13,6 +13,3 @@ class Robot(Element):
 
 if __name__ == "__main__":
     robot = Robot()
-
-    robot.x = 2
-    print("robot.x = {}".format(robot.x))

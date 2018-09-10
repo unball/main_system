@@ -6,22 +6,65 @@ class Element(object):
 
     def __init__(self):
         """Docstring for the method."""
+        self.inst_x = 0
+        self.inst_y = 0
+        self.inst_th = 0
+        self.inst_vx = 0
+        self.inst_vy = 0
+        self.inst_w = 0
+
+    def update(self, x=0, y=0, th=0):
+        """Docstring for the method."""
+        self.prev_x = self.inst_x
+        self.prev_y = self.inst_y
+        self.prev_th = self.inst_th
+        self.inst_x = x
+        self.inst_y = y
+        self.inst_th = th
+        self.calc_velocities()
+
+    @property
+    def pos(self):
+        """Getter property of self.inst_pos."""
+        return [self.inst_x, self.inst_y]
+
+    @pos.setter
+    def pos(self, x, y):
+        self.inst_x = x
+        self.inst_y = y
+
+    @property
+    def th(self):
+        """Getter property of self.inst_th."""
+        return self.inst_th
+
+    @th.setter
+    def th(self, th):
+        self.inst_th = th
+
+    @property
+    def vel(self):
+        """Getter property of self.inst_vel."""
+        return [self.inst_vx, self.inst_vy]
+
+    @vel.setter
+    def vel(self, vx, vy):
+        self.inst_vx = vx
+        self.inst_vy = vy
+
+    @property
+    def w(self):
+        """Getter property of self.inst_w."""
+        return self.inst_w
+
+    @w.setter
+    def w(self, w):
+        self.inst_w = w
+
+    def calc_velocities(self):
+        """Calcalate the velocities with instant and previous positions."""
         pass
 
-    @property
-    def inst_x(self):
-        """Docstring for the method."""
-        return self.__inst_x
 
-    @inst_x.setter
-    def inst_x(self, x):
-        self.__inst_x = x
-
-    @property
-    def inst_y(self):
-        """Docstring for the method."""
-        return self.__inst_y
-
-    @inst_y.setter
-    def inst_y(self, y):
-        self.__inst_y = y
+if __name__ == "__main__":
+    element = Element()

@@ -1,6 +1,6 @@
 """Ball class module."""
 
-from element import Element
+from game_elements.element import Element
 
 
 class Ball(Element):
@@ -9,3 +9,8 @@ class Ball(Element):
     def __init__(self):
         """Responsible to instantiate the attributes of the parent class."""
         super().__init__()
+
+
+if __name__ == "__main__":
+    ball = Ball()
+    print("Testing")
