@@ -6,11 +6,14 @@ class Strategy(object):
 
     def __init__(self):
         """Init method."""
-        pass
+        self.formation = None
 
     def plan(self, world):
         """Toplevel planner which contains all the deciders of the system."""
-        pass
+        try:
+            self.formation = list(None for robot in world.number_of_robots)
+        except TypeError:
+            print("No number_of_robots set in World!")
 
     def get_targets(self):
         """Getter of each robot target planned."""
