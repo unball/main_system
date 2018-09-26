@@ -33,7 +33,10 @@ class World(object):
     def dummy_update(self):
         """Temporary method with a false message from vision.For tests only."""
         try:
-            self._robots = list(robot.update(2, 2, 2) for robot in self._robots)
+            self._robots = list(robot.update(dummy_robot['pos']['x'],
+                                             dummy_robot['pos']['y'],
+                                             dummy_robot['th'])
+                                for robot in self._robots)
         except AttributeError:
             print("Tried to update internal 'robots' but list does not exist")
             return None
@@ -72,7 +75,7 @@ class World(object):
 
     @property
     def number_of_robots(self):
-        """self.number_of_robots property to improve access outside this scope."""
+        """number_of_robots property to improve access outside this scope."""
         return self._number_of_robots
 
 
