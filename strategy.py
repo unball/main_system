@@ -21,9 +21,10 @@ class Strategy(object):
         """Toplevel planner which contains all the deciders of the system."""
         self.world = world
         # TODO: VERIFICATION TEST FOR THE WORLD STATE
-        self.tactic = self.coach.plan(world)
-        self.formation = self.tactic.(world)
+        self.tactic = self.coach.plan(self.world)
+        self.formation = self.tactic.find_formation(self.world)
+        self.targets = list(player.target for player in self.formation)
 
     def get_targets(self):
         """Getter of each robot target planned."""
-        pass
+        return self.targets

@@ -1,5 +1,7 @@
 """First level fuzzy decider module."""
 
+from tactics.attack import Attack
+
 
 def error():
     """Print the standard error message for FIRST LEVEL FUZZY scope."""
@@ -14,15 +16,16 @@ class FirstLvlDecider(object):
         self.tactic = None
 
     def plan(self, world):
-        """Docstring. Shall return a list of players."""
+        """Shall return a Tactic instance."""
         self.world = world
         self.__identify_tactic()
         return self.tactic
 
     def __identify_tactic(self):
         """Identify the main tactic that should be used."""
-        self.tactic = None
-        # TODO: Attack() and Defense() examples
+        # Here should be the fuzzy logic (or other finding logic)
+        # In this case no finding logic is used, always instantiating as Attack
+        self.tactic = Attack()
 
 
 if __name__ == "__main__":
