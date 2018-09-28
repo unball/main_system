@@ -10,7 +10,12 @@ class Tactic(object):
 
     def find_formation(self, world=None):
         """Shall return a list of players."""
-        if world is None:
-            print("WARNING! No 'world' passed as argument.")
         self.world = world
-        return self.formation
+        formation = self.formation
+        return formation
+
+    @property
+    def formation(self):
+        """Return identified formation."""
+        self.indentify_formation()
+        return self._formation
