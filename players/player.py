@@ -7,6 +7,7 @@ class Player(object):
     def __init__(self):
         """Initialie the class attributes when instantiated."""
         self.__obstacles = None
+        self.movement = None
         self._target = None
 
     def set_own_state(self, pos=None, th=None, vel=None, w=None):
@@ -30,7 +31,7 @@ class Player(object):
     def target(self):
         """Get the target calculated for itself."""
         self.calc_target()
-        return self.get_target()
+        return self._target
 
     @property
     def ball(self):
