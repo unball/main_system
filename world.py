@@ -6,7 +6,7 @@ from game_elements.robot import Robot
 MAGIC_NUMBER = 3
 dummy_robot = {"pos": {"x": 0, "y": 0}, "th": 0,
                "vel": {"vx": 0, "vy": 0}, "w": 0}
-dummy_ball = {"pos": {"x": 5, "y": 9}, "vel": {"vx": 0, "vy": 0}}
+dummy_ball = {"pos": {"x": 0, "y": 0.25}, "vel": {"vx": 0, "vy": 0}}
 
 
 class World(object):

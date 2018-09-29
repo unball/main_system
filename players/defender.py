@@ -1,6 +1,7 @@
 """Defender module."""
 
 from players.player import Player
+from movements.mark import Mark
 
 
 class Defender(Player):
@@ -12,4 +13,5 @@ class Defender(Player):
 
     def calc_target(self):
         """Calculate it's own target based on world state."""
-        self._target = [0, 0]
+        self.movement = Mark()
+        print("Defender")

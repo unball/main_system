@@ -1,6 +1,7 @@
 """Goalkeeper module."""
 
 from players.player import Player
+from movements.goalkeep import Goalkeep
 
 
 class Goalkeeper(Player):
@@ -12,4 +13,4 @@ class Goalkeeper(Player):
 
     def calc_target(self):
         """Calculate it's own target based on world state."""
-        self._target = [0, 0]
+        self.movement = Goalkeep()

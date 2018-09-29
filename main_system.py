@@ -15,6 +15,7 @@ def start_system():
     world_state.dummy_update()
     strategy_system.plan(world_state)
     targets = strategy_system.get_targets()
+    print(targets)
     control_system.actuate(targets)
     # Publish to communication node with ROS
 

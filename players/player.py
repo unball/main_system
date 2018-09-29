@@ -9,6 +9,7 @@ class Player(object):
         self.__obstacles = None
         self.movement = None
         self._target = None
+        self._ball = None
 
     def set_own_state(self, pos=None, th=None, vel=None, w=None):
         """Use info of the world state to set it's own pos, vel, etc.
