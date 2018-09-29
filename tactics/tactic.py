@@ -25,7 +25,7 @@ class Tactic(object):
         """Update each player with the world info necessary for it's scope."""
         obstacles = list(self.world.robots)
         # obstacles is a list of the position of all robots
-        for index in range(len(self._formation)):
+        for index in range(len(self._formation)-1):
             _obstacles = fit_obstacles(index, obstacles)
             # it's own position is removed from the list of obstacles
             self._formation[index].set_own_state(self.world.robots[index].pos,

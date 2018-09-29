@@ -12,4 +12,4 @@ class Mark(Movement):
 
     def calc_target(self):
         """Calculate the instant target."""
-        target = 
+        self._target = self._ball.pos

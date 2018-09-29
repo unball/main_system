@@ -31,14 +31,16 @@ class Player(object):
     def target(self):
         """Get the target calculated for itself."""
         self.calc_target()
+        self.movement.ball = self.ball
+        self._target = self.movement.target
         return self._target
 
     @property
     def ball(self):
         """Define the property so the setter can be used."""
-        return self.ball
+        return self._ball
 
     @ball.setter
-    def ball(self, ball):
+    def ball(self, __ball):
         """Setter of ball position on each robot scope."""
-        self.ball = ball
+        self._ball = __ball

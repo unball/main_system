@@ -1,7 +1,9 @@
 """Defense tactic class module."""
 
 from tactics.tactic import Tactic
-from players import *
+from players.striker import Striker
+from players.goalkeeper import Goalkeeper
+from players.defender import Defender
 
 
 class Attack(Tactic):
@@ -17,7 +19,7 @@ class Attack(Tactic):
         In this case no logic is used, instantiating the formation always with
         one Striker, one Defender and one Goalkeeper.
         """
-        self._formation = [Striker(), Defender(), Goalkeeper()]
+        self._formation = [Striker(), Striker(), Striker()]
         self.update_players_self_info()
 
 

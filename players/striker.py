@@ -1,7 +1,7 @@
 """Striker module."""
 
 from players.player import Player
-from movements.movement import Movement
+from movements.mark import Mark
 
 
 class Striker(Player):
@@ -9,13 +9,10 @@ class Striker(Player):
 
     def __init__(self):
         """Responsible to instantiate the attributes of the parent class."""
-        self.movement = Movement()
-        self.movement.set_world_info()
 
     def calc_target(self):
         """Calculate it's own target based on world state."""
         self.movement = Mark()
-        self._target = self.movement.target
         # Here, self._target is supposed to be instantiated with a Movement
 
 
