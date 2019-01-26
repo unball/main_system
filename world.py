@@ -1,12 +1,16 @@
 """World Module."""
 
-from game_elements.ball import Ball
-from game_elements.robot import Robot
+from elements.ball import Ball
+from elements.robot import Robot
 
 MAGIC_NUMBER = 3
-dummy_robot = {"pos": {"x": 0, "y": 0}, "th": 0,
-               "vel": {"vx": 0, "vy": 0}, "w": 0}
-dummy_ball = {"pos": {"x": 0, "y": 0.25}, "vel": {"vx": 0, "vy": 0}}
+dummy_robot = [{"pos": {"x": -.5, "y": 0}, "th": 0,
+               "vel": {"vx": 0, "vy": .1}, "w": 0},
+               {"pos": {"x": .73, "y": 0}, "th": 0,
+               "vel": {"vx": 0, "vy": .1}, "w": 0},
+               {"pos": {"x": -.50, "y": -.40}, "th": 0,
+               "vel": {"vx": -.2, "vy": 0}, "w": 0}]
+dummy_ball = {"pos": {"x": .1, "y": 0}, "vel": {"vx": 0, "vy": 0}}
 
 
 class World(object):
@@ -33,10 +37,14 @@ class World(object):
     def dummy_update(self):
         """Temporary method with a false message from vision.For tests only."""
         try:
-            self._robots = list(robot.update(dummy_robot['pos']['x'],
-                                             dummy_robot['pos']['y'],
-                                             dummy_robot['th'])
-                                for robot in self._robots)
+            for i in range(0,self._number_of_robots):
+                self._robots[i] = self._robots[i].update(dummy_robot[i]['pos']['x'],
+                                             dummy_robot[i]['pos']['y'],
+                                             dummy_robot[i]['th'],
+                                             dummy_robot[i]['vel']['vx'],
+                                             dummy_robot[i]['vel']['vy'])
+                                
+
         except AttributeError:
             print("Tried to update internal 'robots' but list does not exist")
             return None
@@ -48,7 +56,7 @@ class World(object):
 
     def calc_velocities(self):
         """Docstring for the method."""
-        pass
+        passctic = Attack()
 
     @property
     def info(self):

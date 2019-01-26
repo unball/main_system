@@ -11,8 +11,9 @@ class SecondLvlDecider(object):
     def get_formation(self):
         """Return the formation calculated."""
         self.id_formation(self._game_score)
-        self.rearrange_formation()
+        self.rearrange_formation(self.world)
         return self.formation
+
 
     def update_world(self, world):
         """Update the world for this scope of decision."""

@@ -7,29 +7,38 @@ from players.goalkeeper import Goalkeeper
 from players.defender import Defender
 
 from membership_functions import *
+from megafunctions import *
 
 magic_number = 14
+
 
 
 class AttackDecider(SecondLvlDecider):
     """Class docstring."""
 
     def __init__(self):
-        """Init method."""
-        pass
+        self.pos = np.matrix([[.0,0],[0,0],[0,0]])
+        self.vel = np.matrix([[.0,0],[0,0],[0,0]])
+        self.per_robot = []
+        self.rearranged_formation = np.array([])
+        self.formation_S = "GDS"
+        self.game_score =0
 
     def id_formation(self, game_score):
         """Identify the formation based on the world state."""
-        score = self.FUZZYscore(game_score)
+        score = self.FUZZYscore(0)#game_score
+        self.game_score = game_score/10
         if type(score) == type([]):
             self.formation = score
             return None
         ball_x = magic_number * self.FUZZYball_x(self.world.ball.pos[0])
         total_score = ball_x + score
-        self.formation = self.defuzzicator(total_score)
+        print("score: ", score)
+        self.formation, _ = self.defuzzicator(total_score)
 
     def FUZZYscore(self, value):
         """Docstring."""
+        #super attack
         if value <= -7 or value >= 7:
             return [Defender(), Striker(), Striker()]
         elif value > -7 and value <= -5:
@@ -75,15 +84,103 @@ class AttackDecider(SecondLvlDecider):
     def defuzzicator(self, score):
         """Docstring."""
         if score <= -7:
-            return [Goalkeeper(), Defender(), Defender()]
+            return ([Goalkeeper(), Defender(), Defender()], "GDD")
         elif score > -7 and score <= 3.5:
-            return [Goalkeeper(), Defender(), Striker()]
+            return ([Goalkeeper(), Defender(), Striker()], "GDS")
         elif score > 3.5 and score <= 10.5:
-            return [Goalkeeper(), Striker(), Striker()]
+            return ([Goalkeeper(), Striker(), Striker()], "GSS")
         else:
             # score > 10.5
-            return [Defender(), Striker(), Striker()]
+            return ([Defender(), Striker(), Striker()], "DSS")
 
-    def rearrange_formation(self):
+    def maxi(self,per, jf):
+        maxval  = -2.0
+        maxi = 0
+        for i in range(0,3):
+            if per[i]>maxval and jf[i]!=-1:
+                maxval =per[i]
+                maxi = i
+        return maxi
+
+    def rearrange_formation(self,world):
         """Rearrange the list of players."""
-        pass
+        """FAM é a matrix de especialista """
+        FAM = np.matrix([[-1, -.9, -.2, 0, .4],[-.6,-.2,0,.6,.8],[.2,.4,.8,.9,1]])
+        """tops_dist sao os locais de tops da megafunction dist """
+        tops_dist = np.array([.35,.50,.85,1.20,1.35])
+        """tops_dist sao os locais de tops da megafunction ori """
+        tops_ori = np.array([0, .5, 1])
+        """ pos,vel e ball são as posições dos robos, velocidade dos robos e posição da bola respectivamente"""
+        self.pos = np.matrix([[.0,0],[0,0],[0,0]])
+        self.vel = np.matrix([[.0,0],[0,0],[0,0]])
+        ball = np.array(world.ball.pos)
+        for i in range(0,3):
+            self.pos[i] = np.array(world.robots[i].pos)
+            self.vel[i] = np.array(world.robots[i].vel)
+        """Distancia bola-robo"""
+        dist_BR = ball - self.pos
+        abs_dist_BR = np.power(np.power(dist_BR,2).sum(1),.5)
+        """Distancia bola-robo normalizada"""
+        dist_BR = dist_BR/abs_dist_BR
+
+        abs_vel = np.power(np.power(self.vel,2).sum(1),.5)
+        """velocidade robos normalizada"""
+        self.vel = self.vel/abs_vel
+        """orientacao pra fuzzy ori"""
+        ori = np.multiply(self.vel,dist_BR).sum(1)
+
+        """Distancia pro centro do nosso gol-robo (harcoded) - MUDAR"""
+        dist_CG = np.array([.75,.0]) - self.pos
+        dist_CG = np.power(np.power(dist_CG,2).sum(1),.5)
+        print(dist_CG[0,0])
+        """per_robot pertinencia ao ataque de cada robo (-1,+1)"""
+        self.per_robot = []
+        for i in range(0,3):
+            fuzzy_dist = fuzzy(dist_CG[i,0],tops_dist[:-1],tops_dist, tops_dist[1:])
+            fuzzy_ori = fuzzy(ori[i,0],tops_ori[:-1],tops_ori, tops_ori[1:])
+            self.per_robot.append(defuzzy(fuzzy_ori,FAM,fuzzy_dist))
+        """rearranjando formação..."""
+        new_formation = [Defender(),Defender(),Defender()]
+        seek = [Striker(), Defender(), Goalkeeper()]
+        ja_foi = [0, 0, 0]
+        jfnf = [0,0,0]              #ja foi nao foi
+        for k in range(0, 3):
+            for i in range(0, 3):
+                if (seek[k].id == self.formation[i].id and ja_foi[i] != -1):
+                    maxi = self.maxi(self.per_robot,  jfnf)
+                    new_formation[maxi] = seek[k]
+                    ja_foi[i] = -1
+                    jfnf[maxi] = -1
+        self.rearranged_formation = np.array(new_formation)
+        return new_formation
+
+        # se for ataque retorna true 
+        def pair_attack(self):
+            bonds = - (self.game_score * .25) +  np.array([-.25,.25]) #adicionar lado do campo
+            ball_vel_x = world.ball.vel[0]
+            ball_x = world.ball.pos[0]
+            if ball_x > bonds[1]: #adicionar lado do campo
+                   return True #ataque
+            elif  ball_x > bonds[0] and ball_x <= bonds[1]: #adicionar lado do campo
+                if self.formation_S == "GDS" or self.formation_S == "GSS":
+                    if ball_vel_x >= 0: #adicionar lado do campo
+                        return True 
+                elif self.formation_S=="DSS":
+                    return True
+            return False
+
+        def targets(self):
+            if pair_attack():
+                if self.formation_S == "GSS" or self.formation_S == "DSS":
+                     indx = self.per_robot.index(max(self.per_robot))
+            else:
+                pass
+
+"""
+DEFINE ROBOTS 
+ori = dot(norm(v_robot) , norm((pos_ball - pos_robot)))
+dist = abs(CG - pos_robot) 
+
+CG - centro do gol
+
+"""

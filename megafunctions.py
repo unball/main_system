@@ -46,14 +46,14 @@ def fuzzy(posy, begins, middles, ends):
 """
 #recive 1 or 2, arrays of relevance (out of fuzzy), and a matrix numbers (FAM)
 # and return a sum of result
-def defuzzy(in1, *in2, FAM):
+def defuzzy(in1,FAM,*in2):
 	out = np.matrix(in1)
 	if len(in2)!=0:
-		out = np.matrix(in2).transpose()*np.matrix(out)
+		out = np.matrix(out).transpose() * np.matrix(in2)
 	out = np.multiply(FAM,out)
 	return np.sum(out)
 
-
+	
 def strike():
 	pass
 
@@ -91,5 +91,21 @@ oute = [2.5,5,7.5,10]
 
 """ shot
 anglerm = [,0,]
+
+"""
+
+
+
+"""
+DEFINE ROBOTS 
+
+FAM = [[-1, -.9, -.2, 0, .4],[-.6,-.2,0,.6,.8],[.2,.4,.8,.9,1]]
+tops_dist = [35,50,85,120,135]
+tops_ori = [0, .5, 1]
+
+ori = dot(norm(v_robot) , norm((pos_ball - pos_robot)))
+dist = abs(CG - pos_robot) 
+
+CG - centro do gol
 
 """

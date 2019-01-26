@@ -24,6 +24,8 @@ class Strategy(object):
         self.tactic = self.coach.plan(self.world)
         self.formation = self.tactic.find_formation(self.world)
         self.targets = list(player.target for player in self.formation)
+        for player in self.formation:
+            print(player)
 
     def get_targets(self):
         """Getter of each robot target planned."""

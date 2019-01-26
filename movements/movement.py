@@ -1,4 +1,8 @@
 """Movements module."""
+#import sys
+#sys.path.append('../')
+from world import World
+
 
 
 class Movement(object):
@@ -23,3 +27,12 @@ class Movement(object):
         """Mark an enemy player that has the ball, following it."""
         self.calc_target()
         return self._target
+    def shoot(self):
+        pass
+
+"""
+implementando o shoot
+
+
+
+"""
