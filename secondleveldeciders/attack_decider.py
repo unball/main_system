@@ -10,6 +10,11 @@ from membership_functions import *
 
 magic_number = 14
 
+SUPER_ATTACK = [Defender(), Striker(), Striker()]
+ATTACK =
+STANDARD
+SUPER_DEFENSE
+
 
 class AttackDecider(SecondLvlDecider):
     """Class docstring."""
@@ -31,7 +36,7 @@ class AttackDecider(SecondLvlDecider):
     def FUZZYscore(self, value):
         """Docstring."""
         if value <= -7 or value >= 7:
-            return [Defender(), Striker(), Striker()]
+            return SUPER_ATTACK # SuperAttack
         elif value > -7 and value <= -5:
             FA = i_neg(-7, -5, value)
             D = i_pos(-7, -5, value)
