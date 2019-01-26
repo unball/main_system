@@ -21,6 +21,7 @@ class Tactic(object):
     def find_formation(self, world=None):
         """Shall return a list of players."""
         self.world = world
+        self.indentify_formation()
         formation = self.formation
         return formation
 
@@ -39,8 +40,3 @@ class Tactic(object):
             self._formation[index].ball = self.world.ball
             # _obstacles = obstacles
 
-    @property
-    def formation(self):
-        """Return identified formation."""
-        self.indentify_formation()
-        return self._formation
