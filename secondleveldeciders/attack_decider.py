@@ -160,17 +160,28 @@ class AttackDecider(SecondLvlDecider):
 
     # se for ataque retorna true 
     def pair_attack(self):
-        bonds = - (self.game_score * .25) +  np.array([-.25,.25]) #adicionar lado do campo
         ball_vel_x = self.world.ball.vel[0]
         ball_x = self.world.ball.pos[0]
-        if ball_x > bonds[1]: #adicionar lado do campo
-                return True #ataque
-        elif  ball_x > bonds[0] and ball_x <= bonds[1]: #adicionar lado do campo
-            if self.formation_S == "GDS" or self.formation_S == "GSS":
-                if ball_vel_x >= 0: #adicionar lado do campo
-                    return True 
-            elif self.formation_S=="DSS":
-                return True
+        if self.world.fieldSide == LEFT:
+            bonds = - (self.game_score * .025) +  np.array([-.25,.25])
+            if ball_x > bonds[1]:
+                    return True #ataque
+            elif  ball_x > bonds[0] and ball_x <= bonds[1]:
+                if self.formation_S == "GDS" or self.formation_S == "GSS":
+                    if ball_vel_x >= 0:
+                        return True #ataque
+                elif self.formation_S=="DSS":
+                    return True #ataque
+        else:
+            bonds = (self.game_score * .025) +  np.array([-.25,.25])
+            if ball_x < bonds[1]:
+                    return True #ataque
+            elif  ball_x > bonds[0] and ball_x <= bonds[1]:
+                if self.formation_S == "GDS" or self.formation_S == "GSS":
+                    if ball_vel_x >= 0:
+                        return True #ataque
+                elif self.formation_S=="DSS":
+                    return True #ataque
         return False
 
     def targets1(self):
