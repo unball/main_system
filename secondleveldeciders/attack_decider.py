@@ -7,7 +7,9 @@ from players.goalkeeper import Goalkeeper
 from players.defender import Defender
 
 from membership_functions import *
-from megafunctions import *
+import numpy as np
+from megafunctions import fuzzy
+from megafunctions import defuzzy
 
 magic_number = 14
 LEFT = -1
@@ -123,7 +125,7 @@ class AttackDecider(SecondLvlDecider):
             self.vel[i] = np.array(world.robots[i].vel)
         """Distancia bola-robo"""
         dist_BR = ball - self.pos
-        abs_dist_BR = np.power(np.power(dist_BR,2).sum(1),.5)
+        abs_dist_BR = np.power(np.power(dist_BR,2).sum(1), .5)
         """Distancia bola-robo normalizada"""
         dist_BR = dist_BR/abs_dist_BR
 
@@ -250,13 +252,6 @@ class AttackDecider(SecondLvlDecider):
         if self.pair_attack():
             self.targets[argMid] = self.mirrorPos(argMax, argMid)
     
-    
-
-
-         
-
-
-
 """
 DEFINE ROBOTS 
 ori = dot(norm(v_robot) , norm((pos_ball - pos_robot)))
