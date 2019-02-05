@@ -10,8 +10,8 @@ from membership_functions import *
 from megafunctions import *
 
 magic_number = 14
-
-
+LEFT = -1
+RIGHT = 1
 
 class AttackDecider(SecondLvlDecider):
     """Class docstring."""
@@ -19,6 +19,10 @@ class AttackDecider(SecondLvlDecider):
     def __init__(self):
         self.pos = np.matrix([[.0,0],[0,0],[0,0]])
         self.vel = np.matrix([[.0,0],[0,0],[0,0]])
+        self.ballPos = np.array([.0, .0])
+        self.ballVel = np.array([.0, .0])
+        self.target = np.array([.0, .0])
+        self.targets = np.matrix([[.0,0],[0,0],[0,0]])
         self.per_robot = []
         self.rearranged_formation = np.array([])
         self.formation_S = "GDS"
@@ -154,27 +158,93 @@ class AttackDecider(SecondLvlDecider):
         self.rearranged_formation = np.array(new_formation)
         return new_formation
 
-        # se for ataque retorna true 
-        def pair_attack(self):
-            bonds = - (self.game_score * .25) +  np.array([-.25,.25]) #adicionar lado do campo
-            ball_vel_x = world.ball.vel[0]
-            ball_x = world.ball.pos[0]
-            if ball_x > bonds[1]: #adicionar lado do campo
-                   return True #ataque
-            elif  ball_x > bonds[0] and ball_x <= bonds[1]: #adicionar lado do campo
-                if self.formation_S == "GDS" or self.formation_S == "GSS":
-                    if ball_vel_x >= 0: #adicionar lado do campo
-                        return True 
-                elif self.formation_S=="DSS":
-                    return True
-            return False
+    # se for ataque retorna true 
+    def pair_attack(self):
+        bonds = - (self.game_score * .25) +  np.array([-.25,.25]) #adicionar lado do campo
+        ball_vel_x = self.world.ball.vel[0]
+        ball_x = self.world.ball.pos[0]
+        if ball_x > bonds[1]: #adicionar lado do campo
+                return True #ataque
+        elif  ball_x > bonds[0] and ball_x <= bonds[1]: #adicionar lado do campo
+            if self.formation_S == "GDS" or self.formation_S == "GSS":
+                if ball_vel_x >= 0: #adicionar lado do campo
+                    return True 
+            elif self.formation_S=="DSS":
+                return True
+        return False
 
-        def targets(self):
-            if pair_attack():
-                if self.formation_S == "GSS" or self.formation_S == "DSS":
-                     indx = self.per_robot.index(max(self.per_robot))
-            else:
-                pass
+    def targets1(self):
+        if self.pair_attack():
+            if self.formation_S == "GSS" or self.formation_S == "DSS":
+                    indx = self.per_robot.index(max(self.per_robot))
+        else:
+            pass
+
+    def shoot(self):
+        pass
+
+    #separa os indices dos robôs por pertinencia
+    def robotArgs(self, perRobot):
+        argMax = perRobot.argmax()
+        argMin = perRobot.argmin()
+        argmid = 0
+        for i in range(3):
+            if (i != argMax) and (i != argMin):
+                argmid = i
+                break
+        return argMax, argmid, argMin
+
+    #garante que o target do robô está dentro do retangulo da simetria
+    def insideRectangle(self, point, rectangle):
+        if point[0] < rectangle[0][0]:
+            point[0] = rectangle[0][0]
+
+        if point[1] < rectangle[1][1]:
+            point[1] = rectangle[1][1]
+
+        if point[0] > rectangle[1][0]:
+            point[0] = rectangle[1][0]
+
+        if point[1] > rectangle[0][1]:
+            point[1] = rectangle[0][1]
+
+        return point
+    
+    #simetria radial de ataque
+    def mirrorPos(self, argMax, argMid):
+        mirrorCenter = np.array([37.5, 0])  #centro da simetria radial
+        radiusMin = 10                      #raio minimo para simetria
+        rectangle = np.array([[10.0,40.0], [55.0, -40.0]])
+        if self.world.fieldSide == RIGHT:   #se o lado de defesa for o direito troca os valores
+            mirrorCenter = np.array([-37.5, 0])
+            rectangle = np.array([[-55.0, 40.0], [-10.0, -40.0]])
+        centerDom = mirrorCenter - self.pos[argMax] #centro do espelho - posição do dominante
+        #se o robô dominante estiver denforatro do raio minimo, usa a simetria
+        if centerDom > radiusMin:
+            targetMid = centerDom + mirrorCenter
+            return self.insideRectangle(targetMid, rectangle)
+        #leva o robô passivo pra aresta Y do retangulo mais proxima mantento o X do robô
+        if np.array(self.pos[argMid][0])[0][1] >= 0:
+            targetMid[0] = np.array(self.pos[argMid][0])[0][0]
+            targetMid[1] = rectangle[0][1]
+        else:
+            targetMid[0] = np.array(self.pos[argMid][0])[0][0]
+            targetMid[1] = rectangle[1][1]
+        return targetMid
+
+    def updateTargets(self):
+        perRobot = np.array(self.per_robot)
+        argMax, argMid, argMin = self.robotArgs(perRobot)
+        #self.targets[argMax] = self.shoot()
+        if self.pair_attack():
+            self.targets[argMid] = self.mirrorPos(argMax, argMid)
+    
+    
+
+
+         
+
+
 
 """
 DEFINE ROBOTS 
