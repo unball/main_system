@@ -185,14 +185,7 @@ class AttackDecider(SecondLvlDecider):
                 elif self.formation_S=="DSS":
                     return True #ataque
         return False
-
-    def targets1(self):
-        if self.pair_attack():
-            if self.formation_S == "GSS" or self.formation_S == "DSS":
-                    indx = self.per_robot.index(max(self.per_robot))
-        else:
-            pass
-
+        
     def shoot(self):
         pass
 
