@@ -12,6 +12,8 @@ dummy_robot = [{"pos": {"x": -.5, "y": 0}, "th": 0,
                "vel": {"vx": -.2, "vy": 0}, "w": 0}]
 dummy_ball = {"pos": {"x": .1, "y": 0}, "vel": {"vx": 0, "vy": 0}}
 
+LEFT = -1
+RIGHT = 1
 
 class World(object):
     """Docstring for the class."""
@@ -26,6 +28,7 @@ class World(object):
             return None
         self._robots = list(Robot() for robot in range(self._number_of_robots))
         self._ball = Ball()
+        self.fieldSide = LEFT
         print("World initiated successfully.")
         print("Number of robots: {}".format(self._number_of_robots))
 
