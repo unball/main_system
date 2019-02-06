@@ -13,7 +13,7 @@ class Strategy(object):
 
     def __init__(self):
         """Init method."""
-        self.coach = FirstLvlDecider()
+        self.FirstLvlDecider = FirstLvlDecider()
         self.tactic = None
         self.formation = None
 
@@ -21,12 +21,13 @@ class Strategy(object):
         """Toplevel planner which contains all the deciders of the system."""
         self.world = world
         # TODO: VERIFICATION TEST FOR THE WORLD STATE
-        self.tactic = self.coach.plan(self.world)
-        zona_central = ZonaCentral(self.world)
+        self.tactic = self.FirstLvlDecider.plan(self.world)
+        # zona_central = ZonaCentral(self.world)
         self.formation = self.tactic.find_formation(self.world)
-        self.targets = TargetSelector(self.formation, self.world, zona_central)
+        self.targets = list(player.target for player in self.formation)
+        #self.targets = TargetSelector(self.formation, self.world, zona_central)
         # TODO: arrumar arquitetura para garantir tipos diferentes de cálculo de targets
-        
+
     def get_targets(self):
         """Getter of each robot target planned."""
         return self.targets
