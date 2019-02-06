@@ -238,13 +238,19 @@ class AttackDecider(SecondLvlDecider):
             targetMid[1] = rectangle[1][1]
         return targetMid
 
+    #calcula posição da projeção da bola do semicirculo de defesa
+    def blockBall(self):
+        return np.array([.0, .0])
+
     def updateTargets(self):
         perRobot = np.array(self.per_robot)
         argMax, argMid, argMin = self.robotArgs(perRobot)
         #self.targets[argMax] = self.shoot()
         if self.pair_attack():
             self.targets[argMid] = self.mirrorPos(argMax, argMid)
-    
+        else:
+            self.targets[argMid] = self.blockBall()
+        
 """
 DEFINE ROBOTS 
 ori = dot(norm(v_robot) , norm((pos_ball - pos_robot)))
