@@ -5,7 +5,7 @@ class Player(object):
     """Docstring."""
 
     def __init__(self):
-        """Initialie the class attributes when instantiated."""
+        """Initialize the class attributes when instantiated."""
         self.__obstacles = None
         self.movement = None
         self._target = None
