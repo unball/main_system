@@ -77,6 +77,14 @@ class Element(object):
         """Calcalate the velocities with instant and previous positions."""
         pass
 
+    @property
+    def x(self):
+        return self.inst_x
+
+    @property
+    def y(self):
+        return self.inst_y
+
 
 if __name__ == "__main__":
     element = Element()
