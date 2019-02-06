@@ -14,3 +14,5 @@ class Goalkeeper(Player):
     def calc_target(self):
         """Calculate it's own target based on world state."""
         self.movement = Goalkeep()
+        print("Goalkeeper")
+
