@@ -270,12 +270,21 @@ class AttackDecider(SecondLvlDecider):
         yConh = (k*self.ballVel[1]) + self.ballPos[1]
         return np.array([xConh, yConh])
 
+    def midFielder(self):
+        return np.array([.0, .20])
+
+    #atualiza os 3 targets
     def updateTargets(self):
         perRobot = np.array(self.per_robot)
         argMax, argMid, argMin = self.robotArgs(perRobot)
+        
         self.targets[argMax] = self.shoot(argMax)
-        if self.pair_attack():
+
+        attack = self.pair_attack()
+        if attack and ((self.formationS == "GSS") or (self.formationS == "DSS")):
             self.targets[argMid] = self.mirrorPos(argMax, argMid)
+        elif attack and ((self.formationS == "GDS") or (self.formationS == "GDD")):
+            self.targets[argMid] = self.midFielder()
         else:
             self.targets[argMid] = self.blockBall()
         
