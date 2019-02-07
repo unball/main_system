@@ -10,6 +10,8 @@ from membership_functions import *
 import numpy as np
 from megafunctions import fuzzy
 from megafunctions import defuzzy
+from math import sin
+from random import randint
 
 magic_number = 14
 LEFT = -1
@@ -126,11 +128,11 @@ class AttackDecider(SecondLvlDecider):
             self.vel[i] = np.array(world.robots[i].vel)
         """Distancia bola-robo"""
         dist_BR = ball - self.pos
-        abs_dist_BR = np.power(np.power(dist_BR,2).sum(1), .5)
+        abs_dist_BR = (np.power(dist_BR,2).sum(1)**.5)
         """Distancia bola-robo normalizada"""
         dist_BR = dist_BR/abs_dist_BR
 
-        abs_vel = np.power(np.power(self.vel,2).sum(1),.5)
+        abs_vel = (np.power(self.vel,2).sum(1)**.5)
         """velocidade robos normalizada"""
         self.vel = self.vel/abs_vel
         """orientacao pra fuzzy ori"""
@@ -138,7 +140,7 @@ class AttackDecider(SecondLvlDecider):
 
         """Distancia pro centro do nosso gol-robo (harcoded) - MUDAR"""
         dist_CG = np.array([.75,.0]) - self.pos
-        dist_CG = np.power(np.power(dist_CG,2).sum(1),.5)
+        dist_CG = (np.power(dist_CG,2).sum(1)**.5)
         print(dist_CG[0,0])
         """per_robot pertinencia ao ataque de cada robo (-1,+1)"""
         self.per_robot = []
@@ -244,7 +246,7 @@ class AttackDecider(SecondLvlDecider):
         if self.pair_attack():
             self.targets[argMid] = self.mirrorPos(argMax, argMid)
 
-    def shoot(world, target, shooter):
+    def shoot(self, target, shooter):
         robotBall = np.array(self.ballPos - self.pos[shooter])[0]  
         ballTarget = target - np.array(self.ballPos)[0]
         dot = np.dot(robotBall, ballTarget)
@@ -267,9 +269,9 @@ class AttackDecider(SecondLvlDecider):
             
 
 
-    def defineTarget():
+    def defineTarget(self):
         if self.ballVel[0] < -.005: #adaptar ao lado (se a bola está voltando)
-            self.finalTarget =  np.array([.75, random.randint(-1, 1) *.2]) # adaptar para lado do campo
+            self.finalTarget =  np.array([.75, randint(-1, 1) *.15]) # adaptar para lado do campo
 # 
     #def secondStriker(mirrorPoint,shooter):
     #   distMirror = np.linalg.norm(mirrorPoint - np.array(self.pos[shooter])[0]) 
