@@ -226,8 +226,8 @@ class AttackDecider(SecondLvlDecider):
             mirrorCenter = np.array([-37.5, 0])
             rectangle = np.array([[-55.0, 40.0], [-10.0, -40.0]])
         centerDom = mirrorCenter - self.pos[argMax] #centro do espelho - posição do dominante
-        #se o robô dominante estiver denforatro do raio minimo, usa a simetria
-        if centerDom > radiusMin:
+        #se o robô dominante estiver fora do raio minimo, usa a simetria
+        if np.linalg.norm(centerDom) > radiusMin:
             targetMid = centerDom + mirrorCenter
             return self.insideRectangle(targetMid, rectangle)
         #leva o robô passivo pra aresta Y do retangulo mais proxima mantento o X do robô
@@ -268,10 +268,10 @@ class AttackDecider(SecondLvlDecider):
             return np.array([xe,ye])
             
 
-
+    #escolhe um canto ou meio do gol como target final
     def defineTarget(self):
-        if self.ballVel[0] < -.005: #adaptar ao lado (se a bola está voltando)
-            self.finalTarget =  np.array([.75, randint(-1, 1) *.15]) # adaptar para lado do campo
+        if self.ballVel[0] < .005*self.world.fieldSide: #testar velocidade de volta da bola
+            self.finalTarget =  np.array([.75*self.world.fieldSide, randint(-1, 1) *.15])
 # 
     #def secondStriker(mirrorPoint,shooter):
     #   distMirror = np.linalg.norm(mirrorPoint - np.array(self.pos[shooter])[0]) 
@@ -280,11 +280,11 @@ class AttackDecider(SecondLvlDecider):
     #   else:
     #       return ponto_intermediario #adicionar calculo do ponto intermediario
 
-    #def defense(Goal)
+    #def defense(self, Goal)
     #   ########definir r ###########
     #   return r/np,linalg.norm(self.ballPos-Goal) * (self.ballPos-Goal)  + Goal #sem projeção (coloca o target sobre uma circunferencia de raio r exatamente entre a bola e um ponto Goal no gol)
 
-    # goalkeepPeoject(xGoal):
+    # goalkeepPeoject(self, xGoal):
     #   if vx!=0:
     #       #projetando vetor até um xGoal-> y = (xGoal-Xball) * Vyball/Vxball + yBall 
     #       return np.array([xGoal, (Xgoal-ballPos[0]])/ballVel[0] * ballVel[1] + ballPos[1]) #ajustar lado do campo
