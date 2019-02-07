@@ -239,8 +239,36 @@ class AttackDecider(SecondLvlDecider):
         return targetMid
 
     #calcula posição da projeção da bola do semicirculo de defesa
-    def blockBall(self):
-        return np.array([.0, .0])
+    def blockBall(self, radius):
+        #radius = 37.5
+        goalCenter = np.array([-75.0, .0])
+        if self.world.fieldSide == RIGHT:
+            goalCenter[0] = 75.0
+        #Baskara
+        a = 1 + ((self.ballVel[1]/self.ballVel[0])**2)
+
+        b = (-2*goalCenter[0])
+        b = b - (2*self.ballPos[0]*((self.ballVel[1]/self.ballVel[0])**2)) 
+        b = b + (2*((self.ballVel[1]/self.ballVel[0])**2)*self.ballPos[1])
+
+        c = (goalCenter[0]**2) + ((self.ballPos[0]**2)*((self.ballVel[1]/self.ballVel[0])**2))
+        c = c - (2*self.ballPos[0]*(self.ballVel[1]/self.ballVel[0])*self.ballPos[1])
+        c = c + (self.ballPos[1]**2) - (radius**2)
+
+        x = [.0, .0]
+        x[0] = (-b + (((b**2)-(4*a*c))**.5))/(2*a)
+        x[1] = (-b - (((b**2)-(4*a*c))**.5))/(2*a)
+        #x conhecido
+        xConh = x[x.argmax()]
+        if self.world.fieldSide == RIGHT:
+            xConh = x[x.argmin()]
+        
+        #constante
+        k = (xConh - self.ballPos[0])/self.ballVel[0]
+
+        #y conhecido
+        yConh = (k*self.ballVel[1]) + self.ballPos[1]
+        return np.array([xConh, yConh])
 
     def updateTargets(self):
         perRobot = np.array(self.per_robot)
