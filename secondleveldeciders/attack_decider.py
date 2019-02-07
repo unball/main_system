@@ -238,7 +238,7 @@ class AttackDecider(SecondLvlDecider):
             targetMid[1] = rectangle[1][1]
         return targetMid
 
-    #calcula posição da projeção da bola do semicirculo de defesa
+    #calcula posição da projeção da bola do semicirculo(elipse?) de defesa
     def blockBall(self, radius=.375):
         #radius = .375
         goalCenter = np.array([-.75, .0])
@@ -270,8 +270,15 @@ class AttackDecider(SecondLvlDecider):
         yConh = (k*self.ballVel[1]) + self.ballPos[1]
         return np.array([xConh, yConh])
 
-    def midFielder(self):
-        return np.array([.0, .20])
+    #calcula target do defender quando se está atacando
+    def midFielder(self, shooter):
+        #colocar o X no mid bound inferior?
+        target = np.array([.0, -self.targets[shooter][1]])
+        if abs(self.targets[shooter][1]) < .20:
+            target[1] = .20
+            if self.targets[shooter][1] > 0:
+                target[1] = -.20 
+        return target
 
     #atualiza os 3 targets
     def updateTargets(self):
@@ -284,7 +291,7 @@ class AttackDecider(SecondLvlDecider):
         if attack and ((self.formationS == "GSS") or (self.formationS == "DSS")):
             self.targets[argMid] = self.mirrorPos(argMax, argMid)
         elif attack and ((self.formationS == "GDS") or (self.formationS == "GDD")):
-            self.targets[argMid] = self.midFielder()
+            self.targets[argMid] = self.midFielder(argMax)
         else:
             self.targets[argMid] = self.blockBall()
         
