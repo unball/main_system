@@ -10,6 +10,7 @@ from membership_functions import *
 import numpy as np
 from megafunctions import fuzzy
 from megafunctions import defuzzy
+from math import sin
 
 magic_number = 14
 LEFT = -1
@@ -29,6 +30,7 @@ class AttackDecider(SecondLvlDecider):
         self.rearranged_formation = np.array([])
         self.formation_S = "GDS"
         self.game_score =0
+        self.finalTarget = np.array([.75, 0]) #mudar para ser adaptavel ao lado
 
     def id_formation(self, game_score):
         """Identify the formation based on the world state."""
@@ -186,8 +188,6 @@ class AttackDecider(SecondLvlDecider):
                     return True #ataque
         return False
         
-    def shoot(self):
-        pass
 
     #separa os indices dos robôs por pertinencia
     def robotArgs(self, perRobot):
@@ -239,7 +239,7 @@ class AttackDecider(SecondLvlDecider):
         return targetMid
 
     #calcula posição da projeção da bola do semicirculo de defesa
-    def blockBall(self, radius):
+    def blockBall(self, radius=37.5):
         #radius = 37.5
         goalCenter = np.array([-75.0, .0])
         if self.world.fieldSide == RIGHT:
@@ -273,12 +273,57 @@ class AttackDecider(SecondLvlDecider):
     def updateTargets(self):
         perRobot = np.array(self.per_robot)
         argMax, argMid, argMin = self.robotArgs(perRobot)
-        #self.targets[argMax] = self.shoot()
+        self.targets[argMax] = self.shoot()
         if self.pair_attack():
             self.targets[argMid] = self.mirrorPos(argMax, argMid)
         else:
             self.targets[argMid] = self.blockBall()
         
+
+    def shoot(self, world, target, shooter):
+        robotBall = np.array(self.ballPos - self.pos[shooter])[0]  
+        ballTarget = target - np.array(self.ballPos)[0]
+        dot = np.dot(robotBall, ballTarget)
+        normrobotBall = np.linalg.norm(robotBall)
+        normballTarget = np.linalg.norm(ballTarget) 
+        try:
+            fi = acos(dot/(normrobotBall*normballTarget))
+        except:
+            return target
+        distEball = .25*sin(fi)
+        if distEball < .05:
+            return target
+        elif normrobotBall < .05 :
+            return target
+        else:
+            r1 = normballTarget + distEball
+            xe = distEball*target[0]+ r1*self.ballPos[0][0]/(r1+distEball)
+            ye = distEball*target[1]+ r1*self.ballPos[0][1]/(r1+distEball)
+            return np.array([xe,ye])
+            
+
+
+    #def defineTarget(self):
+     #   if self.ballVel[0] < -.005: #adaptar ao lado (se a bola está voltando)
+      #      self.finalTarget =  np.array([.75, random.randint(-1, 1) *.2]) # adaptar para lado do campo
+# 
+    #def secondStriker(mirrorPoint,shooter):
+    #   distMirror = np.linalg.norm(mirrorPoint - np.array(self.pos[shooter])[0]) 
+    #   if distMirror > raioMin and distMirror < raioMax:
+    #       return 2*mirrorPoint - np.array(self.pos[shooter])[0] #SIMETRIA RADIAL
+    #   else:
+    #       return ponto_intermediario #adicionar calculo do ponto intermediario
+
+    #def defense(Goal)
+    #   ########definir r ###########
+    #   return r/np,linalg.norm(self.ballPos-Goal) * (self.ballPos-Goal)  + Goal #sem projeção (coloca o target sobre uma circunferencia de raio r exatamente entre a bola e um ponto Goal no gol)
+
+    # goalkeepPeoject(xGoal):
+    #   if vx!=0:
+    #       #projetando vetor até um xGoal-> y = (xGoal-Xball) * Vyball/Vxball + yBall 
+    #       return np.array([xGoal, (Xgoal-ballPos[0]])/ballVel[0] * ballVel[1] + ballPos[1]) #ajustar lado do campo
+    #   #Se não acompanha o x
+    #   return np.array([xGoal, ballPos[1]])
 """
 DEFINE ROBOTS 
 ori = dot(norm(v_robot) , norm((pos_ball - pos_robot)))
