@@ -29,7 +29,7 @@ class AttackDecider(SecondLvlDecider):
         self.targets = np.matrix([[.0,0],[0,0],[0,0]])
         self.per_robot = []
         self.rearranged_formation = np.array([])
-        self.formation_S = "GDS"
+        self.formationS = "GDS"
         self.game_score =0
         self.finalTarget = np.array([.75, 0]) #mudar para ser adaptavel ao lado
 
@@ -43,7 +43,7 @@ class AttackDecider(SecondLvlDecider):
         ball_x = magic_number * self.FUZZYball_x(self.world.ball.pos[0])
         total_score = ball_x + score
         print("score: ", score)
-        self.formation, _ = self.defuzzicator(total_score)
+        self.formation, self.formationS = self.defuzzicator(total_score)
 
     def FUZZYscore(self, value):
         """Docstring."""
@@ -172,20 +172,20 @@ class AttackDecider(SecondLvlDecider):
             if ball_x > bonds[1]:
                     return True #ataque
             elif  ball_x > bonds[0] and ball_x <= bonds[1]:
-                if self.formation_S == "GDS" or self.formation_S == "GSS":
+                if self.formationS == "GDS" or self.formationS == "GSS":
                     if ball_vel_x >= 0:
                         return True #ataque
-                elif self.formation_S=="DSS":
+                elif self.formationS=="DSS":
                     return True #ataque
         else:
             bonds = (self.game_score * .025) +  np.array([-.25,.25])
             if ball_x < bonds[1]:
                     return True #ataque
             elif  ball_x > bonds[0] and ball_x <= bonds[1]:
-                if self.formation_S == "GDS" or self.formation_S == "GSS":
+                if self.formationS == "GDS" or self.formationS == "GSS":
                     if ball_vel_x >= 0:
                         return True #ataque
-                elif self.formation_S=="DSS":
+                elif self.formationS=="DSS":
                     return True #ataque
         return False
         
