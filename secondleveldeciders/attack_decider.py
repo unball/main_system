@@ -11,6 +11,7 @@ import numpy as np
 from megafunctions import fuzzy
 from megafunctions import defuzzy
 from math import sin
+from random import randint
 
 magic_number = 14
 LEFT = -1
@@ -127,11 +128,11 @@ class AttackDecider(SecondLvlDecider):
             self.vel[i] = np.array(world.robots[i].vel)
         """Distancia bola-robo"""
         dist_BR = ball - self.pos
-        abs_dist_BR = np.power(np.power(dist_BR,2).sum(1), .5)
+        abs_dist_BR = (np.power(dist_BR,2).sum(1)**.5)
         """Distancia bola-robo normalizada"""
         dist_BR = dist_BR/abs_dist_BR
 
-        abs_vel = np.power(np.power(self.vel,2).sum(1),.5)
+        abs_vel = (np.power(self.vel,2).sum(1)**.5)
         """velocidade robos normalizada"""
         self.vel = self.vel/abs_vel
         """orientacao pra fuzzy ori"""
@@ -139,7 +140,7 @@ class AttackDecider(SecondLvlDecider):
 
         """Distancia pro centro do nosso gol-robo (harcoded) - MUDAR"""
         dist_CG = np.array([.75,.0]) - self.pos
-        dist_CG = np.power(np.power(dist_CG,2).sum(1),.5)
+        dist_CG = (np.power(dist_CG,2).sum(1)**.5)
         print(dist_CG[0,0])
         """per_robot pertinencia ao ataque de cada robo (-1,+1)"""
         self.per_robot = []
@@ -188,7 +189,6 @@ class AttackDecider(SecondLvlDecider):
                     return True #ataque
         return False
         
-
     #separa os indices dos robôs por pertinencia
     def robotArgs(self, perRobot):
         argMax = perRobot.argmax()
@@ -218,15 +218,15 @@ class AttackDecider(SecondLvlDecider):
     
     #simetria radial de ataque
     def mirrorPos(self, argMax, argMid):
-        mirrorCenter = np.array([37.5, 0])  #centro da simetria radial
-        radiusMin = 10                      #raio minimo para simetria
-        rectangle = np.array([[10.0,40.0], [55.0, -40.0]])
+        mirrorCenter = np.array([.375, .0]) #centro da simetria radial
+        radiusMin = .1                      #raio minimo para simetria
+        rectangle = np.array([[.1,.4], [.55, -.4]])
         if self.world.fieldSide == RIGHT:   #se o lado de defesa for o direito troca os valores
-            mirrorCenter = np.array([-37.5, 0])
-            rectangle = np.array([[-55.0, 40.0], [-10.0, -40.0]])
+            mirrorCenter = np.array([-.375, .0])
+            rectangle = np.array([[-.55, .4], [-.1, -.4]])
         centerDom = mirrorCenter - self.pos[argMax] #centro do espelho - posição do dominante
         #se o robô dominante estiver denforatro do raio minimo, usa a simetria
-        if centerDom > radiusMin:
+        if np.linalg.norm(centerDom) > radiusMin:
             targetMid = centerDom + mirrorCenter
             return self.insideRectangle(targetMid, rectangle)
         #leva o robô passivo pra aresta Y do retangulo mais proxima mantento o X do robô
@@ -239,11 +239,11 @@ class AttackDecider(SecondLvlDecider):
         return targetMid
 
     #calcula posição da projeção da bola do semicirculo de defesa
-    def blockBall(self, radius=37.5):
-        #radius = 37.5
-        goalCenter = np.array([-75.0, .0])
+    def blockBall(self, radius=.375):
+        #radius = .375
+        goalCenter = np.array([-.75, .0])
         if self.world.fieldSide == RIGHT:
-            goalCenter[0] = 75.0
+            goalCenter[0] = .75
         #Baskara
         a = 1 + ((self.ballVel[1]/self.ballVel[0])**2)
 
@@ -255,7 +255,7 @@ class AttackDecider(SecondLvlDecider):
         c = c - (2*self.ballPos[0]*(self.ballVel[1]/self.ballVel[0])*self.ballPos[1])
         c = c + (self.ballPos[1]**2) - (radius**2)
 
-        x = [.0, .0]
+        x = np.array([.0, .0])
         x[0] = (-b + (((b**2)-(4*a*c))**.5))/(2*a)
         x[1] = (-b - (((b**2)-(4*a*c))**.5))/(2*a)
         #x conhecido
@@ -273,39 +273,39 @@ class AttackDecider(SecondLvlDecider):
     def updateTargets(self):
         perRobot = np.array(self.per_robot)
         argMax, argMid, argMin = self.robotArgs(perRobot)
-        self.targets[argMax] = self.shoot()
+        self.targets[argMax] = self.shoot(argMax)
         if self.pair_attack():
             self.targets[argMid] = self.mirrorPos(argMax, argMid)
         else:
             self.targets[argMid] = self.blockBall()
         
-
-    def shoot(self, world, target, shooter):
+    #calcula o target robô levar a bola ao gol
+    def shoot(self, shooter):
         robotBall = np.array(self.ballPos - self.pos[shooter])[0]  
-        ballTarget = target - np.array(self.ballPos)[0]
+        ballTarget = self.finalTarget - np.array(self.ballPos)[0]
         dot = np.dot(robotBall, ballTarget)
         normrobotBall = np.linalg.norm(robotBall)
         normballTarget = np.linalg.norm(ballTarget) 
         try:
             fi = acos(dot/(normrobotBall*normballTarget))
         except:
-            return target
+            return self.finalTarget
         distEball = .25*sin(fi)
         if distEball < .05:
-            return target
+            return self.finalTarget
         elif normrobotBall < .05 :
-            return target
-        else:
-            r1 = normballTarget + distEball
-            xe = distEball*target[0]+ r1*self.ballPos[0][0]/(r1+distEball)
-            ye = distEball*target[1]+ r1*self.ballPos[0][1]/(r1+distEball)
-            return np.array([xe,ye])
+            return self.finalTarget
+
+        r1 = normballTarget + distEball
+        xe = distEball*self.finalTarget[0]+ r1*self.ballPos[0][0]/(r1+distEball)
+        ye = distEball*self.finalTarget[1]+ r1*self.ballPos[0][1]/(r1+distEball)
+        return np.array([xe,ye])
             
 
-
-    #def defineTarget(self):
-     #   if self.ballVel[0] < -.005: #adaptar ao lado (se a bola está voltando)
-      #      self.finalTarget =  np.array([.75, random.randint(-1, 1) *.2]) # adaptar para lado do campo
+    #define o target final (no gol adiversario)
+    def defineTarget(self):
+        if self.ballVel[0] < (.005*self.world.fieldSide): 
+            self.finalTarget =  np.array([.75*self.world.fieldSide, randint(-1, 1) *.2])
 # 
     #def secondStriker(mirrorPoint,shooter):
     #   distMirror = np.linalg.norm(mirrorPoint - np.array(self.pos[shooter])[0]) 
