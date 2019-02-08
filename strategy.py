@@ -1,6 +1,7 @@
 """Strategy system module."""
 
 from firstleveldecider import FirstLvlDecider
+from target_selector.standard_selector import StandardSelector
 
 
 def error():
@@ -14,6 +15,7 @@ class Strategy(object):
     def __init__(self):
         """Init method."""
         self.FirstLvlDecider = FirstLvlDecider()
+        self.selector = StandardSelector()
         self.tactic = None
         self.formation = None
 
@@ -24,9 +26,8 @@ class Strategy(object):
         self.tactic = self.FirstLvlDecider.plan(self.world)
         # zona_central = ZonaCentral(self.world)
         self.formation = self.tactic.find_formation(self.world)
-        self.targets = list(player.target for player in self.formation)
-        #self.targets = TargetSelector(self.formation, self.world, zona_central)
-        # TODO: arrumar arquitetura para garantir tipos diferentes de cálculo de targets
+        self.selector.update(self.formation, self.world)
+        self.targets = self.selector.calcTargets()
 
     def get_targets(self):
         """Getter of each robot target planned."""
