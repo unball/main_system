@@ -284,9 +284,9 @@ class AttackDecider(SecondLvlDecider):
     def updateTargets(self):
         perRobot = np.array(self.per_robot)
         argMax, argMid, argMin = self.robotArgs(perRobot)
-        
+        #shooter
         self.targets[argMax] = self.shoot(argMax)
-
+        #assistente e defensor
         attack = self.pair_attack()
         if attack and ((self.formationS == "GSS") or (self.formationS == "DSS")):
             self.targets[argMid] = self.mirrorPos(argMax, argMid)
@@ -294,6 +294,9 @@ class AttackDecider(SecondLvlDecider):
             self.targets[argMid] = self.midFielder(argMax)
         else:
             self.targets[argMid] = self.blockBall()
+        #goleiro
+        
+        
         
     #calcula o target robô levar a bola ao gol
     def shoot(self, shooter):
@@ -334,12 +337,12 @@ class AttackDecider(SecondLvlDecider):
     #   ########definir r ###########
     #   return r/np,linalg.norm(self.ballPos-Goal) * (self.ballPos-Goal)  + Goal #sem projeção (coloca o target sobre uma circunferencia de raio r exatamente entre a bola e um ponto Goal no gol)
 
-    # goalkeepPeoject(xGoal):
-    #   if vx!=0:
-    #       #projetando vetor até um xGoal-> y = (xGoal-Xball) * Vyball/Vxball + yBall 
-    #       return np.array([xGoal, (Xgoal-ballPos[0]])/ballVel[0] * ballVel[1] + ballPos[1]) #ajustar lado do campo
-    #   #Se não acompanha o x
-    #   return np.array([xGoal, ballPos[1]])
+    def goalkeeperProject(self, xGoal):
+       if self.ballVel[0] > (.015*self.world.fieldSide):
+           #projetando vetor até um xGoal-> y = (xGoal-Xball) * Vyball/Vxball + yBall 
+           return np.array([xGoal, (Xgoal-ballPos[0]])/ballVel[0] * ballVel[1] + ballPos[1]) #ajustar lado do campo
+       #Se não acompanha o y
+       return np.array([xGoal, ballPos[1]])
 """
 DEFINE ROBOTS 
 ori = dot(norm(v_robot) , norm((pos_ball - pos_robot)))
