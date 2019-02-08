@@ -11,9 +11,9 @@ from membership_functions import *
 magic_number = 14
 
 SUPER_ATTACK = [Defender(), Striker(), Striker()]
-ATTACK =
-STANDARD
-SUPER_DEFENSE
+ATTACK = [Goalkeeper(), Striker(), Striker()]
+STANDARD = [Goalkeeper(), Defender(), Striker()]
+SUPER_DEFENSE = [Goalkeeper(), Defender(), Defender()]
 
 
 class AttackDecider(SecondLvlDecider):
@@ -80,14 +80,14 @@ class AttackDecider(SecondLvlDecider):
     def defuzzicator(self, score):
         """Docstring."""
         if score <= -7:
-            return [Goalkeeper(), Defender(), Defender()]
+            return SUPER_DEFENSE
         elif score > -7 and score <= 3.5:
-            return [Goalkeeper(), Defender(), Striker()]
+            return STANDARD
         elif score > 3.5 and score <= 10.5:
-            return [Goalkeeper(), Striker(), Striker()]
+            return ATTACK
         else:
             # score > 10.5
-            return [Defender(), Striker(), Striker()]
+            return SUPER_ATTACK
 
     def rearrange_formation(self):
         """Rearrange the list of players."""

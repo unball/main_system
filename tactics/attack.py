@@ -24,7 +24,7 @@ class Attack(Tactic):
         """
         self.decider.update_world(self.world)
         self.decider.game_score = GAME_SCORE
-        self._formation = self.decider.get_formation()
+        self.formation = self.decider.get_formation()
         # self._formation = [Goalkeeper(), Defender(), Striker()]
         self.update_players_self_info()
 
