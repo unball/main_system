@@ -1,14 +1,14 @@
 """Main module system. World -> Strategy -> Control."""
 
 from world import World
-from world_standards import *
+import world_standards
 from strategy import Strategy
 from control import Control
 
 
 def start_system():
     """Start the system in the 'main function'."""
-    world_state = World(STANDARD3)
+    world_state = World(world_standards.STANDARD3)
     strategy_system = Strategy()
     control_system = Control()
     # while True:
