@@ -1,7 +1,7 @@
 """Control system module."""
 
 
-class Control(object):
+class Controller(object):
     """Class docstring."""
 
     def __init__(self):

@@ -3,14 +3,14 @@
 from world import World
 import world_standards
 from strategy import Strategy
-from control import Control
+from controllers.controller import Controller
 
 
 def start_system():
     """Start the system in the 'main function'."""
     world_state = World(world_standards.STANDARD3)
     strategy_system = Strategy()
-    control_system = Control()
+    control_system = Controller()
     # while True:
     world_state.dummy_update()
     strategy_system.plan(world_state)
