@@ -6,9 +6,9 @@ class StandardSelector(TargetSelector):
 
     def calcTargets(self, formation = None, world = None, centralZone = None):
         if formation == None:
-            _formation = list(player.target for player in self.formation)
-            return _formation
+            targets = list(player.target for player in self.formation)
+            return targets
         elif isinstance(formation, list):
-            _formation = list(player.target for player in formation)
+            targets = list(player.target for player in formation)
         else:
             raise TypeError("Expected a formation with type 'list'")
