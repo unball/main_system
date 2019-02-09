@@ -34,6 +34,10 @@ class AttackDecider(SecondLvlDecider):
         self.finalTarget = np.array([.75, 0])
         self.bounds = np.array([-.25, .25])
 
+    def setFormation(self, world, gameScore):
+        self.id_formation(gameScore)
+        self.rearrange_formation(world)
+
     def id_formation(self, game_score):
         """Identify the formation based on the world state."""
         score = self.FUZZYscore(0)#game_score
@@ -272,39 +276,16 @@ class AttackDecider(SecondLvlDecider):
         return np.array([xConh, yConh])
     
     #calcula posição da projeção da bola do semicirculo de defesa
-    '''def blockBallElipse(self, maxR=.40, minR=.20):
-        #radius = .375
-        goalCenter = np.array([-.75, .0])
-        if self.world.fieldSide == RIGHT:
-            goalCenter[0] = .75
-        #Baskara
-        maxR = maxR**2
-        minR = minR**2
-        a = (1/minR) + (((self.ballVel[1]/self.ballVel[0])**2)/maxR)
-
-        b = (-2*goalCenter[0])/minR
-        b = b - ((2*self.ballPos[0]*((self.ballVel[1]/self.ballVel[0])**2))/maxR) 
-        b = b + ((2*((self.ballVel[1]/self.ballVel[0])**2)*self.ballPos[1])/maxR)
-
-        c = ((goalCenter[0]**2)/minR) 
-        c = c + (((self.ballPos[0]**2)*((self.ballVel[1]/self.ballVel[0])**2))/maxR)
-        c = c - ((2*self.ballPos[0]*(self.ballVel[1]/self.ballVel[0])*self.ballPos[1])/maxR)
-        c = c + ((self.ballPos[1]**2)/maxR) - 1
-
-        x = np.array([.0, .0])
-        x[0] = (-b + (((b**2)-(4*a*c))**.5))/(2*a)
-        x[1] = (-b - (((b**2)-(4*a*c))**.5))/(2*a)
-        #x conhecido
-        xConh = x[x.argmax()]
-        if self.world.fieldSide == RIGHT:
-            xConh = x[x.argmin()]
-        
-        #constante
-        k = (xConh - self.ballPos[0])/self.ballVel[0]
-
-        #y conhecido
-        yConh = (k*self.ballVel[1]) + self.ballPos[1]
-        return np.array([xConh, yConh])'''
+    def blockBallElipse(self,Goal):
+        ########definir z = [a**2, b**2]###########
+        if (self.ballVel*self.world.fieldSide) > .15: #verificar se a velocidade é projetavel no domínio
+            z = np.array([.4**2, .2**2])
+            c =  [sum(self.ballVel**2*z), 2*np.dot(z*self.ballVel, self.ballPos-Goal), sum(z*(self.ballPos-Goal)**2) - np.prod(z)]
+            k = min(np.roots(c))
+            if k.imag == 0:
+                return k*self.ballVel + self.ballPos
+        #apenas fica entre a bola e o Goal
+        return np.sqrt(np.prod(z)/sum(z(self.ballPos-Goal))) * (self.ballPos-Goal) + Goal
 
     #calcula target do defender quando se está atacando
     def midFielder(self, shooter):
@@ -386,6 +367,7 @@ class AttackDecider(SecondLvlDecider):
         #testar velocidade minima (=.15?)
         if ((self.ballVel[0]*self.world.fieldSide) > .15) and \
            ((self.ballPos*self.world.fieldSide)> .15):
+           #verificar se a projeção está no gol
            #projetando vetor até um xGoal-> y = (xGoal-Xball) * Vyball/Vxball + yBall 
            return np.array([xGoal, (((xGoal-self.ballPos[0])/self.ballVel[0])*self.ballVel[1])+self.ballPos[1]])
         #Se não acompanha o y
