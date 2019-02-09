@@ -20,7 +20,7 @@ def relu(x, bias, m):# linear function (for x above bias and below 1), m is the 
 def ant_relu(x,bias,m):# m is negative
 	return np.maximum(np.minimum(m*(x-bias)+1,1),0)
  	
-def parallelogram(x, bias, bias2, end): #bias < bias2
+def parallelogram(x, bias, bias2, begin, end): #bias < bias2
 	m1 = 1. /(bias-begin)
 	m2 = -1. /(end-bias2)
 	rising = relu(x, begin, m1)
