@@ -24,7 +24,7 @@ class Attack(Tactic):
         one Striker, one Defender and one Goalkeeper.
         """
         self.decider.update_world(self.world)
-        self.decider.game_score = GAME_SCORE
+        self.decider.game_score = GAME_SCORE #tem que vir do world
         self._formation = self.decider.get_formation()
         self.formation1 = self._formation
         #self._formation = [Goalkeeper(), Defender(), Striker()]
