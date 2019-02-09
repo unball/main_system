@@ -24,7 +24,7 @@ class Element(object):
         info = x + y + th + vx + vy + w
         return info
 
-    def update(self, x=0, y=0, th=0):
+    '''def update(self, x=0, y=0, th=0):
         """Docstring for the method."""
         self.prev_x = self.inst_x
         self.prev_y = self.inst_y
@@ -33,7 +33,7 @@ class Element(object):
         self.inst_y = y
         self.inst_th = th
         self.calc_velocities()
-        return self
+        return self'''
 
     def update(self, x=0, y=0, th=0, velx=0, vely=0):
         """Docstring for the method."""
