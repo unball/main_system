@@ -239,7 +239,7 @@ class AttackDecider(SecondLvlDecider):
             targetMid[1] = rectangle[1][1]
         return targetMid
 
-    #calcula posição da projeção da bola do semicirculo(elipse?) de defesa
+    #calcula posição da projeção da bola do semicirculo de defesa
     def blockBallRadius(self, radius=.375):
         #radius = .375
         goalCenter = np.array([-.75, .0])
@@ -270,6 +270,41 @@ class AttackDecider(SecondLvlDecider):
         #y conhecido
         yConh = (k*self.ballVel[1]) + self.ballPos[1]
         return np.array([xConh, yConh])
+    
+    #calcula posição da projeção da bola do semicirculo de defesa
+    '''def blockBallElipse(self, maxR=.40, minR=.20):
+        #radius = .375
+        goalCenter = np.array([-.75, .0])
+        if self.world.fieldSide == RIGHT:
+            goalCenter[0] = .75
+        #Baskara
+        maxR = maxR**2
+        minR = minR**2
+        a = (1/minR) + (((self.ballVel[1]/self.ballVel[0])**2)/maxR)
+
+        b = (-2*goalCenter[0])/minR
+        b = b - ((2*self.ballPos[0]*((self.ballVel[1]/self.ballVel[0])**2))/maxR) 
+        b = b + ((2*((self.ballVel[1]/self.ballVel[0])**2)*self.ballPos[1])/maxR)
+
+        c = ((goalCenter[0]**2)/minR) 
+        c = c + (((self.ballPos[0]**2)*((self.ballVel[1]/self.ballVel[0])**2))/maxR)
+        c = c - ((2*self.ballPos[0]*(self.ballVel[1]/self.ballVel[0])*self.ballPos[1])/maxR)
+        c = c + ((self.ballPos[1]**2)/maxR) - 1
+
+        x = np.array([.0, .0])
+        x[0] = (-b + (((b**2)-(4*a*c))**.5))/(2*a)
+        x[1] = (-b - (((b**2)-(4*a*c))**.5))/(2*a)
+        #x conhecido
+        xConh = x[x.argmax()]
+        if self.world.fieldSide == RIGHT:
+            xConh = x[x.argmin()]
+        
+        #constante
+        k = (xConh - self.ballPos[0])/self.ballVel[0]
+
+        #y conhecido
+        yConh = (k*self.ballVel[1]) + self.ballPos[1]
+        return np.array([xConh, yConh])'''
 
     #calcula target do defender quando se está atacando
     def midFielder(self, shooter):
