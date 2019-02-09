@@ -12,6 +12,7 @@ from megafunctions import fuzzy
 from megafunctions import defuzzy
 from math import sin
 from random import randint
+from math import acos
 
 magic_number = 14
 LEFT = -1
@@ -25,27 +26,34 @@ class AttackDecider(SecondLvlDecider):
         self.vel = np.matrix([[.0,0],[0,0],[0,0]])
         self.ballPos = np.array([.0, .0])
         self.ballVel = np.array([.0, .0])
-        self.target = np.array([.0, .0])
         self.targets = np.matrix([[.0,0],[0,0],[0,0]])
         self.per_robot = []
-        self.rearranged_formation = np.array([])
         self.formationS = "GDS"
-        self.game_score =0
+        self.game_score = .0
         self.finalTarget = np.array([.75, 0])
         self.bounds = np.array([-.25, .25])
+        self.fieldSide = 1
 
-    def setFormation(self, world, gameScore):
-        self.id_formation(gameScore)
+    #1
+    def setup(self, world):
+        self.defineBounds(world.gameScore)
+        self.definePosVel(world)
+        self.defineTarget(world.fieldSide)
+    #2
+    def setFormation(self, world):
+        self.id_formation(world.gameScore)
         self.rearrange_formation(world)
+        print(self.formationS)
+        print(self.per_robot)
 
-    def id_formation(self, game_score):
+    def id_formation(self, gameScore):
         """Identify the formation based on the world state."""
-        score = self.FUZZYscore(0)#game_score
-        self.game_score = game_score/10
+        score = self.FUZZYscore(gameScore)#game_score
+        self.game_score = gameScore/10.0
         if type(score) == type([]):
             self.formation = score
             return None
-        ball_x = magic_number * self.FUZZYball_x(self.world.ball.pos[0])
+        ball_x = magic_number * self.FUZZYball_x(self.ballPos[0])
         total_score = ball_x + score
         print("score: ", score)
         self.formation, self.formationS = self.defuzzicator(total_score)
@@ -133,11 +141,11 @@ class AttackDecider(SecondLvlDecider):
             self.vel[i] = np.array(world.robots[i].vel)
         """Distancia bola-robo"""
         dist_BR = ball - self.pos
-        abs_dist_BR = (np.power(dist_BR,2).sum(1)**.5)
+        abs_dist_BR = np.sqrt(np.power(dist_BR,2).sum(1))
         """Distancia bola-robo normalizada"""
         dist_BR = dist_BR/abs_dist_BR
 
-        abs_vel = (np.power(self.vel,2).sum(1)**.5)
+        abs_vel = np.sqrt(np.power(self.vel,2).sum(1))
         """velocidade robos normalizada"""
         self.vel = self.vel/abs_vel
         """orientacao pra fuzzy ori"""
@@ -145,7 +153,7 @@ class AttackDecider(SecondLvlDecider):
 
         """Distancia pro centro do nosso gol-robo (harcoded) - MUDAR"""
         dist_CG = np.array([.75,.0]) - self.pos
-        dist_CG = (np.power(dist_CG,2).sum(1)**.5)
+        dist_CG = np.sqrt(np.power(dist_CG,2).sum(1))
         print(dist_CG[0,0])
         """per_robot pertinencia ao ataque de cada robo (-1,+1)"""
         self.per_robot = []
@@ -165,15 +173,13 @@ class AttackDecider(SecondLvlDecider):
                     new_formation[maxi] = seek[k]
                     ja_foi[i] = -1
                     jfnf[maxi] = -1
-        self.rearranged_formation = np.array(new_formation)
         return new_formation
 
     # se for ataque retorna true 
     def pair_attack(self):
-        ball_vel_x = self.world.ball.vel[0]
-        ball_x = self.world.ball.pos[0]
-        self.defineBounds()
-        if self.world.fieldSide == LEFT:
+        ball_vel_x = self.ballVel[0]
+        ball_x = self.ballPos[0]
+        if self.fieldSide == LEFT:
             if ball_x > self.bounds[1]:
                     return True #ataque
             elif  ball_x > self.bounds[0] and ball_x <= self.bounds[1]:
@@ -183,7 +189,7 @@ class AttackDecider(SecondLvlDecider):
                 elif self.formationS=="DSS":
                     return True #ataque
         else:
-            self.bounds = (self.game_score * .025) +  np.array([-.25,.25])
+            self.bounds = (self.game_score * .25) +  np.array([-.25,.25])
             if ball_x < self.bounds[1]:
                     return True #ataque
             elif  ball_x > self.bounds[0] and ball_x <= self.bounds[1]:
@@ -226,10 +232,10 @@ class AttackDecider(SecondLvlDecider):
         mirrorCenter = np.array([.375, .0]) #centro da simetria radial
         radiusMin = .1                      #raio minimo para simetria
         rectangle = np.array([[.1,.4], [.55, -.4]])
-        if self.world.fieldSide == RIGHT:   #se o lado de defesa for o direito troca os valores
+        if self.fieldSide == RIGHT:   #se o lado de defesa for o direito troca os valores
             mirrorCenter = np.array([-.375, .0])
             rectangle = np.array([[-.55, .4], [-.1, -.4]])
-        centerDom = mirrorCenter - self.pos[argMax] #centro do espelho - posição do dominante
+        centerDom = mirrorCenter - np.array(self.pos[argMax])[0] #centro do espelho - posição do dominante
         #se o robô dominante estiver denforatro do raio minimo, usa a simetria
         if np.linalg.norm(centerDom) > radiusMin:
             targetMid = centerDom + mirrorCenter
@@ -263,37 +269,62 @@ class AttackDecider(SecondLvlDecider):
         x = np.array([.0, .0])
         x[0] = (-b + (((b**2)-(4*a*c))**.5))/(2*a)
         x[1] = (-b - (((b**2)-(4*a*c))**.5))/(2*a)
-        #x conhecido
-        xConh = x[x.argmax()]
-        if self.world.fieldSide == RIGHT:
-            xConh = x[x.argmin()]
-        
-        #constante
-        k = (xConh - self.ballPos[0])/self.ballVel[0]
+        if (self.ballVel*self.world.fieldSide) > .15:
+            if x[0].imag == 0:
+                #x conhecido
+                xConh = x[x.argmax()]
+                if self.world.fieldSide == RIGHT:
+                    xConh = x[x.argmin()]
+                
+                #constante
+                k = (xConh - self.ballPos[0])/self.ballVel[0]
 
-        #y conhecido
-        yConh = (k*self.ballVel[1]) + self.ballPos[1]
-        return np.array([xConh, yConh])
+                #y conhecido
+                yConh = (k*self.ballVel[1]) + self.ballPos[1]
+                return np.array([xConh, yConh])
+        
+        if not self.ballInsideArea():
+            k = radius/(np.linalg.norm(self.ballPos - goalCenter))
+            return k*(self.ballPos - goalCenter) + goalCenter
+        
+        return np.array([(.15*self.world.fieldSide), (self.ballPos[1]+.1)])
     
+    def ballInsideArea(self):
+        if abs(self.ballPos[0]) > .15:
+            return False
+        elif abs(self.ballPos[1]) > .35:
+            return False
+        return True
+
     #calcula posição da projeção da bola do semicirculo de defesa
     def blockBallElipse(self,Goal):
         ########definir z = [a**2, b**2]###########
-        if (self.ballVel*self.world.fieldSide) > .15: #verificar se a velocidade é projetavel no domínio
+        if (self.ballVel*self.world.fieldSide) > .15:
             z = np.array([.4**2, .2**2])
-            c =  [sum(self.ballVel**2*z), 2*np.dot(z*self.ballVel, self.ballPos-Goal), sum(z*(self.ballPos-Goal)**2) - np.prod(z)]
+            c =  [sum((self.ballVel**2)*z), 2*np.dot(z*self.ballVel, self.ballPos-Goal), sum(z*(self.ballPos-Goal)**2) - np.prod(z)]
             k = min(np.roots(c))
             if k.imag == 0:
-                return k*self.ballVel + self.ballPos
+                target = k*self.ballVel + self.ballPos
+                if(not self.ballInsideArea()):
+                    return target
+                target[1] = target[1] + .1
+                return target
         #apenas fica entre a bola e o Goal
-        return np.sqrt(np.prod(z)/sum(z(self.ballPos-Goal))) * (self.ballPos-Goal) + Goal
+        if not self.ballInsideArea():
+            return (np.sqrt(np.prod(z)/sum(z*(self.ballPos-Goal))) * (self.ballPos-Goal)) + Goal
+    
+        return np.array([(.15*self.world.fieldSide), (self.ballPos[1]+.1)])
 
     #calcula target do defender quando se está atacando
     def midFielder(self, shooter):
         #colocar o X no mid bound inferior?
-        target = np.array([.0, -self.targets[shooter][1]])
-        if abs(self.targets[shooter][1]) < .20:
+        boundLine = min(self.bounds)
+        if self.fieldSide == RIGHT:
+            boundLine = max(self.bounds)
+        target = np.array([boundLine, -self.targets[shooter, 1]])
+        if abs(self.targets[shooter, 1]) < .20:
             target[1] = .20
-            if self.targets[shooter][1] > 0:
+            if self.targets[shooter, 1] > 0:
                 target[1] = -.20 
         return target
 
@@ -301,9 +332,8 @@ class AttackDecider(SecondLvlDecider):
     def updateTargets(self):
         perRobot = np.array(self.per_robot)
         argMax, argMid, argMin = self.robotArgs(perRobot)
-
         #shooter
-        self.targets[argMax] = self.shoot(argMax)
+        self.targets[argMax] = self.shoot(argMax) #filtrar possibilidade de estar na area
 
         #assistente e defensor
         attack = self.pair_attack()
@@ -325,8 +355,6 @@ class AttackDecider(SecondLvlDecider):
         
         return self.targets
         
-        
-        
     #calcula o target robô levar a bola ao gol
     def shoot(self, shooter):
         robotBall = np.array(self.ballPos - self.pos[shooter])[0]  
@@ -345,28 +373,33 @@ class AttackDecider(SecondLvlDecider):
             return self.finalTarget
 
         r1 = normballTarget + distEball
-        xe = distEball*self.finalTarget[0]+ r1*self.ballPos[0][0]/(r1+distEball)
-        ye = distEball*self.finalTarget[1]+ r1*self.ballPos[0][1]/(r1+distEball)
+        xe = distEball*self.finalTarget[0]+ r1*self.ballPos[0]/(r1+distEball)
+        ye = distEball*self.finalTarget[1]+ r1*self.ballPos[1]/(r1+distEball)
         return np.array([xe,ye])
             
     #define o target final (no gol adiversario)
-    def defineTarget(self):
-        if self.ballVel[0] < (.005*self.world.fieldSide): 
-            self.finalTarget =  np.array([.75*self.world.fieldSide, randint(-1, 1) *.2])
+    def defineTarget(self, fieldSide):
+        self.fieldSide = fieldSide
+        if self.ballVel[0] < (.005*fieldSide): 
+            self.finalTarget =  np.array([.75*fieldSide, randint(-1, 1) *.2])
 
-    def defineBounds(self):
-        self.bounds = - (self.game_score * .025) +  np.array([-.25,.25])
+    def defineBounds(self, gameScore):
+        self.bounds = - (gameScore * .025) +  np.array([-.25,.25])
 
-    def definePos(self):
+    def definePosVel(self, world):
+        robots = world.robots
+        ball = world.ball
         for i in range(0,3):
-            self.pos[i] = np.array(self.world.robots[i].pos)
-        self.ballPos = self.world.ballPos
+            self.pos[i] = np.array(robots[i].pos)
+            self.vel[i] = np.array(robots[i].vel)
+        self.ballPos = ball.pos
+        self.ballVel = ball.vel
 
     def goalkeep(self):
-        xGoal = self.world.fieldSide * .72
+        xGoal = self.fieldSide * .72
         #testar velocidade minima (=.15?)
-        if ((self.ballVel[0]*self.world.fieldSide) > .15) and \
-           ((self.ballPos*self.world.fieldSide)> .15):
+        if ((self.ballVel[0]*self.fieldSide) > .15) and \
+           ((self.ballPos*self.fieldSide)> .15):
            #verificar se a projeção está no gol
            #projetando vetor até um xGoal-> y = (xGoal-Xball) * Vyball/Vxball + yBall 
            return np.array([xGoal, (((xGoal-self.ballPos[0])/self.ballVel[0])*self.ballVel[1])+self.ballPos[1]])
