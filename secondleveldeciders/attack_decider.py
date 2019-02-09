@@ -31,7 +31,8 @@ class AttackDecider(SecondLvlDecider):
         self.rearranged_formation = np.array([])
         self.formationS = "GDS"
         self.game_score =0
-        self.finalTarget = np.array([.75, 0]) #mudar para ser adaptavel ao lado
+        self.finalTarget = np.array([.75, 0])
+        self.bounds = np.array([-.25, .25])
 
     def id_formation(self, game_score):
         """Identify the formation based on the world state."""
@@ -120,8 +121,8 @@ class AttackDecider(SecondLvlDecider):
         """tops_dist sao os locais de tops da megafunction ori """
         tops_ori = np.array([0, .5, 1])
         """ pos,vel e ball são as posições dos robos, velocidade dos robos e posição da bola respectivamente"""
-        self.pos = np.matrix([[.0,0],[0,0],[0,0]])
-        self.vel = np.matrix([[.0,0],[0,0],[0,0]])
+        #self.pos = np.matrix([[.0,0],[0,0],[0,0]])
+        #self.vel = np.matrix([[.0,0],[0,0],[0,0]])
         ball = np.array(world.ball.pos)
         for i in range(0,3):
             self.pos[i] = np.array(world.robots[i].pos)
@@ -167,21 +168,21 @@ class AttackDecider(SecondLvlDecider):
     def pair_attack(self):
         ball_vel_x = self.world.ball.vel[0]
         ball_x = self.world.ball.pos[0]
+        self.defineBounds()
         if self.world.fieldSide == LEFT:
-            bonds = - (self.game_score * .025) +  np.array([-.25,.25])
-            if ball_x > bonds[1]:
+            if ball_x > self.bounds[1]:
                     return True #ataque
-            elif  ball_x > bonds[0] and ball_x <= bonds[1]:
+            elif  ball_x > self.bounds[0] and ball_x <= self.bounds[1]:
                 if self.formationS == "GDS" or self.formationS == "GSS":
                     if ball_vel_x >= 0:
                         return True #ataque
                 elif self.formationS=="DSS":
                     return True #ataque
         else:
-            bonds = (self.game_score * .025) +  np.array([-.25,.25])
-            if ball_x < bonds[1]:
+            self.bounds = (self.game_score * .025) +  np.array([-.25,.25])
+            if ball_x < self.bounds[1]:
                     return True #ataque
-            elif  ball_x > bonds[0] and ball_x <= bonds[1]:
+            elif  ball_x > self.bounds[0] and ball_x <= self.bounds[1]:
                 if self.formationS == "GDS" or self.formationS == "GSS":
                     if ball_vel_x >= 0:
                         return True #ataque
@@ -239,7 +240,7 @@ class AttackDecider(SecondLvlDecider):
         return targetMid
 
     #calcula posição da projeção da bola do semicirculo(elipse?) de defesa
-    def blockBall(self, radius=.375):
+    def blockBallRadius(self, radius=.375):
         #radius = .375
         goalCenter = np.array([-.75, .0])
         if self.world.fieldSide == RIGHT:
@@ -284,8 +285,10 @@ class AttackDecider(SecondLvlDecider):
     def updateTargets(self):
         perRobot = np.array(self.per_robot)
         argMax, argMid, argMin = self.robotArgs(perRobot)
+
         #shooter
         self.targets[argMax] = self.shoot(argMax)
+
         #assistente e defensor
         attack = self.pair_attack()
         if attack and ((self.formationS == "GSS") or (self.formationS == "DSS")):
@@ -293,8 +296,18 @@ class AttackDecider(SecondLvlDecider):
         elif attack and ((self.formationS == "GDS") or (self.formationS == "GDD")):
             self.targets[argMid] = self.midFielder(argMax)
         else:
-            self.targets[argMid] = self.blockBall()
-        #goleiro
+            self.targets[argMid] = self.blockBallRadius()
+
+        #goleiro e ultimo defensor
+        if self.formationS == "GSS" or \
+           self.formationS == "GDS" or \
+           self.formationS == "GDD" or \
+           self.ballPos[0]*self.world.fieldSide > .20:
+            self.targets[argMin] = self.goalkeep()
+        else:
+            self.targets[argMin] = self.blockBallRadius()
+        
+        return self.targets
         
         
         
@@ -320,29 +333,28 @@ class AttackDecider(SecondLvlDecider):
         ye = distEball*self.finalTarget[1]+ r1*self.ballPos[0][1]/(r1+distEball)
         return np.array([xe,ye])
             
-
     #define o target final (no gol adiversario)
     def defineTarget(self):
         if self.ballVel[0] < (.005*self.world.fieldSide): 
             self.finalTarget =  np.array([.75*self.world.fieldSide, randint(-1, 1) *.2])
-# 
-    #def secondStriker(mirrorPoint,shooter):
-    #   distMirror = np.linalg.norm(mirrorPoint - np.array(self.pos[shooter])[0]) 
-    #   if distMirror > raioMin and distMirror < raioMax:
-    #       return 2*mirrorPoint - np.array(self.pos[shooter])[0] #SIMETRIA RADIAL
-    #   else:
-    #       return ponto_intermediario #adicionar calculo do ponto intermediario
 
-    #def defense(Goal)
-    #   ########definir r ###########
-    #   return r/np,linalg.norm(self.ballPos-Goal) * (self.ballPos-Goal)  + Goal #sem projeção (coloca o target sobre uma circunferencia de raio r exatamente entre a bola e um ponto Goal no gol)
+    def defineBounds(self):
+        self.bounds = - (self.game_score * .025) +  np.array([-.25,.25])
 
-    def goalkeeperProject(self, xGoal):
-       if self.ballVel[0] > (.015*self.world.fieldSide):
+    def definePos(self):
+        for i in range(0,3):
+            self.pos[i] = np.array(self.world.robots[i].pos)
+        self.ballPos = self.world.ballPos
+
+    def goalkeep(self):
+        xGoal = self.world.fieldSide * .72
+        #testar velocidade minima (=.15?)
+        if ((self.ballVel[0]*self.world.fieldSide) > .15) and \
+           ((self.ballPos*self.world.fieldSide)> .15):
            #projetando vetor até um xGoal-> y = (xGoal-Xball) * Vyball/Vxball + yBall 
-           return np.array([xGoal, (Xgoal-ballPos[0]])/ballVel[0] * ballVel[1] + ballPos[1]) #ajustar lado do campo
-       #Se não acompanha o y
-       return np.array([xGoal, ballPos[1]])
+           return np.array([xGoal, (((xGoal-self.ballPos[0])/self.ballVel[0])*self.ballVel[1])+self.ballPos[1]])
+        #Se não acompanha o y
+        return np.array([xGoal, self.ballPos[1]])
 """
 DEFINE ROBOTS 
 ori = dot(norm(v_robot) , norm((pos_ball - pos_robot)))
