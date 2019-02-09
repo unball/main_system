@@ -46,65 +46,75 @@ class AttackDecider(SecondLvlDecider):
         print(self.formationS)
         print(self.per_robot)
 
+    #refazer fuzzy, usar megafunctions.py
+    '''Rearrange the list of players.
+        """FAM é a matrix de especialista """
+        FAM = np.matrix([[-1, -.9, -.2, 0, .4],[-.6,-.2,0,.6,.8],[.2,.4,.8,.9,1]])
+        """tops_dist sao os locais de tops da megafunction dist """
+        tops_dist = np.array([.35,.50,.85,1.20,1.35])
+        """tops_dist sao os locais de tops da megafunction ori """
+        tops_ori = np.array([0, .5, 1])'''
     def id_formation(self, gameScore):
         """Identify the formation based on the world state."""
-        score = self.FUZZYscore(gameScore)#game_score
+        score = self.FUZZYscore(gameScore)#linear procurar melhor fuzzy
+        print("score: ", score)
         self.game_score = gameScore/10.0
         if type(score) == type([]):
             self.formation = score
             return None
         ball_x = magic_number * self.FUZZYball_x(self.ballPos[0])
         total_score = ball_x + score
-        print("score: ", score)
         self.formation, self.formationS = self.defuzzicator(total_score)
 
-    def FUZZYscore(self, value):
+    def FUZZYscore(self, gameScore):
         """Docstring."""
         #super attack
-        if value <= -7 or value >= 7:
+        if gameScore <= -7 or gameScore >= 7:
+            self.formationS = 'DSS'
             return [Defender(), Striker(), Striker()]
-        elif value > -7 and value <= -5:
-            FA = i_neg(-7, -5, value)
-            D = i_pos(-7, -5, value)
+        elif gameScore > -7 and gameScore <= -5:
+            FA = i_neg(-7, -5, gameScore)
+            D = i_pos(-7, -5, gameScore)
             return (FA * (-7)) + (D * (-5))
-        elif value > -5 and value <= 0:
-            D = i_neg(-5, 0, value)
-            N = i_pos(-5, 0, value)
+        elif gameScore > -5 and gameScore <= 0:
+            D = i_neg(-5, 0, gameScore)
+            N = i_pos(-5, 0, gameScore)
             return (D * (-5)) + (N * (0))
-        elif value > 0 and value <= 5:
-            N = i_neg(0, 5, value)
-            A = i_pos(0, 5, value)
+        elif gameScore > 0 and gameScore <= 5:
+            N = i_neg(0, 5, gameScore)
+            A = i_pos(0, 5, gameScore)
             return (N * (0)) + (A * (5))
-        elif value > 5 and value <= 7:
-            A = i_neg(5, 7, value)
-            FA = i_pos(5, 7, value)
+        elif gameScore > 5 and gameScore <= 7:
+            A = i_neg(5, 7, gameScore)
+            FA = i_pos(5, 7, gameScore)
             return (A * (5)) + (FA * (7))
 
-    def FUZZYball_x(self, value):
+    def FUZZYball_x(self, ballX):
         """Docstring."""
-        if value < -0.5:
+        if ballX < -0.5:
             return -0.5
-        elif value > 0.5:
+        elif ballX > 0.5:
             return 0.5
-        elif value > -0.5 and value <= -0.25:
-            SD = i_neg(-0.5, -0.25, value)
-            D = i_pos(-0.5, -0.25, value)
+        elif ballX > -0.5 and ballX <= -0.25:
+            SD = i_neg(-0.5, -0.25, ballX)
+            D = i_pos(-0.5, -0.25, ballX)
             return (SD * (-0.5)) + (D * (-0.25))
-        elif value > -0.25 and value <= 0:
-            D = i_neg(-0.25, 0, value)
-            N = i_pos(-0.25, 0, value)
+        elif ballX > -0.25 and ballX <= 0:
+            D = i_neg(-0.25, 0, ballX)
+            N = i_pos(-0.25, 0, ballX)
             return (D * (-0.25)) + (N * (0))
-        elif value > 0 and value <= 0.25:
-            N = i_neg(0, 0.25, value)
-            A = i_pos(0, 0.25, value)
+        elif ballX > 0 and ballX <= 0.25:
+            N = i_neg(0, 0.25, ballX)
+            A = i_pos(0, 0.25, ballX)
             return (N * (0)) + (A * (0.25))
-        elif value > 0.25 and value <= 0.5:
-            A = i_neg(0.25, 0.5, value)
-            SA = i_pos(0.25, 0.5, value)
+        elif ballX > 0.25 and ballX <= 0.5:
+            A = i_neg(0.25, 0.5, ballX)
+            SA = i_pos(0.25, 0.5, ballX)
             return (A * (0.25)) + (SA * (0.5))
 
     def defuzzicator(self, score):
         """Docstring."""
+        print(score)
         if score <= -7:
             return ([Goalkeeper(), Defender(), Defender()], "GDD")
         elif score > -7 and score <= 3.5:
@@ -124,7 +134,7 @@ class AttackDecider(SecondLvlDecider):
                 maxi = i
         return maxi
 
-    def rearrange_formation(self,world):
+    def rearrange_formation(self, world):
         """Rearrange the list of players."""
         """FAM é a matrix de especialista """
         FAM = np.matrix([[-1, -.9, -.2, 0, .4],[-.6,-.2,0,.6,.8],[.2,.4,.8,.9,1]])
@@ -132,13 +142,9 @@ class AttackDecider(SecondLvlDecider):
         tops_dist = np.array([.35,.50,.85,1.20,1.35])
         """tops_dist sao os locais de tops da megafunction ori """
         tops_ori = np.array([0, .5, 1])
+
         """ pos,vel e ball são as posições dos robos, velocidade dos robos e posição da bola respectivamente"""
-        #self.pos = np.matrix([[.0,0],[0,0],[0,0]])
-        #self.vel = np.matrix([[.0,0],[0,0],[0,0]])
-        ball = np.array(world.ball.pos)
-        for i in range(0,3):
-            self.pos[i] = np.array(world.robots[i].pos)
-            self.vel[i] = np.array(world.robots[i].vel)
+        ball = self.ballPos
         """Distancia bola-robo"""
         dist_BR = ball - self.pos
         abs_dist_BR = np.sqrt(np.power(dist_BR,2).sum(1))
@@ -253,23 +259,23 @@ class AttackDecider(SecondLvlDecider):
     def blockBallRadius(self, radius=.375):
         #radius = .375
         goalCenter = np.array([-.75, .0])
-        if self.world.fieldSide == RIGHT:
+        if self.fieldSide == RIGHT:
             goalCenter[0] = .75
         #Baskara
-        a = 1 + ((self.ballVel[1]/self.ballVel[0])**2)
+        if (self.ballVel[0]*self.fieldSide) > .15:
+            a = 1 + ((self.ballVel[1]/self.ballVel[0])**2)
 
-        b = (-2*goalCenter[0])
-        b = b - (2*self.ballPos[0]*((self.ballVel[1]/self.ballVel[0])**2)) 
-        b = b + (2*((self.ballVel[1]/self.ballVel[0])**2)*self.ballPos[1])
+            b = (-2*goalCenter[0])
+            b = b - (2*self.ballPos[0]*((self.ballVel[1]/self.ballVel[0])**2)) 
+            b = b + (2*((self.ballVel[1]/self.ballVel[0])**2)*self.ballPos[1])
 
-        c = (goalCenter[0]**2) + ((self.ballPos[0]**2)*((self.ballVel[1]/self.ballVel[0])**2))
-        c = c - (2*self.ballPos[0]*(self.ballVel[1]/self.ballVel[0])*self.ballPos[1])
-        c = c + (self.ballPos[1]**2) - (radius**2)
+            c = (goalCenter[0]**2) + ((self.ballPos[0]**2)*((self.ballVel[1]/self.ballVel[0])**2))
+            c = c - (2*self.ballPos[0]*(self.ballVel[1]/self.ballVel[0])*self.ballPos[1])
+            c = c + (self.ballPos[1]**2) - (radius**2)
 
-        x = np.array([.0, .0])
-        x[0] = (-b + (((b**2)-(4*a*c))**.5))/(2*a)
-        x[1] = (-b - (((b**2)-(4*a*c))**.5))/(2*a)
-        if (self.ballVel*self.world.fieldSide) > .15:
+            x = np.array([.0, .0])
+            x[0] = (-b + (((b**2)-(4*a*c))**.5))/(2*a)
+            x[1] = (-b - (((b**2)-(4*a*c))**.5))/(2*a)
             if x[0].imag == 0:
                 #x conhecido
                 xConh = x[x.argmax()]
@@ -287,7 +293,7 @@ class AttackDecider(SecondLvlDecider):
             k = radius/(np.linalg.norm(self.ballPos - goalCenter))
             return k*(self.ballPos - goalCenter) + goalCenter
         
-        return np.array([(.15*self.world.fieldSide), (self.ballPos[1]+.1)])
+        return np.array([(.15*self.fieldSide), (self.ballPos[1]+.1)])
     
     def ballInsideArea(self):
         if abs(self.ballPos[0]) > .15:
@@ -299,7 +305,7 @@ class AttackDecider(SecondLvlDecider):
     #calcula posição da projeção da bola do semicirculo de defesa
     def blockBallElipse(self,Goal):
         ########definir z = [a**2, b**2]###########
-        if (self.ballVel*self.world.fieldSide) > .15:
+        if (self.ballVel[0]*self.fieldSide) > .15:
             z = np.array([.4**2, .2**2])
             c =  [sum((self.ballVel**2)*z), 2*np.dot(z*self.ballVel, self.ballPos-Goal), sum(z*(self.ballPos-Goal)**2) - np.prod(z)]
             k = min(np.roots(c))
@@ -313,7 +319,7 @@ class AttackDecider(SecondLvlDecider):
         if not self.ballInsideArea():
             return (np.sqrt(np.prod(z)/sum(z*(self.ballPos-Goal))) * (self.ballPos-Goal)) + Goal
     
-        return np.array([(.15*self.world.fieldSide), (self.ballPos[1]+.1)])
+        return np.array([(.15*self.fieldSide), (self.ballPos[1]+.1)])
 
     #calcula target do defender quando se está atacando
     def midFielder(self, shooter):
@@ -348,7 +354,7 @@ class AttackDecider(SecondLvlDecider):
         if self.formationS == "GSS" or \
            self.formationS == "GDS" or \
            self.formationS == "GDD" or \
-           self.ballPos[0]*self.world.fieldSide > .20:
+           self.ballPos[0]*self.fieldSide > .20:
             self.targets[argMin] = self.goalkeep()
         else:
             self.targets[argMin] = self.blockBallRadius()
