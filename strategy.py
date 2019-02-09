@@ -23,10 +23,11 @@ class Strategy(object):
         self.world = world
         # TODO: VERIFICATION TEST FOR THE WORLD STATE
         self.tactic = self.coach.plan(self.world)
-       # self.formation = self.tactic.find_formation(self.world)
-        self.decider.setFormation(world, 5)
-
-        #self.targets = list(player.target for player in self.formation)
+        
+        self.decider.setup(world)
+        self.decider.setFormation(world)
+        self.targets = self.decider.updateTargets()
+        
         #for player in self.formation:
          #   print(player)
 
