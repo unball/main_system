@@ -35,10 +35,10 @@ class AttackDecider(SecondLvlDecider):
         self.fieldSide = 1
 
     #1
-    def setup(self, world):
-        self.defineBounds(world.gameScore)
+    def setParams(self, world):
         self.definePosVel(world)
         self.defineTarget(world.fieldSide)
+        self.defineBounds(world.gameScore)
     #2
     def setFormation(self, world):
         self.id_formation(world.gameScore)
@@ -390,7 +390,7 @@ class AttackDecider(SecondLvlDecider):
             self.finalTarget =  np.array([.75*fieldSide, randint(-1, 1) *.2])
 
     def defineBounds(self, gameScore):
-        self.bounds = - (gameScore * .025) +  np.array([-.25,.25])
+        self.bounds =  (self.fieldSide*(gameScore * .025)) +  np.array([-.25,.25])
 
     def definePosVel(self, world):
         robots = world.robots

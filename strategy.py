@@ -24,7 +24,7 @@ class Strategy(object):
         # TODO: VERIFICATION TEST FOR THE WORLD STATE
         self.tactic = self.coach.plan(self.world)
         
-        self.decider.setup(world)
+        self.decider.setParams(world)
         self.decider.setFormation(world)
         self.targets = self.decider.updateTargets()
         
