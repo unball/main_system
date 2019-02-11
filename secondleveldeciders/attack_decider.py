@@ -40,18 +40,20 @@ class AttackDecider(SecondLvlDecider):
         self.bounds = np.array([-.25, .25])
         self.fieldSide = 1
 
-    #1
+    #1 seta os parâmetros iniciais
     def setParams(self, world):
         self.definePosVel(world)
         self.defineTarget(world.fieldSide)
         self.defineBounds(world.gameScore)
-    #2
+    
+    #2 retorna a formação
     def setFormation(self, world):
         self.idFormation(world.gameScore)
         self.rearrange_formation(world)
         print(self.formationS)
         print(self.per_robot)
 
+    #identifica a melhor formação
     def idFormation(self, gameScore):
 
         #FAM é a matrix de especialista
@@ -81,6 +83,7 @@ class AttackDecider(SecondLvlDecider):
                 maxi = i
         return maxi
 
+    #rearranja a lista de formação para a troca de função entre os robôs
     def rearrange_formation(self, world):
         """Rearrange the list of players."""
         """FAM é a matrix de especialista """
