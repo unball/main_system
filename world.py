@@ -29,7 +29,7 @@ class World(object):
         self._robots = list(Robot() for robot in range(self._number_of_robots))
         self._ball = Ball()
         self.fieldSide = LEFT
-        self.gameScore = -6
+        self.gameScore = 9
         print("World initiated successfully.")
         print("Number of robots: {}".format(self._number_of_robots))
 

@@ -17,6 +17,11 @@ from math import acos
 magic_number = 14
 LEFT = -1
 RIGHT = 1
+allFormationsS = ['GDD', 'GDS', 'GSS', 'DSS']
+allFormations = [[Goalkeeper(), Defender(), Defender()], \
+                [Goalkeeper(), Defender(), Striker()], \
+                [Goalkeeper(), Striker(), Striker()], \
+                [Defender(), Striker(), Striker()]]
 
 class AttackDecider(SecondLvlDecider):
     """Class docstring."""
@@ -29,6 +34,7 @@ class AttackDecider(SecondLvlDecider):
         self.targets = np.matrix([[.0,0],[0,0],[0,0]])
         self.per_robot = []
         self.formationS = "GDS"
+        self.formation = [Goalkeeper(), Defender(), Striker()]
         self.game_score = .0
         self.finalTarget = np.array([.75, 0])
         self.bounds = np.array([-.25, .25])
@@ -41,89 +47,30 @@ class AttackDecider(SecondLvlDecider):
         self.defineBounds(world.gameScore)
     #2
     def setFormation(self, world):
-        self.id_formation(world.gameScore)
+        self.idFormation(world.gameScore)
         self.rearrange_formation(world)
         print(self.formationS)
         print(self.per_robot)
 
-    #refazer fuzzy, usar megafunctions.py
-    '''Rearrange the list of players.
-        """FAM é a matrix de especialista """
-        FAM = np.matrix([[-1, -.9, -.2, 0, .4],[-.6,-.2,0,.6,.8],[.2,.4,.8,.9,1]])
-        """tops_dist sao os locais de tops da megafunction dist """
-        tops_dist = np.array([.35,.50,.85,1.20,1.35])
-        """tops_dist sao os locais de tops da megafunction ori """
-        tops_ori = np.array([0, .5, 1])'''
-    def id_formation(self, gameScore):
-        """Identify the formation based on the world state."""
-        score = self.FUZZYscore(gameScore)#linear procurar melhor fuzzy
-        print("score: ", score)
-        self.game_score = gameScore/10.0
-        if type(score) == type([]):
-            self.formation = score
-            return None
-        ball_x = magic_number * self.FUZZYball_x(self.ballPos[0])
-        total_score = ball_x + score
-        self.formation, self.formationS = self.defuzzicator(total_score)
+    def idFormation(self, gameScore):
 
-    def FUZZYscore(self, gameScore):
-        """Docstring."""
-        #super attack
-        if gameScore <= -7 or gameScore >= 7:
-            self.formationS = 'DSS'
-            return [Defender(), Striker(), Striker()]
-        elif gameScore > -7 and gameScore <= -5:
-            FA = i_neg(-7, -5, gameScore)
-            D = i_pos(-7, -5, gameScore)
-            return (FA * (-7)) + (D * (-5))
-        elif gameScore > -5 and gameScore <= 0:
-            D = i_neg(-5, 0, gameScore)
-            N = i_pos(-5, 0, gameScore)
-            return (D * (-5)) + (N * (0))
-        elif gameScore > 0 and gameScore <= 5:
-            N = i_neg(0, 5, gameScore)
-            A = i_pos(0, 5, gameScore)
-            return (N * (0)) + (A * (5))
-        elif gameScore > 5 and gameScore <= 7:
-            A = i_neg(5, 7, gameScore)
-            FA = i_pos(5, 7, gameScore)
-            return (A * (5)) + (FA * (7))
+        #FAM é a matrix de especialista
+        FAM = np.matrix([[0, 1, 3],[0, 1, 2],[0, 1, 2], [0, 2, 2],[2, 3, 3]])
 
-    def FUZZYball_x(self, ballX):
-        """Docstring."""
-        if ballX < -0.5:
-            return -0.5
-        elif ballX > 0.5:
-            return 0.5
-        elif ballX > -0.5 and ballX <= -0.25:
-            SD = i_neg(-0.5, -0.25, ballX)
-            D = i_pos(-0.5, -0.25, ballX)
-            return (SD * (-0.5)) + (D * (-0.25))
-        elif ballX > -0.25 and ballX <= 0:
-            D = i_neg(-0.25, 0, ballX)
-            N = i_pos(-0.25, 0, ballX)
-            return (D * (-0.25)) + (N * (0))
-        elif ballX > 0 and ballX <= 0.25:
-            N = i_neg(0, 0.25, ballX)
-            A = i_pos(0, 0.25, ballX)
-            return (N * (0)) + (A * (0.25))
-        elif ballX > 0.25 and ballX <= 0.5:
-            A = i_neg(0.25, 0.5, ballX)
-            SA = i_pos(0.25, 0.5, ballX)
-            return (A * (0.25)) + (SA * (0.5))
+        boundMin = min(self.bounds)
+        boundMax = max(self.bounds)
+        if self.fieldSide == RIGHT:
+            boundMin = max(self.bounds)
+            boundMax = min(self.bounds)
+        topDist = np.array([boundMin, ((boundMin+boundMax)/2), boundMax])
 
-    def defuzzicator(self, score):
-        """Docstring."""
-        print(score)
-        if score <= -7:
-            return ([Goalkeeper(), Defender(), Defender()], "GDD")
-        elif score > -7 and score <= 3.5:
-            return ([Goalkeeper(), Defender(), Striker()], "GDS")
-        elif score > 3.5 and score <= 10.5:
-            return ([Goalkeeper(), Striker(), Striker()], "GSS")
-        else:
-            # score > 10.5
-            return ([Defender(), Striker(), Striker()], "DSS")
+        topScore = np.array([-7, -3, 0, 3, 7])
+
+        fuzzyDist = fuzzy(self.ballPos[0],topDist[:-1],topDist, topDist[1:])
+        fuzzyScore = fuzzy(gameScore,topScore[:-1],topScore, topScore[1:])
+
+        self.formationS = allFormationsS[FAM[fuzzyScore.argmax(), fuzzyDist.argmax()]]
+        self.formation = allFormations[FAM[fuzzyScore.argmax(), fuzzyDist.argmax()]]
 
     def maxi(self,per, jf):
         maxval  = -2.0
