@@ -8,6 +8,6 @@ class Controller(object):
         """Init method."""
         pass
 
-    def actuate(self, targets):
+    def actuate(self, targets, world):
         """Control system actuator itself."""
         pass
