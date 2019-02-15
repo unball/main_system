@@ -25,10 +25,15 @@ class World(object):
         print("World initiated successfully.")
         print("Number of robots: {}".format(self._number_of_robots))
 
-    def update(self):
+    def update(self, vision_message):
         """Follow the 'update' methods from the element's classes."""
-        # subscribe
-        pass
+        found_list = list(vision_message.found)
+        for i in range(len(found_list)):
+            if found_list[i] is True:
+                self._robots[i].update(vision_message.x[i],
+                                       vision_message.y[i],
+                                       vision_message.th[i])
+        self._ball.update(vision_message.ball_x, vision_message.ball_y)
 
     def dummy_update(self):
         """Temporary method with a false message from vision.For tests only."""
