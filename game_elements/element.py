@@ -1,5 +1,7 @@
 """Element module."""
 
+time_to_derivate = 0.033  # seconds
+
 
 class Element(object):
     """Parent class of an element of game such as robot or ball."""
