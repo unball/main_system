@@ -5,30 +5,29 @@ import rospy
 
 from vision.msg import VisionMessage
 
-# import world_standards
-# from world import World
-# from strategy import Strategy
-# from controllers.controller import Controller
+import world_standards
+from world import World
+from strategy import Strategy
+from controllers.controller import Controller
 
 
-def callback(data):
-    rospy.loginfo("UHUUUL")
-    print("blablablabla")
-
+def update(data, world_state):
+    world_state.update(data)
+    print(world_state.robots)
+    print(world_state.ball)
 
 def start_system():
     """Start the system in the 'main function'."""
-    # world_state = World(world_standards.STANDARD3)
-    # strategy_system = Strategy()
-    # control_system = Controller()
+    world_state = World(world_standards.STANDARD3)
+    strategy_system = Strategy()
+    control_system = Controller()
 
     rospy.init_node('main_system')
-    rospy.Subscriber('/vision_output_topic', VisionMessage, callback)
+    rospy.Subscriber('vision_output_topic', VisionMessage, update, world_state)
 
-    # world_state.dummy_update()
-    # strategy_system.plan(world_state)
-    # targets = strategy_system.get_targets()
-    # control_system.actuate(targets)
+    strategy_system.plan(world_state)
+    targets = strategy_system.get_targets()
+    control_system.actuate(targets, world_state)
     rospy.spin()
 
 
