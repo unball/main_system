@@ -1,66 +1,93 @@
+#!/usr/bin/env python
 import control
 import numpy as np
-import matplotlib as plt
+
+import rospy
+
+from vision.msg import VisionMessage
+from communication.msg import robots_speeds_msg
 
 
-def update_state():
-    global dx
-    global dy
-    global dth
-    global du1
-    global du2
-    global state_vector
-
-    dx = x - x_r
-    dy = y - y_r
-    dth = th - th_r
-
-    state_vector = [[dx],
-                    [dy],
-                    [dth]]
+def update(data, state_vector):
+    state_vector[0] = data.x[0]/10 - x_r
+    state_vector[1] = data.y[0]/10 - y_r
+    state_vector[2] = data.th[0] - th_r
 
 
-x_r = 1
-y_r = 1
-th_r = np.pi
-u1_r = 1
-u2_r = 1
+def start_system():
+    r = 0.03
+    R = 0.075/2
+    global x_r
+    global y_r
+    global th_r
 
-x = 0
-y = 0
-th = 0
-u1 = 0
-u2 = 0
+    x_r = 0.0
+    y_r = 0.0
+    th_r = 0
 
-A = [[0, 0, -1*np.sin(th_r)*u1_r],
-     [0, 0, np.cos(th_r)*u1_r],
-     [0, 0, 0]]
+    u1_r = 1
+    u2_r = 1
 
-B = [[np.cos(th_r), 0],
-     [np.sin(th_r), 0],
-     [0, 1]]
+    state_vector = [[0],
+                    [0],
+                    [0]]
 
-C = [[1, 0, 0],
-     [0, 1, 0],
-     [0, 0, 1]]
+    A = [[0, 0, -1*np.sin(th_r)*u1_r],
+         [0, 0, np.cos(th_r)*u1_r],
+         [0, 0, 0]]
 
-D = [[0, 0, 0],
-     [0, 0, 0],
-     [0, 0, 0]]
+    B = [[np.cos(th_r), 0],
+         [np.sin(th_r), 0],
+         [0, 1]]
+
+    C = [[1, 0, 0],
+         [0, 1, 0],
+         [0, 0, 1]]
+
+    D = [[0, 0, 0],
+         [0, 0, 0],
+         [0, 0, 0]]
+
+    global clsd_loop_poles
+    clsd_loop_poles = [-1, -1, -5]
+
+    rospy.init_node('control_system')
+    rospy.Subscriber('vision_output_topic', VisionMessage, update, state_vector)
+    pub = rospy.Publisher('robots_speeds', robots_speeds_msg, queue_size=1)
+    rate = rospy.Rate(30)
+
+    while True:
+        A[0][2] = -1*np.sin(th_r)*u1_r
+
+        B[0][1] = np.cos(th_r)
+        B[1][1] = np.sin(th_r)
+
+        K = control.place(A, B, clsd_loop_poles)
+
+        # output = np.dot(C, state_vector)
+        du = np.dot(-K, state_vector)
+
+        u1 = du[0] + u1_r
+        u2 = du[1] + u2_r
 
 
-global clsd_loop_poles
-clsd_loop_poles = [-5, -5, -25]
+        print("du: ",[u1, u2])
+        print("K: ", K)
+        print("state_vector: ", state_vector)
+        print("----------------")
 
-for t in range(5):
-    update_state()
+        msg = robots_speeds_msg()
+        msg.linear_vel(0) = u1
+        msg.angular_vel(0) = u2
 
-    A[0][2] = -1*np.sin(th_r)*u1_r
+        # msg = comm_msg()
+        # msg.MotorB[0] = 1/r*u1 - (R/r)*u2
+        # msg.MotorA[0] = 1/r*u1 + (R/r)*u2
 
-    B[0][1] = np.cos(th_r)
-    B[1][1] = np.sin(th_r)
+        pub.publish(msg)
+        rate.sleep()
 
-    K = control.place(A, B, clsd_loop_poles)
 
-    du = -K * state_vector
-    output = C * state_vector
+if __name__ == '__main__':
+    print("---------- TESTING CONTROL ----------")
+    start_system()
