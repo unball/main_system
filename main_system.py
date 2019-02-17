@@ -16,6 +16,7 @@ def update(data, world_state):
     print(world_state.robots)
     print(world_state.ball)
 
+
 def start_system():
     """Start the system in the 'main function'."""
     world_state = World(world_standards.STANDARD3)
