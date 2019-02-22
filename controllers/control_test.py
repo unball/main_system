@@ -16,19 +16,25 @@ k_linear = 3
 k_angular = 4
 
 
-def correctAngError(inst_th):
-    true_error = inst_th - th_r
-    if np.linalg.norm(-inst_th - th_r) < np.linalg.norm(true_error):
-        true_error = -inst_th - th_r
+def correctErrors(inst_x, inst_y, inst_th):
+    x_error = inst_x - x_r
+    y_error = inst_y - y_r
+    th_error = inst_th - th_r
 
-    return true_error
+    if np.linalg.norm(th_error) > np.pi/2:
+        th_error = (th_error + np.pi/2) % (np.pi) - np.pi/2
+        x_error = (-1) * x_error
+        y_error = (-1) * y_error
+
+    state_vector = [x_error, y_error, th_error]
+    return state_vector
 
 
 def update(data, state_vector):
-    state_vector[0] = data.x[0] - x_r
-    state_vector[1] = data.y[0] - y_r
-    state_vector[2] = correctAngError(data.th[0])
-    # state_vector[2] = data.th[0] - th_r
+    aux = correctErrors(data.x[0], data.y[0], data.th[0])
+    state_vector[0] = aux[0]
+    state_vector[1] = aux[1]
+    state_vector[2] = aux[2]
 
 
 def start_system():
@@ -40,9 +46,9 @@ def start_system():
     global y_r
     global th_r
 
-    x_r = 0.3
-    y_r = 0.3
-    th_r = np.pi/4
+    x_r = 0
+    y_r = 0
+    th_r = 0
 
     u1_r = 1
     u2_r = 1
@@ -111,11 +117,16 @@ def start_system():
 
         # K = control.place(A, B, clsd_loop_poles)
 
-        # d_state_vector = ((A - np.dot(B, K)), state_vector)
+        # print(control.ctrb(A, B))
+        A_2 = list(A)
+        A_2 = A_2.remove(A[2])
+        B_2 = list(B)
+        B_2 = B_2.remove(B[2])
+        # print(control.ctrb(A_2, B_2))
+        # print("-----------")
 
         output = np.dot(C, state_vector)
         print(output)
-        # print(u1_r, u2_r)
         du = np.dot(-K, state_vector)
         # print(du)
 
