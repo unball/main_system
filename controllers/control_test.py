@@ -7,8 +7,7 @@ from cv2 import getTickCount
 from cv2 import getTickFrequency
 
 from vision.msg import VisionMessage
-from python_simulator.msg import comm_msg
-# from communication.msg import robots_speeds_msg
+from communication.msg import robots_speeds_msg
 
 linear_saturation = 5
 angular_saturation = 100
@@ -17,32 +16,40 @@ k_linear = 3
 k_angular = 4
 
 
+def correctAngError(inst_th):
+    true_error = inst_th - th_r
+    if np.linalg.norm(-inst_th - th_r) < np.linalg.norm(true_error):
+        true_error = -inst_th - th_r
+
+    return true_error
+
+
 def update(data, state_vector):
-    state_vector[0] = data.x[0]/100 - x_r
-    state_vector[1] = data.y[0]/100 - y_r
-    state_vector[2] = data.th[0] - th_r
-    # state_vector[2] = np.linalg.norm(data.th[0]) - np.linalg.norm(0)
+    state_vector[0] = data.x[0] - x_r
+    state_vector[1] = data.y[0] - y_r
+    state_vector[2] = correctAngError(data.th[0])
+    # state_vector[2] = data.th[0] - th_r
 
 
 def start_system():
     e1 = getTickCount()
     time = 0
     r = 0.03
-    R = 0.075/2
+    L = 0.075
     global x_r
     global y_r
     global th_r
 
-    x_r = 0.5
-    y_r = -0.5
-    th_r = 0
+    x_r = 0.3
+    y_r = 0.3
+    th_r = np.pi/4
 
     u1_r = 1
     u2_r = 1
 
-    state_vector = [[1],
-                    [1],
-                    [1]]
+    state_vector = [[0.1],
+                    [0.1],
+                    [0.1]]
 
     A = [[0, 0, -1*np.sin(th_r)*u1_r],
          [0, 0, np.cos(th_r)*u1_r],
@@ -60,12 +67,35 @@ def start_system():
          [0, 0, 0],
          [0, 0, 0]]
 
+    max_dx = 0.01
+    max_dy = 0.01
+    max_dth = 0.01
+
+    q0 = 1/(max_dx**2)
+    q1 = 1/(max_dy**2)
+    q2 = 1/(max_dth**2)
+
+    Q = [[q0, 0, 0],
+         [0, q1, 0],
+         [0, 0, q2]]
+
+    max_du1 = 1
+    max_du2 = 1
+
+    rho = 50
+
+    r0 = (1/(max_du1**2)) * rho
+    r1 = (1/(max_du2**2)) * rho
+
+    R = [[r0, 0],
+         [0, r1]]
+
     global clsd_loop_poles
     clsd_loop_poles = [-2, -2, -5]
 
     rospy.init_node('control_system')
     rospy.Subscriber('vision_output_topic', VisionMessage, update, state_vector)
-    pub = rospy.Publisher('robots_speeds', comm_msg, queue_size=1)
+    pub = rospy.Publisher('robots_speeds', robots_speeds_msg, queue_size=1)
     rate = rospy.Rate(30)
 
     while True:
@@ -77,20 +107,20 @@ def start_system():
         B[0][0] = np.cos(th_r)
         B[1][0] = np.sin(th_r)
 
-        K = control.place(A, B, clsd_loop_poles)
+        K, S, E = control.lqr(A, B, Q, R)
 
-        d_state_vector = ((A - np.dot(B, K)), state_vector)
+        # K = control.place(A, B, clsd_loop_poles)
+
+        # d_state_vector = ((A - np.dot(B, K)), state_vector)
 
         output = np.dot(C, state_vector)
         print(output)
         # print(u1_r, u2_r)
         du = np.dot(-K, state_vector)
+        # print(du)
 
         u1 = du[0]
         u2 = du[1]
-
-        u1 = u1 + u1_r
-        u2 = u2 + u2_r
 
         '''
         if u1 > linear_saturation:
@@ -104,28 +134,20 @@ def start_system():
             u1 = -1 * angular_saturation
         '''
 
-        # print("du: ", [u1, u2])
-        # print("K: ", K)
-        # print("state_vector: ", state_vector)
-        # print("----------------")
+        msg = robots_speeds_msg()
+        msg.linear_vel[0] = u1
+        msg.angular_vel[0] = u2
 
-        # msg = robots_speeds_msg()
-        # msg.linear_vel(0) = u1
-        # msg.angular_vel(0) = u2
-
-        msg = comm_msg()
-        msg.MotorB[0] = 1/r*u1 - (R/r)*u2
-        msg.MotorA[0] = 1/r*u1 + (R/r)*u2
+        e3 = getTickCount()
+        place_time = (e3 - e2)/getTickFrequency()
+        # print(place_time)
 
         pub.publish(msg)
         rate.sleep()
 
-        # x_r = 0.5*np.sin(time/10)
-        # y_r = 0.5*np.sin(time/20)
-        # th_r = np.arctan2(y_r, x_r)
-
-        u1_r = k_linear * np.sqrt(np.power(state_vector[0], 2) + np.power(state_vector[1], 2))
-        u2_r = k_angular * state_vector[2]
+        # x_r = x_r + 0.01
+        # y_r = np.sin(x_r) * 0.3
+        # th_r = np.arctan2(-output[1], -output[0])
 
         time = (e2 - e1)/getTickFrequency()
         # print(time)
