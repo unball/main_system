@@ -16,10 +16,21 @@ k_linear = 3
 k_angular = 4
 
 
-def correctErrors(inst_x, inst_y, inst_th):
-    x_error = inst_x - x_r
-    y_error = inst_y - y_r
-    th_error = inst_th - th_r
+def CorrectLinVel(lin_vel, theta):
+    vel_x = np.cos(theta)*lin_vel
+    vel_y = np.sin(theta)*lin_vel
+
+    true_vel = (np.cos(theta) * vel_x) + (np.cos(np.pi/2 - theta) * vel_y)
+    lateral_vel = (np.cos(np.pi/2 - theta)*vel_x) + (np.cos(theta) * vel_y)
+    print(lateral_vel)
+    # print("Lin_vel: {}\nTrue_vel: {}".format(lin_vel, true_vel))
+    return true_vel
+
+
+def correctErrors(sensor_x, sensor_y, _sensor_th):
+    x_error = sensor_x - x_r
+    y_error = sensor_y - y_r
+    th_error = _sensor_th - th_r
 
     if np.linalg.norm(th_error) > np.pi/2:
         th_error = (th_error + np.pi/2) % (np.pi) - np.pi/2
@@ -31,14 +42,24 @@ def correctErrors(inst_x, inst_y, inst_th):
 
 
 def update(data, state_vector):
+    inst_x = data.x[0]
+    inst_y = data.y[0]
+    inst_th = data.th[0]
+
     aux = correctErrors(data.x[0], data.y[0], data.th[0])
+
     state_vector[0] = aux[0]
     state_vector[1] = aux[1]
     state_vector[2] = aux[2]
+    # state_vector[3][0] = float(state_vector[3][0] - state_vector[0]*loop_time)
+    # state_vector[4][0] = float(state_vector[4][0] - state_vector[1]*loop_time)
+    # state_vector[5][0] = float(state_vector[5][0] - state_vector[2]*loop_time)
 
 
 def start_system():
     e1 = getTickCount()
+    global loop_time
+    loop_time = 0
     time = 0
     r = 0.03
     L = 0.075
@@ -46,9 +67,21 @@ def start_system():
     global y_r
     global th_r
 
+    global inst_x
+    global inst_y
+    global inst_th
+
+    global xi
+    global yi
+    global thi
+
     x_r = 0
     y_r = 0
     th_r = 0
+
+    inst_x = 0
+    inst_y = 0
+    inst_th = 0
 
     u1_r = 1
     u2_r = 1
@@ -61,13 +94,31 @@ def start_system():
          [0, 0, np.cos(th_r)*u1_r],
          [0, 0, 0]]
 
+    Ai = [[0, 0, -1*np.sin(th_r)*u1_r, 0, 0, 0],
+          [0, 0, np.cos(th_r)*u1_r, 0, 0, 0],
+          [0, 0, 0, 0, 0, 0],
+          [-1, 0, 0, 0, 0, 0],
+          [0, -1, 0, 0, 0, 0],
+          [0, 0, -1, 0, 0, 0]]
+
     B = [[np.cos(th_r), 0],
          [np.sin(th_r), 0],
          [0, 1]]
 
+    Bi = [[np.cos(th_r), 0],
+          [np.sin(th_r), 0],
+          [0, 1],
+          [0, 0],
+          [0, 0],
+          [0, 0]]
+
     C = [[1, 0, 0],
          [0, 1, 0],
          [0, 0, 1]]
+
+    Ci = [[1, 0, 0, 0, 0, 0],
+          [0, 1, 0, 0, 0, 0],
+          [0, 0, 1, 0, 0, 0]]
 
     D = [[0, 0, 0],
          [0, 0, 0],
@@ -77,13 +128,29 @@ def start_system():
     max_dy = 0.01
     max_dth = 0.01
 
+    max_xi = 1
+    max_yi = 1
+    max_thi = 1
+
     q0 = 1/(max_dx**2)
     q1 = 1/(max_dy**2)
     q2 = 1/(max_dth**2)
 
+    # Estados integrativos
+    q3 = 1/(max_xi**2)
+    q4 = 1/(max_yi**2)
+    q5 = 1/(max_thi**2)
+
     Q = [[q0, 0, 0],
          [0, q1, 0],
          [0, 0, q2]]
+
+    Qi = [[q0, 0, 0, 0, 0, 0],
+          [0, q1, 0, 0, 0, 0],
+          [0, 0, q2, 0, 0, 0],
+          [0, 0, 0, q3, 0, 0],
+          [0, 0, 0, 0, q4, 0],
+          [0, 0, 0, 0, 0, q5]]
 
     max_du1 = 1
     max_du2 = 1
@@ -113,25 +180,23 @@ def start_system():
         B[0][0] = np.cos(th_r)
         B[1][0] = np.sin(th_r)
 
-        K, S, E = control.lqr(A, B, Q, R)
+        Ai[0][2] = -1*np.sin(th_r)*u1_r
+        Ai[1][2] = np.cos(th_r)*u1_r
 
+        Bi[0][0] = np.cos(th_r)
+        Bi[1][0] = np.sin(th_r)
+
+        K, S, E = control.lqr(A, B, Q, R)
+        # Ki, Si, Ei = control.lqr(Ai, Bi, Qi, R)
         # K = control.place(A, B, clsd_loop_poles)
 
-        # print(control.ctrb(A, B))
-        A_2 = list(A)
-        A_2 = A_2.remove(A[2])
-        B_2 = list(B)
-        B_2 = B_2.remove(B[2])
-        # print(control.ctrb(A_2, B_2))
-        # print("-----------")
-
-        output = np.dot(C, state_vector)
-        print(output)
         du = np.dot(-K, state_vector)
-        # print(du)
+        print(state_vector)
 
         u1 = du[0]
         u2 = du[1]
+
+        # u1 = CorrectLinVel(du[0], inst_th)
 
         '''
         if u1 > linear_saturation:
@@ -150,8 +215,8 @@ def start_system():
         msg.angular_vel[0] = u2
 
         e3 = getTickCount()
-        place_time = (e3 - e2)/getTickFrequency()
-        # print(place_time)
+        loop_time = (e3 - e2)/getTickFrequency()
+        # print(loop_time)
 
         pub.publish(msg)
         rate.sleep()
