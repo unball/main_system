@@ -51,9 +51,11 @@ class World(object):
             print("Tried to update internal 'ball' but obj does not exist")
             return None
 
-    def calc_velocities(self):
+    def calc_velocities(self, time_to_derivate):
         """Docstring for the method."""
-        pass
+        for i in range(len(self.robots)):
+            self.robots[i].calc_velocities(time_to_derivate)
+        self.ball.calc_velocities(time_to_derivate)
 
     @property
     def info(self):
