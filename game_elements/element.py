@@ -9,6 +9,11 @@ class Element(object):
         self.inst_x = 0
         self.inst_y = 0
         self.inst_th = 0
+
+        self.prev_x = 0
+        self.prev_y = 0
+        self.prev_th = 0
+
         self.inst_vx = 0
         self.inst_vy = 0
         self.inst_w = 0
@@ -32,7 +37,6 @@ class Element(object):
         self.inst_x = x
         self.inst_y = y
         self.inst_th = th
-        self.calc_velocities()
         return self
 
     @property
@@ -73,9 +77,11 @@ class Element(object):
     def w(self, w):
         self.inst_w = w
 
-    def calc_velocities(self):
+    def calc_velocities(self, time_to_derivate):
         """Calcalate the velocities with instant and previous positions."""
-        pass
+        self.inst_vx = (self.inst_x - self.prev_x)/time_to_derivate
+        self.inst_vy = (self.inst_y - self.prev_y)/time_to_derivate
+        self.inst_w = (self.inst_th - self.prev_th)/time_to_derivate
 
     @property
     def x(self):
