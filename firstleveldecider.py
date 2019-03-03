@@ -8,7 +8,7 @@ def error():
     print("\nFIRST LEVEL FUZZY ERROR:")
 
 
-class FirstLvlDecider(object):
+class FirstLvlDecider(object):  
     """Class docstring."""
 
     def __init__(self):

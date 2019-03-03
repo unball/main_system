@@ -5,7 +5,6 @@ from movements.movement import Movement
 FIXED_X = 0.63
 AREA_LENGHT = 0.5
 
-
 class Goalkeep(Movement):
     """Docstring."""
 

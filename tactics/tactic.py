@@ -16,12 +16,11 @@ class Tactic(object):
     def __init__(self):
         """Init method."""
         self.decider = AttackDecider()
-        self.formation = None
+        self._formation = None
 
     def find_formation(self, world=None):
         """Shall return a list of players."""
         self.world = world
-        self.indentify_formation()
         formation = self.formation
         return formation
 
@@ -29,14 +28,19 @@ class Tactic(object):
         """Update each player with the world info necessary for it's scope."""
         obstacles = list(self.world.robots)
         # obstacles is a list of the position of all robots
-        for index in range(len(self.formation)):
+        for index in range(len(self._formation)):
             # _obstacles = obstacles
             # it's own position is removed from the list of obstacles
-            self.formation[index].set_own_state(self.world.robots[index].pos,
+            self._formation[index].set_own_state(self.world.robots[index].pos,
                                                  self.world.robots[index].th,
                                                  self.world.robots[index].vel,
                                                  self.world.robots[index].w)
-            self.formation[index].obstacles = obstacles
-            self.formation[index].ball = self.world.ball
+            self._formation[index].obstacles = obstacles
+            self._formation[index].ball = self.world.ball
             # _obstacles = obstacles
 
+    @property
+    def formation(self):
+        """Return identified formation."""
+        self.indentify_formation()
+        return self._formation
