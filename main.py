@@ -43,11 +43,11 @@ def start_system():
     rate = rospy.Rate(30)
 
     while not rospy.is_shutdown():
-        # strategy_system.plan(world_state)
-        # targets = strategy_system.get_targets()
+        strategy_system.plan(world_state)
+        targets = strategy_system.get_targets()
 
         # # Targets bypass for controller tests
-        targets = [[-0.65, -0.2, np.pi/2], [0.5, 0.5, np.pi/4], [0, 0, 0]]
+        #targets = [[-0.65, -0.2, np.pi/2], [0.5, 0.5, np.pi/4], [0, 0, 0]]
 
         output_msg = control_system.actuate(targets, world_state)
         pub.publish(output_msg)
