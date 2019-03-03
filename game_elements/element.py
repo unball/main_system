@@ -1,5 +1,6 @@
 """Element module."""
 
+alpha = 0.1
 
 class Element(object):
     """Parent class of an element of game such as robot or ball."""
@@ -79,9 +80,9 @@ class Element(object):
 
     def calc_velocities(self, time_to_derivate):
         """Calcalate the velocities with instant and previous positions."""
-        self.inst_vx = (self.inst_x - self.prev_x)/time_to_derivate
-        self.inst_vy = (self.inst_y - self.prev_y)/time_to_derivate
-        self.inst_w = (self.inst_th - self.prev_th)/time_to_derivate
+        self.inst_vx = ((self.inst_x - self.prev_x)/time_to_derivate)*alpha + (self.inst_vx)*(1-alpha)
+        self.inst_vy = ((self.inst_y - self.prev_y)/time_to_derivate)*alpha + (self.inst_vy)*(1-alpha)
+        self.inst_w = ((self.inst_th - self.prev_th)/time_to_derivate)*alpha + (self.inst_w)*(1-alpha)
 
     @property
     def x(self):
