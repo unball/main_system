@@ -361,8 +361,46 @@ class AttackDecider(SecondLvlDecider):
            return np.array([xGoal, (((xGoal-self.ballPos[0])/self.ballVel[0])*self.ballVel[1])+self.ballPos[1]])
         #Se não acompanha o y
         return np.array([xGoal, self.ballPos[1]])
+
+    def avoidance(self):
+        perRobot = np.array(self.per_robot)
+        argMax, argMid, argMin = self.robotArgs(perRobot)
+
+        robotTarget = self.targets[argMax] - self.pos[argMax]
+        robotTargetNorm = robotTarget / np.linalg.norm(robotTarget)
+        RobotMaxMin = self.pos[argMin] - self.pos[argMax]
+        RobotMaxMinNorm = np.linalg.norm(RobotMaxMin)
+        # se max está indo a caminho do min  desvia
+        if np.dot(robotTargetNorm, RobotMaxMin/RobotMaxMinNorm) > .9877:
+            self.targets[argMax] =  self.pos[argMin] + .01*np.array(-RobotMaxMin[1], RobotMaxMin[0])/RobotMaxMinNorm**2
+        robotTarget = self.targets[argMid] - self.pos[argMid]
+        robotTargetNorm = robotTarget / np.linalg.norm(robotTarget)
+        RobotMidMax = self.pos[argMax] - self.pos[argMid]
+        RobotMidMaxNorm = np.linalg.norm(RobotMidMax)
+        # se mid está indo a caminho do max-> desvia
+        if np.dot(robotTargetNorm, RobotMidMax/RobotMidMaxNorm) > .9877: 
+            self.targets[argMid] =  self.pos[argMax] + .01*np.array(-RobotMidMax[1], RobotMidMax[0])/RobotMidMaxNorm**2
+            robotTarget = self.targets[argMid] - self.pos[argMid]
+            robotTargetNorm = robotTarget / np.linalg.norm(robotTarget)
+        RobotMidMin = self.pos[argMin] - self.pos[argMid]
+        RobotMidMinNorm = np.linalg.norm(RobotMidMin)
+        # se mid está indo a caminho do min-> desvia
+        if np.dot(robotTargetNorm, RobotMidMin/RobotMidMinNorm) > .9877:
+            self.targets[argMid] =  self.pos[argMin] + .01*np.array(-RobotMidMin[1], RobotMidMin[0])/RobotMidMinNorm**2    
+       
+        """
+        xv = -(+/-)*.01*Yt/(xt^2+yt^2)
+        yv = (+/-)*.01*xt/(xt^2+yt^2)
+        target = desviado + v
+        """
+
+        def bounds(self):
+            larger = self.targets[:,0] > .75
+            self.targets[larger] = .73 
+
+
 """
-DEFINE ROBOTS 
+DEFINE ROBOTS  
 ori = dot(norm(v_robot) , norm((pos_ball - pos_robot)))
 dist = abs(CG - pos_robot) 
 
