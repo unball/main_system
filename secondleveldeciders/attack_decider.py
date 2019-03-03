@@ -32,7 +32,7 @@ class AttackDecider(SecondLvlDecider):
         self.ballPos = np.array([.0, .0])
         self.ballVel = np.array([.0, .0])
         self.targets = np.matrix([[.0,0],[0,0],[0,0]])
-        self.per_robot = []
+        self.per_robot = [.0, .0, .0]
         self.formationS = "GDS"
         self.formation = [Goalkeeper(), Defender(), Striker()]
         self.game_score = .0
@@ -112,11 +112,11 @@ class AttackDecider(SecondLvlDecider):
         dist_CG = np.sqrt(np.power(dist_CG,2).sum(1))
         # print(dist_CG[0,0])
         """per_robot pertinencia ao ataque de cada robo (-1,+1)"""
-        self.per_robot = []
+       
         for i in range(0,3):
             fuzzy_dist = fuzzy(dist_CG[i,0],tops_dist[:-1],tops_dist, tops_dist[1:])
             fuzzy_ori = fuzzy(ori[i,0],tops_ori[:-1],tops_ori, tops_ori[1:])
-            self.per_robot.append(defuzzy(fuzzy_ori,FAM,fuzzy_dist))
+            self.per_robot[i] = .5*(defuzzy(fuzzy_ori,FAM,fuzzy_dist)) + .5*self.per_robot[i]
         """rearranjando formação..."""
         new_formation = [Defender(),Defender(),Defender()]
         seek = [Striker(), Defender(), Goalkeeper()]
