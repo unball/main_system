@@ -31,7 +31,7 @@ class World(object):
         print("World initiated successfully.")
         print("Number of robots: {}".format(self._number_of_robots))
         self.fieldSide = LEFT
-        self.gameScore = 9
+        self.gameScore = 0
 
     def update(self, vision_message):
         """Follow the 'update' methods from the element's classes."""
