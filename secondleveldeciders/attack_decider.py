@@ -50,8 +50,7 @@ class AttackDecider(SecondLvlDecider):
     def setFormation(self, world):
         self.idFormation(world.gameScore)
         self.rearrange_formation(world)
-        # print(self.formationS)
-        # print(self.per_robot)
+        print(self.per_robot.index(min(self.per_robot)))
 
     #identifica a melhor formação
     def idFormation(self, gameScore):
@@ -105,10 +104,6 @@ class AttackDecider(SecondLvlDecider):
         """velocidade robos normalizada"""
         self.vel = self.vel/abs_vel
         self.vel[np.isnan(self.vel)] = 0
-                
-
-
-        print(self.vel)
 
         """orientacao pra fuzzy ori"""
         ori = np.multiply(self.vel,dist_BR).sum(1)
@@ -304,7 +299,8 @@ class AttackDecider(SecondLvlDecider):
         elif attack and ((self.formationS == "GDS") or (self.formationS == "GDD")):
             self.targets[argMid] = self.midFielder(argMax)
         else:
-            self.targets[argMid] = self.blockBallRadius()
+            self.targets[argMid] = np.array([-0.5, self.ballPos[1]])
+            # self.targets[argMid] = self.blockBallRadius()
 
         #goleiro e ultimo defensor
         if self.formationS == "GSS" or \
@@ -313,7 +309,8 @@ class AttackDecider(SecondLvlDecider):
            self.ballPos[0]*self.fieldSide > .20:
             self.targets[argMin] = self.goalkeep()
         else:
-            self.targets[argMin] = self.blockBallRadius()
+            self.targets[argMid] = np.array([-0.5, self.ballPos[1]])
+            # self.targets[argMin] = self.blockBallRadius()
         
         angles = np.arctan2((self.targets - self.pos)[:,1], (self.targets - self.pos)[:,0]).tolist()
         targets = self.targets.tolist()
