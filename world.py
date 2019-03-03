@@ -1,7 +1,7 @@
 """World Module."""
 
-from elements.ball import Ball
-from elements.robot import Robot
+from game_elements.ball import Ball
+from game_elements.robot import Robot
 
 MAGIC_NUMBER = 3
 dummy_robot = [{"pos": {"x": -.5, "y": 0}, "th": 0,

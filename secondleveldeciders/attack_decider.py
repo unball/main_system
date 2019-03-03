@@ -312,7 +312,7 @@ class AttackDecider(SecondLvlDecider):
         angles = np.arctan2((self.targets - self.pos)[:,1], (self.targets - self.pos)[:,0]).tolist()
         targets = self.targets.tolist()
         for i in range(len(targets)):
-            targets[i].append(np.arctan2(angles[i][0]))
+            targets[i].append(angles[i][0])
         return targets
         
     #calcula o target robô levar a bola ao gol
