@@ -50,8 +50,8 @@ class AttackDecider(SecondLvlDecider):
     def setFormation(self, world):
         self.idFormation(world.gameScore)
         self.rearrange_formation(world)
-        print(self.formationS)
-        print(self.per_robot)
+        # print(self.formationS)
+        # print(self.per_robot)
 
     #identifica a melhor formação
     def idFormation(self, gameScore):
@@ -104,13 +104,18 @@ class AttackDecider(SecondLvlDecider):
         abs_vel = np.sqrt(np.power(self.vel,2).sum(1))
         """velocidade robos normalizada"""
         self.vel = self.vel/abs_vel
+        self.vel[np.isnan(self.vel)] = 0
+                
+
+
+        print(self.vel)
+
         """orientacao pra fuzzy ori"""
         ori = np.multiply(self.vel,dist_BR).sum(1)
-
         """Distancia pro centro do nosso gol-robo (harcoded) - MUDAR"""
         dist_CG = np.array([.75,.0]) - self.pos
         dist_CG = np.sqrt(np.power(dist_CG,2).sum(1))
-        print(dist_CG[0,0])
+        # print(dist_CG[0,0])
         """per_robot pertinencia ao ataque de cada robo (-1,+1)"""
         self.per_robot = []
         for i in range(0,3):
@@ -188,6 +193,7 @@ class AttackDecider(SecondLvlDecider):
         mirrorCenter = np.array([.375, .0]) #centro da simetria radial
         radiusMin = .1                      #raio minimo para simetria
         rectangle = np.array([[.1,.4], [.55, -.4]])
+        targetMid = np.array([0, 0])
         if self.fieldSide == RIGHT:   #se o lado de defesa for o direito troca os valores
             mirrorCenter = np.array([-.375, .0])
             rectangle = np.array([[-.55, .4], [-.1, -.4]])
@@ -229,7 +235,7 @@ class AttackDecider(SecondLvlDecider):
             if x[0].imag == 0:
                 #x conhecido
                 xConh = x[x.argmax()]
-                if self.world.fieldSide == RIGHT:
+                if self.fieldSide == RIGHT:
                     xConh = x[x.argmin()]
                 
                 #constante
@@ -359,7 +365,7 @@ class AttackDecider(SecondLvlDecider):
         xGoal = self.fieldSide * .72
         #testar velocidade minima (=.15?)
         if ((self.ballVel[0]*self.fieldSide) > .15) and \
-           ((self.ballPos*self.fieldSide)> .15):
+           ((self.ballPos[0]*self.fieldSide)> .15):
            #verificar se a projeção está no gol
            #projetando vetor até um xGoal-> y = (xGoal-Xball) * Vyball/Vxball + yBall 
            return np.array([xGoal, (((xGoal-self.ballPos[0])/self.ballVel[0])*self.ballVel[1])+self.ballPos[1]])
