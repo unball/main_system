@@ -59,6 +59,14 @@ class Element(object):
         self.inst_y = y
 
     @property
+    def x(self):
+        return self.inst_x
+
+    @property
+    def y(self):
+        return self.inst_y
+
+    @property
     def th(self):
         """Getter property of self.inst_th."""
         return self.inst_th
