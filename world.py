@@ -2,6 +2,7 @@
 
 from game_elements.ball import Ball
 from game_elements.robot import Robot
+import field
 
 MAGIC_NUMBER = 3
 dummy_robot = [{"pos": {"x": -.5, "y": 0}, "th": 0,
@@ -12,14 +13,14 @@ dummy_robot = [{"pos": {"x": -.5, "y": 0}, "th": 0,
                "vel": {"vx": -.2, "vy": 0}, "w": 0}]
 dummy_ball = {"pos": {"x": .1, "y": 0}, "vel": {"vx": 0, "vy": 0}}
 
-LEFT = -1
-RIGHT = 1
-
 class World(object):
     """Docstring for the class."""
 
     def __init__(self, setting=0):
         """Init method."""
+        self.fieldSide = field.LEFT
+        self.gameScore = 0
+        self._isPaused = False
         if setting != 0:
             self._number_of_robots = setting['number_of_robots']
         else:
@@ -30,8 +31,6 @@ class World(object):
         self._ball = Ball()
         print("World initiated successfully.")
         print("Number of robots: {}".format(self._number_of_robots))
-        self.fieldSide = LEFT
-        self.gameScore = 0
 
     def update(self, vision_message):
         """Follow the 'update' methods from the element's classes."""
@@ -52,7 +51,6 @@ class World(object):
                                              dummy_robot[i]['th'],
                                              dummy_robot[i]['vel']['vx'],
                                              dummy_robot[i]['vel']['vy'])
-                                
 
         except AttributeError:
             print("Tried to update internal 'robots' but list does not exist")
@@ -68,6 +66,16 @@ class World(object):
         for i in range(len(self.robots)):
             self.robots[i].calc_velocities(time_to_derivate)
         self.ball.calc_velocities(time_to_derivate)
+
+    def change_field_side(self, new_side):
+        print(new_side)
+        self.fieldSide = new_side  
+
+    def pause(self):
+        self._isPaused = True
+
+    def play(self):
+        self._isPaused = False
 
     @property
     def info(self):
@@ -96,6 +104,10 @@ class World(object):
     def number_of_robots(self):
         """number_of_robots property to improve access outside this scope."""
         return self._number_of_robots
+
+    @property
+    def isPaused(self):
+        return self._isPaused
 
 
 if __name__ == '__main__':
