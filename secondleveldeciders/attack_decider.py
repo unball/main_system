@@ -332,7 +332,7 @@ class AttackDecider(SecondLvlDecider):
             #self.targets[argMid] = np.array([-0.5, self.ballPos[1]])
             self.targets[argMin] = self.blockBallElipse()
         
-        #self.avoidance()
+        self.avoidance()
         self.filtring(argMax,argMid,argMin)
         self.targets = alpha*self.targets + (1-alpha)*targetsPrevius
 
@@ -382,7 +382,7 @@ class AttackDecider(SecondLvlDecider):
         cos_fi = 1
         if normrobotBall*normballTarget!=0:
             cos_fi = dot/(normrobotBall*normballTarget)
-        return self.finalTarget + (1-.3*(1+robotBall)*cos_fi)*(self.ballPos - self.finalTarget)
+        return self.finalTarget + (1-.3*(1+np.linalg.norm(robotBall))*cos_fi)*(self.ballPos - self.finalTarget)
 
     def shoot3(self, shooter):
         robotBall = np.array(self.ballPos - self.pos[shooter])[0]  
@@ -390,7 +390,7 @@ class AttackDecider(SecondLvlDecider):
         m2 = robotBall[1]/robotBall[0]
         m =  ballTarget[1]/ ballTarget[0]
         fi = np.arctan2((m2-m),(1+m*m2))
-        if abs(fi)>3.1415/3:
+        if abs(fi)>3.1415/3: 
             x = self.ballPos[0] + .25*self.fieldSide
             return np.array([x, m*(x-self.ballPos[0]) + self.ballPos[1]])
         return self.ballPos
@@ -434,7 +434,7 @@ class AttackDecider(SecondLvlDecider):
         robotTargetNorm = robotTarget / np.linalg.norm(robotTarget)
         RobotMaxBall = self.ballPos - self.pos[argMax]
         RobotMaxBallNorm = np.linalg.norm(RobotMaxBall)
-        # se max está indo a caminho do min  desvia
+        # se max está indo a caminho da bola
         if  self.vel[argMax,0]*self.fieldSide > 0:
             self.targets[argMax] =  self.ballPos + np.dot(robotTargetNorm, (RobotMaxBall/RobotMaxBallNorm).transpose()) *(.01*np.array(-RobotMaxBall[0,1], RobotMaxBall[0,0])/RobotMaxBallNorm**2)
         robotTarget = self.targets[argMax] - self.pos[argMax]
@@ -442,22 +442,28 @@ class AttackDecider(SecondLvlDecider):
         RobotMaxMin = self.pos[argMin] - self.pos[argMax]
         RobotMaxMinNorm = np.linalg.norm(RobotMaxMin)
         # se max está indo a caminho do min  desvia
-        if np.dot(robotTargetNorm, (RobotMaxMin/RobotMaxMinNorm).transpose()) > .7:
-            self.targets[argMax] =  self.pos[argMin] + .01*np.array(-RobotMaxMin[0,1], RobotMaxMin[0,0])/RobotMaxMinNorm**2
+        if RobotMaxMinNorm!=0:
+            self.targets[argMax] = -.01*(RobotMaxMin/ (RobotMaxMinNorm)**3) + self.targets[argMax]
+        #if np.dot(robotTargetNorm, (RobotMaxMin/RobotMaxMinNorm).transpose()) > .7:
+        #    self.targets[argMax] =  self.pos[argMin] + .01*np.array(-RobotMaxMin[0,1], RobotMaxMin[0,0])/RobotMaxMinNorm**2
         robotTarget = self.targets[argMid] - self.pos[argMid]
         robotTargetNorm = robotTarget / np.linalg.norm(robotTarget)
         RobotMidMax = self.pos[argMax] - self.pos[argMid]
         RobotMidMaxNorm = np.linalg.norm(RobotMidMax)
         # se mid está indo a caminho do max-> desvia
-        if np.dot(robotTargetNorm, (RobotMidMax/RobotMidMaxNorm).transpose()) > .7: 
-            self.targets[argMid] =  self.pos[argMax] + .01*np.array(-RobotMidMax[0,1], RobotMidMax[0,1])/RobotMidMaxNorm**2
-            robotTarget = self.targets[argMid] - self.pos[argMid]
-            robotTargetNorm = robotTarget / np.linalg.norm(robotTarget)
+        if RobotMidMaxNorm!=0:
+            self.targets[argMid] = -.01*(RobotMidMax/ (RobotMidMaxNorm)**3) + self.targets[argMid]
+        #if np.dot(robotTargetNorm, (RobotMidMax/RobotMidMaxNorm).transpose()) > .7: 
+        #    self.targets[argMid] =  self.pos[argMax] + .01*np.array(-RobotMidMax[0,1], RobotMidMax[0,1])/RobotMidMaxNorm**2
+        robotTarget = self.targets[argMid] - self.pos[argMid]
+        robotTargetNorm = robotTarget / np.linalg.norm(robotTarget)
         RobotMidMin = self.pos[argMin] - self.pos[argMid]
         RobotMidMinNorm = np.linalg.norm(RobotMidMin)
         # se mid está indo a caminho do min-> desvia
-        if np.dot(robotTargetNorm, (RobotMidMin/RobotMidMinNorm).transpose()) > .7:
-            self.targets[argMid] =  self.pos[argMin] + .01*np.array(-RobotMidMin[0,1], RobotMidMin[0,0])/RobotMidMinNorm**2    
+        if RobotMidMaxNorm!=0:
+            self.targets[argMid] = -.01*(RobotMidMin/ (RobotMidMinNorm)**3) + self.targets[argMid]
+        #if np.dot(robotTargetNorm, (RobotMidMin/RobotMidMinNorm).transpose()) > .7:
+        #    self.targets[argMid] =  self.pos[argMin] + .01*np.array(-RobotMidMin[0,1], RobotMidMin[0,0])/RobotMidMinNorm**2    
        
         """
         xv = -(+/-)*.01*Yt/(xt^2+yt^2)
