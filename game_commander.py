@@ -11,7 +11,7 @@ def start_commanding():
     rate = rospy.Rate(30)
 
     while not rospy.is_shutdown():
-        print("Type one of the following commands: <side:SIDE>|<game:COMMAND>")
+        print("Type one of the following commands: side:<LEFT or RIGHT>|game:<PLAY or PAUSE>|score:<+ or ->")
         command.data = input(">>> ")
         output_msg = command.data
         pub.publish(output_msg)
