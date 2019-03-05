@@ -123,7 +123,7 @@ class AttackDecider(SecondLvlDecider):
         dist_CG = np.sqrt(np.power(dist_CG,2).sum(1))
         #print(dist_CG)
         """per_robot pertinencia ao ataque de cada robo (-1,+1)"""
-        alpha = .05 
+        alpha = .15 
         perPrevius = np.array(self.per_robot.copy())
         perPrevius[np.isnan(perPrevius)] = .0
         
@@ -333,6 +333,7 @@ class AttackDecider(SecondLvlDecider):
             self.targets[argMin] = self.blockBallElipse()
         
         #self.avoidance()
+        self.filtring(argMax,argMid,argMin)
         self.targets = alpha*self.targets + (1-alpha)*targetsPrevius
 
         #plt.scatter(self.targets[argMax][0,0],self.targets[argMax][0,1])
@@ -378,10 +379,21 @@ class AttackDecider(SecondLvlDecider):
         dot = np.dot(robotBall, ballTarget)
         normrobotBall = np.linalg.norm(robotBall)
         normballTarget = np.linalg.norm(ballTarget) 
-        cos_fi = .7
+        cos_fi = 1
         if normrobotBall*normballTarget!=0:
             cos_fi = dot/(normrobotBall*normballTarget)
         return self.finalTarget + (1-.3*(1+robotBall)*cos_fi)*(self.ballPos - self.finalTarget)
+
+    def shoot3(self, shooter):
+        robotBall = np.array(self.ballPos - self.pos[shooter])[0]  
+        ballTarget = self.finalTarget - np.array(self.ballPos)[0]
+        m2 = robotBall[1]/robotBall[0]
+        m =  ballTarget[1]/ ballTarget[0]
+        fi = np.arctan2((m2-m),(1+m*m2))
+        if abs(fi)>3.1415/3:
+            x = self.ballPos[0] + .25*self.fieldSide
+            return np.array([x, m*(x-self.ballPos[0]) + self.ballPos[1]])
+        return self.ballPos
             
     #define o target final (no gol adiversario)
     def defineTarget(self, fieldSide):
@@ -403,15 +415,16 @@ class AttackDecider(SecondLvlDecider):
         self.ballVel = np.array(ball.vel)
 
     def goalkeep(self):
-        xGoal = self.fieldSide * .72
+        xGoal = self.fieldSide * .70
         #testar velocidade minima (=.15?)
         if ((self.ballVel[0]*self.fieldSide) > .15) and \
            ((self.ballPos[0]*self.fieldSide)> .0):
            #verificar se a projeção está no gol
-           #projetando vetor até um xGoal-> y = (xGoal-Xball) * Vyball/Vxball + yBall 
-           return np.array([xGoal, (((xGoal-self.ballPos[0])/self.ballVel[0])*self.ballVel[1])+self.ballPos[1]])
+           #projetando vetor até um xGoal-> y = (xGoal-Xball) * Vyball/Vxball + yBall
+           y =  (((xGoal-self.ballPos[0])/self.ballVel[0])*self.ballVel[1])+self.ballPos[1]
+           return np.array([xGoal, max(min(.35, y),-.35)])
         #Se não acompanha o y
-        return np.array([xGoal, self.ballPos[1]])
+        return np.array([xGoal, max(min(self.ballPos[1],.35),-.35)])
 
     def avoidance(self):
         perRobot = np.array(self.per_robot.copy())
@@ -424,8 +437,6 @@ class AttackDecider(SecondLvlDecider):
         # se max está indo a caminho do min  desvia
         if  self.vel[argMax,0]*self.fieldSide > 0:
             self.targets[argMax] =  self.ballPos + np.dot(robotTargetNorm, (RobotMaxBall/RobotMaxBallNorm).transpose()) *(.01*np.array(-RobotMaxBall[0,1], RobotMaxBall[0,0])/RobotMaxBallNorm**2)
-
-
         robotTarget = self.targets[argMax] - self.pos[argMax]
         robotTargetNorm = robotTarget / np.linalg.norm(robotTarget)
         RobotMaxMin = self.pos[argMin] - self.pos[argMax]
@@ -454,10 +465,14 @@ class AttackDecider(SecondLvlDecider):
         target = desviado + v
         """
 
-        def bounds(self):
-            larger = self.targets[:,0] > .75
-            self.targets[larger] = .73 
-
+    def filtring(self,argMax,argMid, argMin):
+        self.targets[argMax] =  [max(min(self.targets[argMax,0],.75),-.75), max(min(self.targets[argMax,1],.65),-.65)]
+        if abs(self.targets[argMax,1])<.35 and self.targets[argMax,0]*self.fieldSide > .6 : #inside area
+            self.targets[argMax,0] = .55*self.fieldSide 
+        self.targets[argMid] =  [max(min(self.targets[argMid,0],.75),-.75), max(min(self.targets[argMid,1],.65),-.65)]
+        if abs(self.targets[argMid,1])<.35 and self.targets[argMid,0]*self.fieldSide > .6 : #inside area
+            self.targets[argMid,0] = .55*self.fieldSide
+        self.targets[argMin] =  [max(min(self.targets[argMin,0],.75),-.75), max(min(self.targets[argMin,1],.65),-.65)]
 
 """
 DEFINE ROBOTS  
