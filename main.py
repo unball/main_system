@@ -11,8 +11,8 @@ from communication.msg import robots_speeds_msg
 import time
 
 import world_standards
-from world import World
-from strategy import Strategy
+from world.world import World
+from strategy.strategy import Strategy
 from controllers.ssLQRregulator import ssLQRregulator
 import field
 
