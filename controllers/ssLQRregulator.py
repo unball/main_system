@@ -69,7 +69,7 @@ class ssLQRregulator():
                   [0, self.q1, 0],
                   [0, 0, self.q2]]
 
-        self.rho = 50
+        self.rho = 5000
 
         self.r0 = 1 * self.rho
         self.r1 = 1 * self.rho
