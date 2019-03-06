@@ -7,6 +7,7 @@ import rospy
 from vision.msg import VisionMessage
 from std_msgs.msg import String
 from communication.msg import robots_speeds_msg
+from communication.msg import comm_msg
 
 import time
 
@@ -56,6 +57,11 @@ def start_system():
     global start
     start = 0
 
+    r = 0.031
+    L = 0.072
+    conversion = 512.*19./1000 #tics per rotation
+    reduction = 1. #wheel to motor
+
     world_state = World(world_standards.STANDARD3)
     strategy_system = Strategy()
     control_system = ssLQRregulator()
@@ -63,21 +69,27 @@ def start_system():
     rospy.init_node('main_system')
     rospy.Subscriber('vision_output_topic', VisionMessage, updateWorld, world_state)
     rospy.Subscriber('game_commands', String, commandGame, world_state)
-    pub = rospy.Publisher('robots_speeds', robots_speeds_msg, queue_size=1)
+    pubSimulator = rospy.Publisher('robots_speeds', robots_speeds_msg, queue_size=1)
+    pubRadio = rospy.Publisher('radio_topic', comm_msg, queue_size=1)
     rate = rospy.Rate(30)
 
     while not rospy.is_shutdown():
         strategy_system.plan(world_state)
         targets = strategy_system.get_targets()
 
-        # # Targets bypass for controller tests
-        #targets = [[-0.65, -0.2, np.pi/2], [0.5, 0.5, np.pi/4], [0, 0, 0]]
+        output_msgRadio = comm_msg()
 
         if world_state.isPaused:
-            output_msg = robots_speeds_msg()
+            output_msgSim = robots_speeds_msg()
         elif not world_state.isPaused:
-            output_msg = control_system.actuate(targets, world_state)
-        pub.publish(output_msg)
+            velocities = control_system.actuate(targets, world_state)
+            output_msgSim = velocities
+            for i in range(world_state.number_of_robots):
+                output_msgRadio.MotorA[i] = int((1/r)*velocities.linear_vel[i] + (L/r)*velocities.angular_vel[i]*conversion*reduction/(np.pi *2))
+                output_msgRadio.MotorB[i] = int((1/r)*velocities.linear_vel[i] + (L/r)*velocities.angular_vel[i]*conversion*reduction/(np.pi *2))
+
+        pubSimulator.publish(output_msgSim)
+        pubRadio.publish(output_msgRadio)
         rate.sleep()
 
 

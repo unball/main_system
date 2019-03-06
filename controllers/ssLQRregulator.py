@@ -4,6 +4,7 @@ import numpy as np
 import control
 
 from communication.msg import robots_speeds_msg
+from communication.msg import comm_msg
 
 ref_lin_vel = 1
 ref_ang_vel = 1
@@ -32,7 +33,7 @@ class ssLQRregulator():
         self.updateStateVector()
 
         self.v_r = list(ref_lin_vel for i in range(self.number_of_robots))
-        self.w_t = list(ref_ang_vel for i in range(self.number_of_robots))
+        self.w_r = list(ref_ang_vel for i in range(self.number_of_robots))
 
         # State Space representation of a linear system x_p = Ax + Bu
         #                                                 y = Cx + Du
@@ -78,19 +79,37 @@ class ssLQRregulator():
                   [0, self.r1]]
 
         # Pole placement regulator closed loop poles
-        self.poles = [[-2, -2, -5],
-                      [-2, -2, -5],
-                      [-2, -2, -5]]
+        self.poles = [[-5, -5, -3.5],
+                      [-5, -5, -3],
+                      [-5, -5, -3]]
+
+        # Saturation
+        self.max_lin_vel = 100
+        self.min_lin_vel = 0.5
+
+        self.max_ang_vel = 100
+        self.min_ang_vel = 100
 
     def actuate(self, references, world):
         """Control system actuator itself. Receives references and world info."""
         self.updateIntVariables(references, world)
         self.updateDynamicMatrices()
         self.updateStateVector()
-        print(self.state_vector)
-        print("-------------------------------")
         self.controlLaw()
+        # self.saturateVelocities()
         return self.output_vel
+
+    def saturateVelocities(self):
+        for i in range(self.number_of_robots):
+            if np.linalg.norm(self.output_vel.linear_vel[i]) > self.max_lin_vel:
+                self.output_vel.linear_vel[i] = self.max_lin_vel * np.sign(self.output_vel.linear_vel[i])
+            elif np.linalg.norm(self.output_vel.linear_vel[i]) < self.min_lin_vel:
+                self.output_vel.linear_vel[i] = self.min_lin_vel * np.sign(self.output_vel.linear_vel[i])
+
+            if np.linalg.norm(self.output_vel.angular_vel[i]) > self.max_ang_vel:
+                self.output_vel.angular_vel[i] = self.max_ang_vel * np.sign(self.output_vel.angular_vel[i])
+            elif np.linalg.norm(self.output_vel.angular_vel[i]) < self.min_ang_vel:
+                self.output_vel.angular_vel[i] = self.min_ang_vel * np.sign(self.output_vel.angular_vel[i])
 
     def updateIntVariables(self, references, world):
         for i in range(self.number_of_robots):
@@ -101,11 +120,6 @@ class ssLQRregulator():
             self.x_r[i] = references[i][0]
             self.y_r[i] = references[i][1]
             self.th_r[i] = references[i][2]
-
-        # # Goalkeeper test
-        # self.x_r[0] = -0.65
-        # self.y_r[0] = world.ball.y
-        # self.th_r[0] = np.pi/2
 
     def updateDynamicMatrices(self):
         for i in range(self.number_of_robots):
@@ -130,8 +144,8 @@ class ssLQRregulator():
 
     def controlLaw(self):
         for i in range(self.number_of_robots):
-            K, S, E = control.lqr(self.A[i], self.B[i], self.Q, self.R)
-            # K = control.place(self.A[i], self.B[i], self.poles[i])
+            # K, S, E = control.lqr(self.A[i], self.B[i], self.Q, self.R)
+            K = control.place(self.A[i], self.B[i], self.poles[i])
             velocities = np.dot(-K, self.state_vector[i])
             self.output_vel.linear_vel[i] = velocities[0]
             self.output_vel.angular_vel[i] = velocities[1]
