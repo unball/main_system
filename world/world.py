@@ -1,7 +1,7 @@
 """World Module."""
 
-from game_elements.ball import Ball
-from game_elements.robot import Robot
+from world.game_elements.ball import Ball
+from world.game_elements.robot import Robot
 import field
 
 MAGIC_NUMBER = 3

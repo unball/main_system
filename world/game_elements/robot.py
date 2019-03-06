@@ -1,6 +1,6 @@
 """Robot class module."""
 
-from game_elements.element import Element
+from world.game_elements.element import Element
 
 
 class Robot(Element):
