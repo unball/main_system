@@ -1,15 +1,15 @@
 """Attack decider module."""
 
-from secondleveldeciders.secondleveldecider import SecondLvlDecider
+from strategy.secondleveldeciders.secondleveldecider import SecondLvlDecider
 
-from players.striker import Striker
-from players.goalkeeper import Goalkeeper
-from players.defender import Defender
+from strategy.players.striker import Striker
+from strategy.players.goalkeeper import Goalkeeper
+from strategy.players.defender import Defender
 
-from membership_functions import *
+from strategy.membership_functions import *
 import numpy as np
-from megafunctions import fuzzy
-from megafunctions import defuzzy
+from strategy.megafunctions import fuzzy
+from strategy.megafunctions import defuzzy
 from math import sin
 from random import randint
 from math import acos

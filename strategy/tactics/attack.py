@@ -1,6 +1,6 @@
 """Defense tactic class module."""
 
-from tactics.tactic import Tactic
+from strategy.tactics.tactic import Tactic
 #from players.striker import Striker
 #from players.goalkeeper import Goalkeeper
 #from players.defender import Defender

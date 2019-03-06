@@ -1,6 +1,6 @@
 """First level fuzzy decider module."""
 
-from tactics.attack import Attack
+from strategy.tactics.attack import Attack
 
 
 def error():

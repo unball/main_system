@@ -1,6 +1,6 @@
 """Tactic module."""
 
-from secondleveldeciders.attack_decider import AttackDecider
+from strategy.secondleveldeciders.attack_decider import AttackDecider
 
 
 def fit_obstacles(index, obstacles):

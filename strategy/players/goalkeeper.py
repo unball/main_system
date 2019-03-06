@@ -1,7 +1,7 @@
 """Goalkeeper module."""
 
-from players.player import Player
-from movements.goalkeep import Goalkeep
+from strategy.players.player import Player
+from strategy.movements.goalkeep import Goalkeep
 
 
 class Goalkeeper(Player):

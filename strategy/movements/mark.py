@@ -1,6 +1,6 @@
 """Mark module."""
 
-from movements.movement import Movement
+from strategy.movements.movement import Movement
 
 
 class Mark(Movement):

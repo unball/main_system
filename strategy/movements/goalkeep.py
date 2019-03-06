@@ -1,6 +1,6 @@
 """Goalkeep module."""
 
-from movements.movement import Movement
+from strategy.movements.movement import Movement
 
 FIXED_X = 0.63
 AREA_LENGHT = 0.5

@@ -1,7 +1,7 @@
 """Striker module."""
 
-from players.player import Player
-from movements.mark import Mark
+from strategy.players.player import Player
+from strategy.movements.mark import Mark
 
 
 class Striker(Player):

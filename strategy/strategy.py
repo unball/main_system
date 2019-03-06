@@ -1,7 +1,7 @@
 """Strategy system module."""
 
-from firstleveldecider import FirstLvlDecider
-from secondleveldeciders.attack_decider import AttackDecider
+from strategy.firstleveldecider import FirstLvlDecider
+from strategy.secondleveldeciders.attack_decider import AttackDecider
 
 def error():
     """Print the standard error message for STRATEGY scope."""
@@ -13,7 +13,7 @@ class Strategy(object):
 
     def __init__(self):
         """Init method."""
-        self.coach = FirstLvlDecider()
+        self.firstLvlDec = FirstLvlDecider()
         self.tactic = None
         self.formation = None
         self.decider = AttackDecider()
@@ -22,14 +22,12 @@ class Strategy(object):
         """Toplevel planner which contains all the deciders of the system."""
         self.world = world
         # TODO: VERIFICATION TEST FOR THE WORLD STATE
-        self.tactic = self.coach.plan(self.world)
+        self.tactic = self.firstLvlDec.plan(self.world)
         
         self.decider.setParams(world)
         self.decider.setFormation(world)
         self.targets = self.decider.updateTargets()
         
-        #for player in self.formation:
-         #   print(player)
 
     def get_targets(self):
         """Getter of each robot target planned."""
