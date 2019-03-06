@@ -39,7 +39,7 @@ class AttackDecider(SecondLvlDecider):
         self.ballPos = np.array([.0, .0])
         self.ballVel = np.array([.0, .0])
         self.targets = np.matrix([[.0,0],[0,0],[0,0]])
-        self.per_robot = [-1.0, -1.0, -1.0]
+        self.per_robot = [-1.0, -0, 1.0]
         self.formationS = "GDS"
         self.formation = [Goalkeeper(), Defender(), Striker()]
         self.game_score = .0
@@ -132,6 +132,7 @@ class AttackDecider(SecondLvlDecider):
             fuzzy_ori = fuzzy(ori[i,0],tops_ori[:-1],tops_ori, tops_ori[1:])
             self.per_robot[i] = alpha*(defuzzy(fuzzy_ori,FAM,fuzzy_dist)) + (1-alpha)* perPrevius[i]
         """rearranjando formação..."""
+        self.per_robot[0] = -10
         new_formation = [Defender(),Defender(),Defender()]
         seek = [Striker(), Defender(), Goalkeeper()]
         ja_foi = [0, 0, 0]
@@ -306,9 +307,10 @@ class AttackDecider(SecondLvlDecider):
         alpha = .1
         targetsPrevius = self.targets.copy()
         perRobot = np.array(self.per_robot.copy())
+        perRobot[0] = -10
         argMax, argMid, argMin = self.robotArgs(perRobot)
         #shooter
-        self.targets[argMax] = self.shoot2(argMax) #filtrar possibilidade de estar na area
+        self.targets[argMax] = self.shoot3(argMax) #filtrar possibilidade de estar na area
         #self.targets[argMax] = self.ballPos
         #print(self.targets[argMax])
         #assistente e defensor
@@ -390,10 +392,10 @@ class AttackDecider(SecondLvlDecider):
         m2 = robotBall[1]/robotBall[0]
         m =  ballTarget[1]/ ballTarget[0]
         fi = np.arctan2((m2-m),(1+m*m2))
-        if abs(fi)>3.1415/3: 
-            x = self.ballPos[0] + .25*self.fieldSide
+        if abs(fi)>3.1415/9: 
+            x = self.ballPos[0] + .35*self.fieldSide
             return np.array([x, m*(x-self.ballPos[0]) + self.ballPos[1]])
-        return self.ballPos
+        return self.finalTarget
             
     #define o target final (no gol adiversario)
     def defineTarget(self, fieldSide):
@@ -415,20 +417,30 @@ class AttackDecider(SecondLvlDecider):
         self.ballVel = np.array(ball.vel)
 
     def goalkeep(self):
-        xGoal = self.fieldSide * .70
+        xGoal = self.fieldSide * .75
         #testar velocidade minima (=.15?)
-        if ((self.ballVel[0]*self.fieldSide) > .15) and \
+        if ((self.ballVel[0]*self.fieldSide) > .1) and \
            ((self.ballPos[0]*self.fieldSide)> .0):
            #verificar se a projeção está no gol
            #projetando vetor até um xGoal-> y = (xGoal-Xball) * Vyball/Vxball + yBall
            y =  (((xGoal-self.ballPos[0])/self.ballVel[0])*self.ballVel[1])+self.ballPos[1]
-           return np.array([xGoal, max(min(.35, y),-.35)])
+           return np.array([xGoal-.05*self.fieldSide, max(min(.23, y),-.23)])
         #Se não acompanha o y
-        return np.array([xGoal, max(min(self.ballPos[1],.35),-.35)])
+        return np.array([xGoal-.05*self.fieldSide, max(min(self.ballPos[1],.23),-.23)])
 
     def avoidance(self):
         perRobot = np.array(self.per_robot.copy())
         argMax, argMid, argMin = self.robotArgs(perRobot)
+
+        xGoal = self.fieldSide * .75
+        y =  (((xGoal-self.ballPos[0])/self.ballVel[0])*self.ballVel[1])+self.ballPos[1]
+        RobotMinBall = np.array([xGoal-.05*self.fieldSide, max(min(.23, y),-.23)]) - self.pos[argMin]
+        RobotMinBallNorm = np.linalg.norm(RobotMinBall)
+        #se mid está indo a caminho do max-> desvia
+        if self.ballVel[0]*self.fieldSide > .1 and self.ballPos[0]*self.fieldSide > 0 and RobotMinBallNorm!=0 :
+            goalk = [ self.targets[argMin,0],  (RobotMinBall[0,1])/ RobotMinBallNorm**3  + self.targets[argMin,1] ]
+            self.targets[argMin] = [goalk[0], max(min(goalk[1], .3), -.3)]
+
 
         robotTarget = self.targets[argMax] - self.pos[argMax]
         robotTargetNorm = robotTarget / np.linalg.norm(robotTarget)
