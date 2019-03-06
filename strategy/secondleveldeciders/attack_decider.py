@@ -110,10 +110,10 @@ class AttackDecider(SecondLvlDecider):
         abs_vel = np.sqrt(np.power(self.vel,2).sum(1))
         """velocidade robos normalizada"""
         self.vel = self.vel/abs_vel
-        #for i in range(3):
-        #    self.vel[i][np.isnan(self.vel[i, 0])]  = np.cos(self.th[i])
-        #    self.vel[i][np.isnan(self.vel[i, 1])]  = np.sin(self.th[i])
-        self.vel[np.isnan(self.vel)] = 0
+        for i in range(3):
+            self.vel[i][np.isnan(self.vel[i, 0])]  = np.cos(self.th[i])
+            self.vel[i][np.isnan(self.vel[i, 1])]  = np.sin(self.th[i])
+        # self.vel[np.isnan(self.vel)] = 0
         
         """orientacao pra fuzzy ori"""
         ori = np.multiply(self.vel,dist_BR).sum(1)
@@ -310,7 +310,7 @@ class AttackDecider(SecondLvlDecider):
         perRobot[0] = -10
         argMax, argMid, argMin = self.robotArgs(perRobot)
         #shooter
-        self.targets[argMax] = self.shoot3(argMax) #filtrar possibilidade de estar na area
+        self.targets[argMax] = self.shoot(argMax) #filtrar possibilidade de estar na area
         #self.targets[argMax] = self.ballPos
         #print(self.targets[argMax])
         #assistente e defensor
@@ -363,14 +363,14 @@ class AttackDecider(SecondLvlDecider):
             fi = acos(dot/(normrobotBall*normballTarget))
         #else:
         #    return self.finalTarget
-        distEball = .3*sin(fi)
-        if distEball < .05 and normrobotBall > .05:
-            return self.finalTarget
+        distEball = .3*sin(fi) 
+        if fi < np.pi/9:
+            return self.ballPos
             #return self.ballPos
         #elif normrobotBall < .05 :
         #    return self.finalTarget
 
-        r1 = normballTarget + abs(distEball)
+        r1 = normballTarget + abs(distEball) + 0.05
         xe = distEball*self.finalTarget[0]+ r1*self.ballPos[0]/(r1+distEball)
         ye = distEball*self.finalTarget[1]+ r1*self.ballPos[1]/(r1+distEball)
         return np.array([xe,ye])
@@ -401,7 +401,7 @@ class AttackDecider(SecondLvlDecider):
     def defineTarget(self, fieldSide):
         self.fieldSide = fieldSide
         if self.ballVel[0] < (.005*fieldSide): 
-            self.finalTarget =  np.array([-.75*fieldSide, randint(-1, 1) *.2])
+            self.finalTarget =  np.array([-.75*fieldSide, 0])
 
     def defineBounds(self, gameScore):
         self.bounds =  (self.fieldSide*(gameScore * .025)) +  np.array([-.25,.25])
@@ -432,23 +432,24 @@ class AttackDecider(SecondLvlDecider):
         perRobot = np.array(self.per_robot.copy())
         argMax, argMid, argMin = self.robotArgs(perRobot)
 
-        xGoal = self.fieldSide * .75
-        y =  (((xGoal-self.ballPos[0])/self.ballVel[0])*self.ballVel[1])+self.ballPos[1]
-        RobotMinBall = np.array([xGoal-.05*self.fieldSide, max(min(.23, y),-.23)]) - self.pos[argMin]
-        RobotMinBallNorm = np.linalg.norm(RobotMinBall)
+        # xGoal = self.fieldSide * .75
+        # y =  (((xGoal-self.ballPos[0])/self.ballVel[0])*self.ballVel[1])+self.ballPos[1]
+        # RobotMinBall = np.array([xGoal-.05*self.fieldSide, max(min(.23, y),-.23)]) - self.pos[argMin]
+        # RobotMinBallNorm = np.linalg.norm(RobotMinBall)
         #se mid está indo a caminho do max-> desvia
-        if self.ballVel[0]*self.fieldSide > .1 and self.ballPos[0]*self.fieldSide > 0 and RobotMinBallNorm!=0 :
-            goalk = [ self.targets[argMin,0],  (RobotMinBall[0,1])/ RobotMinBallNorm**3  + self.targets[argMin,1] ]
-            self.targets[argMin] = [goalk[0], max(min(goalk[1], .3), -.3)]
+        # if self.ballVel[0]*self.fieldSide > .1 and self.ballPos[0]*self.fieldSide > 0 and RobotMinBallNorm!=0 :
+        #    goalk = [ self.targets[argMin,0],  (RobotMinBall[0,1])/ RobotMinBallNorm**3  + self.targets[argMin,1] ]
+        #    self.targets[argMin] = [goalk[0], max(min(goalk[1], .3), -.3)]
 
 
-        robotTarget = self.targets[argMax] - self.pos[argMax]
-        robotTargetNorm = robotTarget / np.linalg.norm(robotTarget)
-        RobotMaxBall = self.ballPos - self.pos[argMax]
-        RobotMaxBallNorm = np.linalg.norm(RobotMaxBall)
-        # se max está indo a caminho da bola
-        if  self.vel[argMax,0]*self.fieldSide > 0:
-            self.targets[argMax] =  self.ballPos + np.dot(robotTargetNorm, (RobotMaxBall/RobotMaxBallNorm).transpose()) *(.01*np.array(-RobotMaxBall[0,1], RobotMaxBall[0,0])/RobotMaxBallNorm**2)
+        
+        # robotTarget = self.targets[argMax] - self.pos[argMax]
+        # robotTargetNorm = robotTarget / np.linalg.norm(robotTarget)
+        # RobotMaxBall = self.ballPos - self.pos[argMax]
+        # RobotMaxBallNorm = np.linalg.norm(RobotMaxBall)
+        # # se max está indo a caminho da bola
+        # if  self.vel[argMax,0]*self.fieldSide > 0:
+        #     self.targets[argMax] =  self.ballPos + np.dot(robotTargetNorm, (RobotMaxBall/RobotMaxBallNorm).transpose()) *(.01*np.array(-RobotMaxBall[0,1], RobotMaxBall[0,0])/RobotMaxBallNorm**2)
         robotTarget = self.targets[argMax] - self.pos[argMax]
         robotTargetNorm = robotTarget / np.linalg.norm(robotTarget)
         RobotMaxMin = self.pos[argMin] - self.pos[argMax]
