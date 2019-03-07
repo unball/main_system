@@ -79,16 +79,16 @@ class ssLQRregulator():
                   [0, self.r1]]
 
         # Pole placement regulator closed loop poles
-        self.poles = [[-5, -5, -3.5],
-                      [-5, -5, -3],
-                      [-5, -5, -3]]
+        self.poles = [[-1, -1, -0.5],
+                      [-1, -1, -0.5],
+                      [-1, -1, -0.5]]
 
         # Saturation
-        self.max_lin_vel = 100
-        self.min_lin_vel = 0.5
+        self.max_lin_vel = 0.5
+        self.min_lin_vel = 0
 
-        self.max_ang_vel = 100
-        self.min_ang_vel = 100
+        self.max_ang_vel = 10
+        self.min_ang_vel = 0
 
     def actuate(self, references, world):
         """Control system actuator itself. Receives references and world info."""

@@ -341,9 +341,9 @@ class AttackDecider(SecondLvlDecider):
         #plt.scatter(self.targets[argMax][0,0],self.targets[argMax][0,1])
         #plt.pause(.03)
 
-        print(self.targets)
-        print(argMax,argMid,argMin)
-        print('----------')
+        # print(self.targets)
+        # print(argMax,argMid,argMin)
+        # print('----------')
 
         angles = np.arctan2((self.targets - self.pos)[:,1], (self.targets - self.pos)[:,0]).tolist()
         targets = self.targets.tolist()

@@ -85,8 +85,8 @@ def start_system():
             velocities = control_system.actuate(targets, world_state)
             output_msgSim = velocities
             for i in range(world_state.number_of_robots):
-                output_msgRadio.MotorA[i] = int((1/r)*velocities.linear_vel[i] + (L/r)*velocities.angular_vel[i]*conversion*reduction/(np.pi *2))
-                output_msgRadio.MotorB[i] = int((1/r)*velocities.linear_vel[i] + (L/r)*velocities.angular_vel[i]*conversion*reduction/(np.pi *2))
+                output_msgRadio.MotorA[i] = int(((1/r)*velocities.linear_vel[i] + (L/r)*velocities.angular_vel[i])*conversion*reduction/(np.pi *2))
+                output_msgRadio.MotorB[i] = int(((1/r)*velocities.linear_vel[i] - (L/r)*velocities.angular_vel[i])*conversion*reduction/(np.pi *2))
 
         pubSimulator.publish(output_msgSim)
         pubRadio.publish(output_msgRadio)
