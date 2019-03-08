@@ -56,11 +56,6 @@ def start_system():
     global start
     start = 0
 
-    r = 0.031
-    L = 0.072
-    conversion = 512.*19./100 #tics per rotation
-    reduction = 1/3. #wheel to motor
-
     world_state = World(world_standards.STANDARD3)
     strategy_system = Strategy()
     control_system = ssLQRregulator()
