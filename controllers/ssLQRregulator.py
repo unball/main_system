@@ -79,16 +79,9 @@ class ssLQRregulator():
                   [0, self.r1]]
 
         # Pole placement regulator closed loop poles
-        self.poles = [[-5, -5, -3],
-                      [-5, -5, -3],
-                      [-5, -5, -3]]
-
-        # Saturation
-        self.max_lin_vel = 1.5
-        self.min_lin_vel = 0
-
-        self.max_ang_vel = 20
-        self.min_ang_vel = 0
+        self.poles = [[-1, -1, -3],
+                      [-1, -1, -3],
+                      [-1, -1, -3]]
 
     def actuate(self, references, world):
         """Control system actuator itself. Receives references and world info."""
@@ -96,6 +89,7 @@ class ssLQRregulator():
         self.updateDynamicMatrices()
         self.updateStateVector()
         self.controlLaw()
+        print(self.output_vel)
         return self.output_vel
 
     def updateIntVariables(self, references, world):
