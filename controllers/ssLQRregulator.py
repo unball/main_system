@@ -79,15 +79,15 @@ class ssLQRregulator():
                   [0, self.r1]]
 
         # Pole placement regulator closed loop poles
-        self.poles = [[-1, -1, -0.5],
-                      [-1, -1, -0.5],
-                      [-1, -1, -0.5]]
+        self.poles = [[-5, -5, -3],
+                      [-5, -5, -3],
+                      [-5, -5, -3]]
 
         # Saturation
-        self.max_lin_vel = 0.5
+        self.max_lin_vel = 1.5
         self.min_lin_vel = 0
 
-        self.max_ang_vel = 10
+        self.max_ang_vel = 20
         self.min_ang_vel = 0
 
     def actuate(self, references, world):
@@ -96,20 +96,7 @@ class ssLQRregulator():
         self.updateDynamicMatrices()
         self.updateStateVector()
         self.controlLaw()
-        # self.saturateVelocities()
         return self.output_vel
-
-    def saturateVelocities(self):
-        for i in range(self.number_of_robots):
-            if np.linalg.norm(self.output_vel.linear_vel[i]) > self.max_lin_vel:
-                self.output_vel.linear_vel[i] = self.max_lin_vel * np.sign(self.output_vel.linear_vel[i])
-            elif np.linalg.norm(self.output_vel.linear_vel[i]) < self.min_lin_vel:
-                self.output_vel.linear_vel[i] = self.min_lin_vel * np.sign(self.output_vel.linear_vel[i])
-
-            if np.linalg.norm(self.output_vel.angular_vel[i]) > self.max_ang_vel:
-                self.output_vel.angular_vel[i] = self.max_ang_vel * np.sign(self.output_vel.angular_vel[i])
-            elif np.linalg.norm(self.output_vel.angular_vel[i]) < self.min_ang_vel:
-                self.output_vel.angular_vel[i] = self.min_ang_vel * np.sign(self.output_vel.angular_vel[i])
 
     def updateIntVariables(self, references, world):
         for i in range(self.number_of_robots):
