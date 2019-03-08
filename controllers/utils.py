@@ -1,3 +1,5 @@
+import numpy as np
+
 def convSpeeds2Motors(velocities):
     convertion = (512*19) / 100
     wheel_reduction = 3/1
@@ -17,5 +19,14 @@ def convSpeeds2Motors(velocities):
 
         wR = wR * wheel_reduction * convertion
         wL = wL * wheel_reduction * convertion
+
+        if np.fabs(wR) > max_motor_speed or np.fabs(wL) > max_motor_speed:
+            if np.fabs(wR) >= np.fabs(wL):
+                wL = max_motor_speed * wL/np.fabs(wR)
+                wR = max_motor_speed * wR/np.fabs(wR)
+            elif np.fabs(wL) >= np.fabs(wR):
+                wR = max_motor_speed * wR/np.fabs(wL)
+                wL = max_motor_speed * wL/np.fabs(wL)
+
 
         return wR, wL
