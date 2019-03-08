@@ -1,3 +1,5 @@
+import numpy as np
+
 def convSpeeds2Motors(velocities):
     convertion = (512*19) / 100
     wheel_reduction = 3/1
