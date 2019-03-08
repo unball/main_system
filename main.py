@@ -15,6 +15,7 @@ import world_standards
 from world.world import World
 from strategy.strategy import Strategy
 from controllers.ssLQRregulator import ssLQRregulator
+from controllers.utils import convSpeeds2Motors
 import field
 
 
@@ -25,8 +26,6 @@ def updateWorld(data, world_state):
 
     world_state.update(data)
     world_state.calc_velocities(interval_time)
-
-    # print(interval_time)
 
     start = time.time()
 
@@ -59,8 +58,8 @@ def start_system():
 
     r = 0.031
     L = 0.072
-    conversion = 512.*19./1000 #tics per rotation
-    reduction = 1. #wheel to motor
+    conversion = 512.*19./100 #tics per rotation
+    reduction = 1/3. #wheel to motor
 
     world_state = World(world_standards.STANDARD3)
     strategy_system = Strategy()
@@ -85,8 +84,16 @@ def start_system():
             velocities = control_system.actuate(targets, world_state)
             output_msgSim = velocities
             for i in range(world_state.number_of_robots):
-                output_msgRadio.MotorA[i] = int(((1/r)*velocities.linear_vel[i] + (L/r)*velocities.angular_vel[i])*conversion*reduction/(np.pi *2))
-                output_msgRadio.MotorB[i] = int(((1/r)*velocities.linear_vel[i] - (L/r)*velocities.angular_vel[i])*conversion*reduction/(np.pi *2))
+                output_msgRadio.MotorA[i], output_msgRadio.MotorB[i] = convSpeeds2Motors(velocities)
+            
+            # # Velocity bypass
+            # # Used in firmware tests
+            # output_msgRadio.MotorA[0] = 50
+            # output_msgRadio.MotorB[0] = -50
+            # output_msgRadio.MotorA[1] = 100
+            # output_msgRadio.MotorB[1] = -100
+            # output_msgRadio.MotorA[2] = -500
+            # output_msgRadio.MotorB[2] = 500
 
         pubSimulator.publish(output_msgSim)
         pubRadio.publish(output_msgRadio)
