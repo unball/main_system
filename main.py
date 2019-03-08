@@ -68,10 +68,12 @@ def start_system():
     rate = rospy.Rate(30)
 
     while not rospy.is_shutdown():
-        strategy_system.plan(world_state)
-        targets = strategy_system.get_targets()
+        # strategy_system.plan(world_state)
+        # targets = strategy_system.get_targets()
 
         output_msgRadio = comm_msg()
+
+        targets = [[0, 0, 0], [-0.63, world_state.ball.y, np.pi/2], [world_state.ball.x, world_state.ball.y, np.atan2(world_state.ball.y - world_state.robots[2].y, world_state.ball.x - world_state.robots[2].x)]]
 
         if world_state.isPaused:
             output_msgSim = robots_speeds_msg()
