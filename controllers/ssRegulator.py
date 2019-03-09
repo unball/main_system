@@ -79,9 +79,9 @@ class ssRegulator():
                   [0, self.r1]]
 
         # Pole placement regulator closed loop poles
-        self.poles = [[-1, -1, -4],
-                      [-1, -1, -3],
-                      [-1, -1, -3]]
+        self.poles = [[-1, -1, -0.1],
+                      [-0.5, -0.5, -0.6],
+                      [-0.5, -0.5, -0.8]]
 
     def actuate(self, references, world):
         """Control system actuator itself. Receives references and world info."""

@@ -76,23 +76,29 @@ def start_system():
 
         elif not world_state.isPaused:
             velocities = control_system.actuate(targets, world_state)
+            
+            
+            # velocities.linear_vel[1] = 0
+            # velocities.linear_vel[2] = 0
+
             output_msgSim = velocities
 
             # # Spin loop
             for i in range(world_state.number_of_robots):
                 if spin[i] == 1:
                     output_msgSim.linear_vel[i] = 0
-                    output_msgSim.angular_vel[i] = 15
+                    output_msgSim.angular_vel[i] = -15
                 elif spin[i] == -1:
                     output_msgSim.linear_vel[i] = 0
-                    output_msgSim.angular_vel[i] = -15
+                    output_msgSim.angular_vel[i] = 15
+
 
             output_msgRadio = convSpeeds2Motors(velocities)
             
             # # Velocity bypass
             # # Used in firmware tests
-            # output_msgRadio.MotorA[0] = 50
-            # output_msgRadio.MotorB[0] = -50
+            # output_msgRadio.MotorA[0] = 100
+            # output_msgRadio.MotorB[0] = -100
             # output_msgRadio.MotorA[1] = 100
             # output_msgRadio.MotorB[1] = -100
             # output_msgRadio.MotorA[2] = -500
