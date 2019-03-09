@@ -30,26 +30,16 @@ def updateWorld(data, world_state):
     start = time.time()
 
 def commandGame(data, world_state):
-    command = data.data.split(":")
-    command[0] = command[0].lower()
-    command[1] = command[1].upper()
-    if command[0] == "side":
-        if command[1] == "LEFT":
-            world_state.change_field_side(field.LEFT)
-        if command[1] == "RIGHT":
-            world_state.change_field_side(field.RIGHT)
-    elif command[0] == "game":
-        if command[1] == "PAUSE":
-            world_state.pause()
-        elif command[1] == "PLAY":
+    command = data.data
+    command = command.upper()
+    if command == "L":
+        world_state.change_field_side(field.LEFT)
+    elif command == "R":
+        world_state.change_field_side(field.RIGHT)
+    if command == "P":
+        world_state.pause()
+    elif command == "G":
             world_state.play()
-    elif command[0] == "score":
-        if command[1] == "+":
-            world_state.gameScore = world_state.gameScore + 1
-        elif command[1] == "-":
-            world_state.gameScore = world_state.gameScore - 1
-
-
 
 def start_system():
     """Start the system in the 'main function'."""
@@ -70,7 +60,7 @@ def start_system():
     while not rospy.is_shutdown():
         loop_start = time.time()
         strategy_system.plan(world_state)
-        targets = strategy_system.get_targets()
+        targets, spin = strategy_system.get_targets()
 
         output_msgRadio = comm_msg()
 
@@ -84,10 +74,18 @@ def start_system():
             output_msgSim = robots_speeds_msg()
 
         elif not world_state.isPaused:
-            print(targets)
             velocities = control_system.actuate(targets, world_state)
-            print(velocities)
             output_msgSim = velocities
+
+            # # Spin loop
+            for i in range(world_state.number_of_robots):
+                if spin[i] == 1:
+                    output_msgSim.linear_vel[i] = 0
+                    output_msgSim.angular_vel[i] = 15
+                elif spin[i] == -1:
+                    output_msgSim.linear_vel[i] = 0
+                    output_msgSim.angular_vel[i] = -15
+
             output_msgRadio = convSpeeds2Motors(velocities)
             
             # # Velocity bypass
@@ -100,12 +98,10 @@ def start_system():
             # output_msgRadio.MotorB[2] = 500
 
         pubSimulator.publish(output_msgSim)
-        print(output_msgRadio)
         pubRadio.publish(output_msgRadio)
         rate.sleep()
         loop_end = time.time()
         loop_time = loop_end - loop_start
-        print("Loop time: ", loop_time)
 
 
 if __name__ == '__main__':
