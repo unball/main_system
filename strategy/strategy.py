@@ -36,4 +36,4 @@ class Strategy(object):
 
     def get_targets(self):
         """Getter of each robot target planned."""
-        return self.targets
+        return self.targets, self.spin
