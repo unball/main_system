@@ -61,6 +61,7 @@ def start_system():
         loop_start = time.time()
         strategy_system.plan(world_state)
         targets, spin = strategy_system.get_targets()
+        print(targets)
 
         output_msgRadio = comm_msg()
 
