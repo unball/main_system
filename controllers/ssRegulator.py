@@ -79,7 +79,7 @@ class ssRegulator():
                   [0, self.r1]]
 
         # Pole placement regulator closed loop poles
-        self.poles = [[-1, -1, -3],
+        self.poles = [[-1, -1, -4],
                       [-1, -1, -3],
                       [-1, -1, -3]]
 
@@ -128,5 +128,5 @@ class ssRegulator():
             # K, S, E = control.lqr(self.A[i], self.B[i], self.Q, self.R)
             K = control.place(self.A[i], self.B[i], self.poles[i])
             velocities = np.dot(-K, self.state_vector[i])
-            self.output_vel.linear_vel[i] = velocities[0]
+            self.output_vel.linear_vel[i] = velocities[0] # + np.sign(velocities[0])*0.5
             self.output_vel.angular_vel[i] = velocities[1]
