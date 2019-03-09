@@ -68,17 +68,23 @@ def start_system():
     rate = rospy.Rate(30)
 
     while not rospy.is_shutdown():
-        # strategy_system.plan(world_state)
-        # targets = strategy_system.get_targets()
+        loop_start = time.time()
+        strategy_system.plan(world_state)
+        targets = strategy_system.get_targets()
 
         output_msgRadio = comm_msg()
 
-        targets = [[-0.63, world_state.ball.y, np.pi/2], [-0.3, world_state.ball.y, np.pi/2], [0.4, world_state.ball.y, np.pi/2]]
+        # # Targets bypass
+        # # Used in control tests
+        # targets = [[world_state.ball.x, world_state.ball.y, np.arctan2(world_state.ball.y - world_state.robots[0].y, world_state.ball.x - world_state.robots[0].x)],
+        #            [0, 0, 0],
+        #            [0, 0, 0]] 
 
         if world_state.isPaused:
             output_msgSim = robots_speeds_msg()
 
         elif not world_state.isPaused:
+            print(targets)
             velocities = control_system.actuate(targets, world_state)
             print(velocities)
             output_msgSim = velocities
@@ -97,6 +103,9 @@ def start_system():
         print(output_msgRadio)
         pubRadio.publish(output_msgRadio)
         rate.sleep()
+        loop_end = time.time()
+        loop_time = loop_end - loop_start
+        print("Loop time: ", loop_time)
 
 
 if __name__ == '__main__':
