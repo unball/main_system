@@ -13,6 +13,7 @@ class Striker(Player):
     def __init__(self):
         """Responsible to instantiate the attributes of the parent class."""
         self.id = 2
+        self._spin = 0
 
     def calc_target(self, world):
         """Calculate it's own target based on world state."""
@@ -33,12 +34,25 @@ class Striker(Player):
                         if alpha < np.pi/12 and abs(robotPos[0] - ballPos[0]) < .2:
                             target = [-7.5*world.fieldSide, 10*yPro]
                             target.append(np.arctan2(target[1]-world.robots[2].pos[1], target[0]-world.robots[2].pos[0]))
+                            self._spin = 0
                             return target 
-
+        elif np.linalg.norm(robotPos - ballPos) <= .07:
+            if robotPos[1]*world.fieldSide < 0: 
+                if robotPos[0]*world.fieldSide < 0:
+                    self._spin = 1
+                else:
+                    self._spin = -1
+            else:
+                if robotPos[1]*world.fieldSide < 0:
+                    self._spin = -1
+                else:
+                    self._spin = 1
+        else:
+            self._spin = 0
         target = world.ball.pos
         target.append(np.arctan2(target[1]-world.robots[2].pos[1], target[0]-world.robots[2].pos[0]))
         return target
-
+   
 
 if __name__ == "__main__":
     teste = Striker()

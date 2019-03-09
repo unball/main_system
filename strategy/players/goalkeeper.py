@@ -12,10 +12,18 @@ class Goalkeeper(Player):
         """Responsible to instantiate the attributes of the parent class."""
         super().__init__()
         self.id = 0
+        self._spin = 0
 
     def calc_target(self, world):
         """Calculate it's own target based on world state."""
         print("Goalkeeper")
+        if np.linalg.norm(np.array(world.robots[0].pos) - np.array(world.ball.pos)) <= .07:
+            if -1*world.robots[0].y*world.fieldSide >= 0:
+                self._spin = -1
+            else:
+                self._spin = 1
+        else:
+            self._spin = 0
         xGoal = world.fieldSide * .75
         #testar velocidade minima (=.15?)
         if ((world.ball.vel[0]*world.fieldSide) > .1) and \

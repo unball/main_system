@@ -32,6 +32,7 @@ class Strategy(object):
         # self.decider.setFormation(world)
         # self.targets = self.decider.updateTargets()
         self.targets = list(player.calc_target(self.world) for player in self.formation)
+        self.spin =  list(player.spin for player in self.formation)
 
     def get_targets(self):
         """Getter of each robot target planned."""

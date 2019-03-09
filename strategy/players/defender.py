@@ -12,11 +12,19 @@ class Defender(Player):
     def __init__(self):
         """Responsible to instantiate the attributes of the parent class."""
         self.id = 1
+        self._spin = 0
 
     def calc_target(self, world):
         """Calculate it's own target based on world state."""
         print("Defender")
         ########definir z = [a**2, b**2]###########
+        dist = np.array(world.robots[1].pos) - np.array(world.ball.pos)
+        if np.linalg.norm(dist) <= .07:
+            if -1*world.robots[1].y*world.fieldSide >= 0:
+                self._spin = -1
+            else: self._spin = 1
+        else:
+            self._spin=0
         ballVel = np.array(world.ball.vel)
         ballPos = np.array(world.ball.pos)
 

@@ -9,6 +9,7 @@ class Player(object):
         self.movement = None
         self._target = None
         self._ball = None
+        self._spin = None
 
     def set_own_state(self, pos=None, th=None, vel=None, w=None):
         """Use info of the world state to set it's own pos, vel, etc.
@@ -44,3 +45,7 @@ class Player(object):
     def ball(self, __ball):
         """Setter of ball position on each robot scope."""
         self._ball = __ball
+    @property
+    def spin(self):
+        """Define the property so the setter can be used."""
+        return self._spin
