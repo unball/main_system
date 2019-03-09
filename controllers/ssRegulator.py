@@ -10,7 +10,7 @@ ref_lin_vel = 1
 ref_ang_vel = 1
 
 
-class ssLQRregulator():
+class ssRegulator():
     """Class docstring."""
 
     def __init__(self):
@@ -89,7 +89,7 @@ class ssLQRregulator():
         self.updateDynamicMatrices()
         self.updateStateVector()
         self.controlLaw()
-        print(self.output_vel)
+        # print(self.output_vel)
         return self.output_vel
 
     def updateIntVariables(self, references, world):
