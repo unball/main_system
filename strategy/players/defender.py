@@ -30,7 +30,7 @@ class Defender(Player):
 
 
         z = [.5**2, .3**2]
-        Goal = np.array([-.7, 0])
+        Goal = np.array([.75*world.fieldSide, 0])
         if (world.ball.vel[0]*world.fieldSide) > .15:
             c =  [sum(z*(ballVel)**2), 2*np.dot(z*ballVel, ballPos-Goal), sum(z*(ballPos-Goal)**2) - np.prod(z)]
             k = min(np.roots(c))
@@ -47,7 +47,7 @@ class Defender(Player):
         #apenas fica entre a bola e o Goal
         #if not ballInsideArea():
         signal = 1
-        if ballPos[1]<0:
+        if ballPos[1]*world.fieldSide>=0:
             ballPos[1] = ballPos[1]* -1
             signal = -1
         if sum(z*(ballPos-Goal)) > 0:
