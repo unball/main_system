@@ -1,6 +1,5 @@
 """Player module."""
 
-
 class Player(object):
     """Docstring."""
 
