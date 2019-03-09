@@ -14,7 +14,7 @@ import time
 import world_standards
 from world.world import World
 from strategy.strategy import Strategy
-from controllers.ssLQRregulator import ssLQRregulator
+from controllers.ssRegulator import ssRegulator
 from controllers.utils import convSpeeds2Motors
 import field
 
@@ -58,7 +58,7 @@ def start_system():
 
     world_state = World(world_standards.STANDARD3)
     strategy_system = Strategy()
-    control_system = ssLQRregulator()
+    control_system = ssRegulator()
 
     rospy.init_node('main_system')
     rospy.Subscriber('vision_output_topic', VisionMessage, updateWorld, world_state)
@@ -73,15 +73,16 @@ def start_system():
 
         output_msgRadio = comm_msg()
 
-        targets = [[0, 0, 0], [-0.63, world_state.ball.y, np.pi/2], [world_state.ball.x, world_state.ball.y, np.atan2(world_state.ball.y - world_state.robots[2].y, world_state.ball.x - world_state.robots[2].x)]]
+        targets = [[-0.63, world_state.ball.y, np.pi/2], [-0.3, world_state.ball.y, np.pi/2], [0.4, world_state.ball.y, np.pi/2]]
 
         if world_state.isPaused:
             output_msgSim = robots_speeds_msg()
+
         elif not world_state.isPaused:
             velocities = control_system.actuate(targets, world_state)
+            print(velocities)
             output_msgSim = velocities
-            for i in range(world_state.number_of_robots):
-                output_msgRadio.MotorA[i], output_msgRadio.MotorB[i] = convSpeeds2Motors(velocities)
+            output_msgRadio = convSpeeds2Motors(velocities)
             
             # # Velocity bypass
             # # Used in firmware tests
@@ -93,6 +94,7 @@ def start_system():
             # output_msgRadio.MotorB[2] = 500
 
         pubSimulator.publish(output_msgSim)
+        print(output_msgRadio)
         pubRadio.publish(output_msgRadio)
         rate.sleep()
 
