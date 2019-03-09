@@ -31,6 +31,10 @@ class Defender(Player):
 
         z = [.5**2, .3**2]
         Goal = np.array([.75*world.fieldSide, 0])
+        if world.ball.x*world.fieldSide>=.65:
+            target = world.ball.pos
+            target.append(np.arctan2(target[1]-world.robots[1].pos[1], target[0]-world.robots[1].pos[0]))
+            return target   
         if (world.ball.vel[0]*world.fieldSide) > .15:
             c =  [sum(z*(ballVel)**2), 2*np.dot(z*ballVel, ballPos-Goal), sum(z*(ballPos-Goal)**2) - np.prod(z)]
             k = min(np.roots(c))
