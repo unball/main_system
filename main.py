@@ -61,36 +61,33 @@ def start_system():
         loop_start = time.time()
         strategy_system.plan(world_state)
         targets, spin = strategy_system.get_targets()
-        print(targets)
 
         output_msgRadio = comm_msg()
 
         # # Targets bypass
         # # Used in control tests
         # targets = [[world_state.ball.x, world_state.ball.y, np.arctan2(world_state.ball.y - world_state.robots[0].y, world_state.ball.x - world_state.robots[0].x)],
-        #            [0, 0, 0],
-        #            [0, 0, 0]] 
+        #            [world_state.ball.x, world_state.ball.y, np.arctan2(world_state.ball.y - world_state.robots[0].y, world_state.ball.x - world_state.robots[0].x)],
+        #            [world_state.ball.x, world_state.ball.y, np.arctan2(world_state.ball.y - world_state.robots[0].y, world_state.ball.x - world_state.robots[0].x)]]
 
         if world_state.isPaused:
             output_msgSim = robots_speeds_msg()
 
         elif not world_state.isPaused:
             velocities = control_system.actuate(targets, world_state)
+            velocities.angular_vel[0] = 0
             
-            
-            # velocities.linear_vel[1] = 0
-            # velocities.linear_vel[2] = 0
 
             output_msgSim = velocities
 
             # # Spin loop
-            for i in range(world_state.number_of_robots):
-                if spin[i] == 1:
-                    output_msgSim.linear_vel[i] = 0
-                    output_msgSim.angular_vel[i] = -15
-                elif spin[i] == -1:
-                    output_msgSim.linear_vel[i] = 0
-                    output_msgSim.angular_vel[i] = 15
+            # for i in range(world_state.number_of_robots):
+            #     if spin[i] == 1:
+            #         output_msgSim.linear_vel[i] = 0
+            #         output_msgSim.angular_vel[i] = -15
+            #     elif spin[i] == -1:
+            #         output_msgSim.linear_vel[i] = 0
+            #         output_msgSim.angular_vel[i] = 15
 
 
             output_msgRadio = convSpeeds2Motors(velocities)
@@ -101,7 +98,7 @@ def start_system():
             # output_msgRadio.MotorB[0] = -100
             # output_msgRadio.MotorA[1] = 100
             # output_msgRadio.MotorB[1] = -100
-            # output_msgRadio.MotorA[2] = -500
+            # output_msgRadio.MotorA[2] = 500
             # output_msgRadio.MotorB[2] = 500
 
         pubSimulator.publish(output_msgSim)
