@@ -75,7 +75,9 @@ def start_system():
 
         elif not world_state.isPaused:
             velocities = control_system.actuate(targets, world_state)
-            velocities.angular_vel[0] = 0
+            # velocities.linear_vel[0] = 0
+            # velocities.linear_vel[1] = 0
+            # velocities.linear_vel[2] = 0
             
 
             output_msgSim = velocities
