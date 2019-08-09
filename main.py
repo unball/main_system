@@ -4,7 +4,7 @@
 import numpy as np
 import rospy
 
-from vision.msg import VisionMessage
+# from vision.msg import VisionMessage
 from std_msgs.msg import String
 from communication.msg import robots_speeds_msg
 from communication.msg import comm_msg
@@ -51,7 +51,7 @@ def start_system():
     control_system = ssRegulator()
 
     rospy.init_node('main_system')
-    rospy.Subscriber('vision_output_topic', VisionMessage, updateWorld, world_state)
+    # rospy.Subscriber('vision_output_topic', VisionMessage, updateWorld, world_state)
     rospy.Subscriber('game_commands', String, commandGame, world_state)
     pubSimulator = rospy.Publisher('robots_speeds', robots_speeds_msg, queue_size=1)
     pubRadio = rospy.Publisher('radio_topic', comm_msg, queue_size=1)
