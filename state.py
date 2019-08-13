@@ -1,0 +1,18 @@
+from abc import ABC, abstractmethod
+
+class State(ABC):
+    def __init__(self):
+        super().__init__()
+        self.quit_requested = False
+    
+    @abstractmethod
+    def Update(self):
+        pass 
+    
+    @property
+    def quit_requested(self):
+        return self.quit_requested
+
+
+if __name__ == "__main__":
+    pass
