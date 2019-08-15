@@ -18,6 +18,9 @@ class State(ABC):
     def QuitRequested(self):
         return self.__quitRequested
 
+    @property
+    def StateChangeRequested(self):
+        return self.__stateChangeRequested
 
 if __name__ == "__main__":
     pass
