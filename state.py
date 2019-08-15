@@ -4,7 +4,8 @@ class State(ABC):
     def __init__(self):
         super().__init__()
         self.__quitRequested = False
-    
+        self.__stateChangeRequested = False
+
     @abstractmethod
     def Update(self):
         pass 
