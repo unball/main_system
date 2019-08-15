@@ -22,5 +22,12 @@ class State(ABC):
     def StateChangeRequested(self):
         return self.__stateChangeRequested
 
+    def request_quit(self):
+        self.__quitRequested = True
+
+    def request_state_change(self):
+        self.__stateChangeRequested = True
+
+
 if __name__ == "__main__":
     pass
