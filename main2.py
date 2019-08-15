@@ -4,7 +4,7 @@ from main_menu import MainMenu
 def start():
     state = MainMenu()
     while True:
-        state.Update()
+        state.update()
         if state.quit_requested:
             break
 

@@ -7,7 +7,7 @@ class State(ABC):
         self.__stateChangeRequested = False
 
     @abstractmethod
-    def Update(self):
+    def update(self):
         pass 
     
     @property
