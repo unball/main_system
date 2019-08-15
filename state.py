@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 class State(ABC):
     def __init__(self):
         super().__init__()
-        self.quit_requested = False
+        self.__quitRequested = False
     
     @abstractmethod
     def Update(self):
