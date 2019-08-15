@@ -15,7 +15,7 @@ class GameLoop(State):
         self.__strategySystem.plan(static_classes.world)
         targets, spin = self.__strategySystem.get_targets()
         velocities = self.__controlSystem.actuate(targets, static_classes.world)
-        pass
+        # Communication
 
     def next_state(self):
         pass
