@@ -9,7 +9,10 @@ class State(ABC):
     @abstractmethod
     def update(self):
         pass 
-    
+
+    @abstractmethod    
+    def next_state(self):
+        pass
     @property
     def quit_requested(self):
         return self.quit_requested

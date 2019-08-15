@@ -8,5 +8,8 @@ class MainMenu(State):
     def update(self):
         pass
 
+    def next_state(self):
+        return GameLoop()
+
 if __name__ == "__main__":
     pass
