@@ -3,6 +3,8 @@ from abc import ABC
 
 from strategy.strategy import Strategy
 from controllers.ssRegulator import ssRegulator
+import static_classes
+
 class GameLoop(State):
     def __init__(self):
         super().__init__()
