@@ -5,7 +5,7 @@ def start():
     state = MainMenu()
     while True:
         state.update()
-        if state.quit_requested:
+        if state.QuitRequested:
             break
 
 if __name__ == "__main__":

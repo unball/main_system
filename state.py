@@ -13,9 +13,10 @@ class State(ABC):
     @abstractmethod    
     def next_state(self):
         pass
+    
     @property
-    def quit_requested(self):
-        return self.quit_requested
+    def QuitRequested(self):
+        return self.__quitRequested
 
 
 if __name__ == "__main__":
