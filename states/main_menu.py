@@ -1,4 +1,4 @@
-from state import State
+from states.state import State
 from abc import ABC
 
 from game_loop import GameLoop

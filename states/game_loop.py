@@ -1,10 +1,10 @@
-from state import State
+from states.state import State
 from abc import ABC
 
 from strategy.strategy import Strategy
 from controllers.ssRegulator import ssRegulator
 from communication.radio_comm import RadioCommunicator
-import static_classes
+from statics import static_classes
 
 class GameLoop(State):
     def __init__(self):
