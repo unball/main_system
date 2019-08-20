@@ -1,4 +1,4 @@
-import world.world as world
-import world_standards
+from statics.world.world import World
+from statics.world_standards import *
 
-world = world.World(world_standards.STANDARD3)
+world = World(STANDARD3)

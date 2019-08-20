@@ -3,7 +3,7 @@ from abc import ABC
 
 from strategy.strategy import Strategy
 from controllers.ssRegulator import ssRegulator
-from communication.radio_comm import RadioCommunicator
+from communication_system.radio_comm import RadioCommunicator
 from statics import static_classes
 
 class GameLoop(State):
@@ -15,12 +15,10 @@ class GameLoop(State):
 
     def update(self):
         # Vision System
-        # Measurement System
         self.__strategySystem.plan(static_classes.world)
         targets, spin = self.__strategySystem.get_targets()
         velocities = self.__controlSystem.actuate(targets, static_classes.world)
         self.__radioComm.send(velocities)
-        # Communication
 
     def next_state(self):
         pass

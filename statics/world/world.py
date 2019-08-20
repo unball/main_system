@@ -1,8 +1,8 @@
 """World Module."""
 
-from world.game_elements.ball import Ball
-from world.game_elements.robot import Robot
-import field
+from statics.world.game_elements.ball import Ball
+from statics.world.game_elements.robot import Robot
+from statics import field
 
 MAGIC_NUMBER = 3
 dummy_robot = [{"pos": {"x": -.5, "y": 0}, "th": 0,

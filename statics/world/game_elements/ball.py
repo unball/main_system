@@ -1,6 +1,6 @@
 """Ball class module."""
 
-from world.game_elements.element import Element
+from statics.world.game_elements.element import Element
 
 
 class Ball(Element):

@@ -1,7 +1,7 @@
 from states.state import State
 from abc import ABC
 
-from game_loop import GameLoop
+from states.game_loop import GameLoop
 
 class MainMenu(State):
     def __init__(self):
