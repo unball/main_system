@@ -3,7 +3,7 @@ from gi.repository import GLib
 import gui.mainWindow
 import cv2
 
-class frameRenderer():
+class frameRenderer(ABC):
 	def __init__(self, vision):
 		self.parentVision = vision
 		GLib.idle_add(gui.mainWindow.MainWindow().add_frame_renderer, self)
