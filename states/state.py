@@ -1,18 +1,16 @@
 from abc import ABC, abstractmethod
 
 class State(ABC):
-    def __init__(self):
+    def __init__(self, thread):
         super().__init__()
         self.__quitRequested = False
         self.__stateChangeRequested = False
+        self.thread = thread
+        self.__nextState = None
 
     @abstractmethod
     def update(self):
         pass 
-
-    @abstractmethod    
-    def next_state(self):
-        pass
     
     @property
     def QuitRequested(self):
@@ -25,8 +23,15 @@ class State(ABC):
     def request_quit(self):
         self.__quitRequested = True
 
-    def request_state_change(self):
+#    def request_state_change(self):
+#        self.__stateChangeRequested = True
+
+    def request_state_change(self, state):
         self.__stateChangeRequested = True
+        self.__nextState = state
+
+    def next_state(self):
+        return self.__nextState
 
 
 if __name__ == "__main__":
