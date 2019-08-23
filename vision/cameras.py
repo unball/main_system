@@ -1,6 +1,8 @@
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
 from os import listdir
 import gui.singleton
-from gi.repository import Gtk
 import statics.configFile
 import cv2
 
