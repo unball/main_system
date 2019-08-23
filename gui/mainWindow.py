@@ -12,6 +12,8 @@ class MainWindow(metaclass=gui.singleton.Singleton):
 		self.update_frame_thread = None
 		self.selectedFrameRenderer = None
 		self.frameRenderers = []
+		self.ui_frame = None
+		self.gameThread = None
 
 	def loadBuilder(self):
 		if self.builder is None:
