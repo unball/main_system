@@ -28,14 +28,14 @@ class Vision():
             time.sleep(0.03)
             return
         robosAliados, robosAdversariosIdentificados, bola = self.process(frame)
-#        world.update(VisionMessage(
-#            [r[1][0] for r in robosAliados],
-#            [r[1][1] for r in robosAliados],
-#            [r[2] for r in robosAliados],
-#            bola[0][0] if bola is not None else None, 
-#            bola[0][1] if bola is not None else None,
-#            [r[3] for r in robosAliados]
-#        ))
+        world.update(VisionMessage(
+            [r[1][0] for r in robosAliados],
+            [r[1][1] for r in robosAliados],
+            [r[2] for r in robosAliados],
+            bola[0][0] if bola is not None else 0, 
+            bola[0][1] if bola is not None else 0,
+            [r[3] for r in robosAliados]
+        ))
     
     @abstractmethod
     def ui_init(self):
