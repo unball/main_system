@@ -2,8 +2,8 @@ from threading import Thread, Event
 from gi.repository import Gtk, Gdk
 import gui.signals
 import gui.uiFrame
-import gui.frameUpdater
 import gui.singleton
+import states.gameThread
 
 class MainWindow(metaclass=gui.singleton.Singleton):
 
@@ -50,14 +50,19 @@ class MainWindow(metaclass=gui.singleton.Singleton):
 		window = self.getObject("window1")
 		window.show_all()
 		
-		# Create webcam thread that updates UI frame
-		ui_frame = gui.uiFrame.uiFrame(self.getObject("frame"), self.getObject("frame_event"))
-		self.update_frame_thread = gui.frameUpdater.frameUpdater(ui_frame)
-		self.update_frame_thread.run()
+		# Creates uiFrame object that handles frame drawning on screen
+		self.ui_frame = gui.uiFrame.uiFrame(self.getObject("frame"), self.getObject("frame_event"))
+		
+		# Creates game thread
+		self.gameThread = states.gameThread.GameThread()
+		self.gameThread.run()
+		#self.update_frame_thread = gui.frameUpdater.frameUpdater(ui_frame)
+		#self.update_frame_thread.run()
 		
 		# Start GTK main loop
 		Gtk.main()
 		
 		# Stops threads
-		self.update_frame_thread.stop()
+		#self.update_frame_thread.stop()
+		self.gameThread.stop()
 		
