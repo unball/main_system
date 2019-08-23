@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 """Control system module."""
 import numpy as np
-import control
+#import control
 
-from communication.msg import robots_speeds_msg
-from communication.msg import comm_msg
+#from communication.msg import robots_speeds_msg
+#from communication.msg import comm_msg
 
 ref_lin_vel = 1
 ref_ang_vel = 1
@@ -15,7 +15,7 @@ class ssRegulator():
 
     def __init__(self):
         """Init method."""
-        self.output_vel = robots_speeds_msg()
+        #self.output_vel = robots_speeds_msg()
         self.number_of_robots = 3
 
         self.x_i = list(0 for i in range(self.number_of_robots))
@@ -90,7 +90,8 @@ class ssRegulator():
         self.updateStateVector()
         self.controlLaw()
         # print(self.output_vel)
-        return self.output_vel
+        #return self.output_vel
+        return None
 
     def updateIntVariables(self, references, world):
         for i in range(self.number_of_robots):
@@ -126,7 +127,8 @@ class ssRegulator():
     def controlLaw(self):
         for i in range(self.number_of_robots):
             # K, S, E = control.lqr(self.A[i], self.B[i], self.Q, self.R)
-            K = control.place(self.A[i], self.B[i], self.poles[i])
-            velocities = np.dot(-K, self.state_vector[i])
-            self.output_vel.linear_vel[i] = velocities[0] # + np.sign(velocities[0])*0.5
-            self.output_vel.angular_vel[i] = velocities[1]
+            #K = control.place(self.A[i], self.B[i], self.poles[i])
+            #velocities = np.dot(-K, self.state_vector[i])
+            #self.output_vel.linear_vel[i] = velocities[0] # + np.sign(velocities[0])*0.5
+            #self.output_vel.angular_vel[i] = velocities[1]
+            pass

@@ -1,0 +1,38 @@
+.roboRow {
+	border: 1px solid #000;
+}
+
+.roboId {
+	font-family: Serif;
+	font-size: 24pt;
+}
+
+.leftbar {
+	background: #fff;
+	padding: 15px;
+}
+
+.blueButton {
+	background: blue;
+	color: #fff;
+}
+
+.redButton {
+	background: red;
+	color: #fff;
+}
+
+.playButton {
+	background: green;
+	color: #fff;
+}
+
+.leftButton {
+	background: midnightblue;
+	color: #fff;
+}
+
+.rightButton {
+	background: darkslategray;
+	color: #fff;
+}
