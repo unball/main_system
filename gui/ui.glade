@@ -74,40 +74,100 @@
       </object>
     </child>
     <child>
-      <object class="GtkGrid">
+      <object class="GtkBox">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="row_homogeneous">True</property>
         <child>
-          <object class="GtkBox">
+          <object class="GtkStackSidebar">
+            <property name="width_request">200</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="hexpand">True</property>
-            <property name="vexpand">True</property>
-            <property name="orientation">vertical</property>
-            <signal name="destroy" handler="onDestroy" swapped="no"/>
+            <property name="stack">stack1</property>
+            <signal name="set-focus-child" handler="mainPageChange" swapped="no"/>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkStack" id="stack1">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="transition_type">slide-left-right</property>
             <child>
               <object class="GtkGrid">
-                <property name="width_request">640</property>
-                <property name="height_request">480</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="row_homogeneous">True</property>
-                <property name="column_homogeneous">True</property>
                 <child>
-                  <object class="GtkEventBox" id="frame_event">
+                  <object class="GtkBox">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="halign">center</property>
-                    <property name="valign">center</property>
+                    <property name="hexpand">True</property>
+                    <property name="vexpand">True</property>
+                    <property name="orientation">vertical</property>
+                    <signal name="destroy" handler="onDestroy" swapped="no"/>
                     <child>
-                      <object class="GtkImage" id="frame">
+                      <object class="GtkGrid">
+                        <property name="width_request">640</property>
+                        <property name="height_request">480</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="pixel_size">200</property>
-                        <property name="icon_name">face-crying-symbolic</property>
-                        <property name="icon_size">6</property>
+                        <property name="row_homogeneous">True</property>
+                        <property name="column_homogeneous">True</property>
+                        <child>
+                          <object class="GtkEventBox" id="frame_event">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="halign">center</property>
+                            <property name="valign">center</property>
+                            <child>
+                              <object class="GtkImage" id="frame">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="pixel_size">200</property>
+                                <property name="icon_name">face-crying-symbolic</property>
+                                <property name="icon_size">6</property>
+                              </object>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="left_attach">0</property>
+                            <property name="top_attach">0</property>
+                          </packing>
+                        </child>
                       </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkNotebook" id="fr_notebook">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <signal name="switch-page" handler="onConfigPageChange" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="stats_label">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="halign">start</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">2</property>
+                      </packing>
                     </child>
                   </object>
                   <packing>
@@ -117,222 +177,199 @@
                 </child>
               </object>
               <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
+                <property name="name">mainMenu</property>
+                <property name="title" translatable="yes">Configuração</property>
               </packing>
             </child>
             <child>
-              <object class="GtkNotebook" id="fr_notebook">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <signal name="switch-page" handler="onConfigPageChange" swapped="no"/>
-              </object>
-              <packing>
-                <property name="expand">True</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel" id="stats_label">
+              <object class="GtkBox">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="halign">start</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">2</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="left_attach">1</property>
-            <property name="top_attach">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkBox">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="orientation">vertical</property>
-            <property name="spacing">4</property>
-            <child>
-              <object class="GtkImage">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="halign">center</property>
-                <property name="valign">start</property>
-                <property name="pixbuf">logo.png</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel" id="gameCommands_placar">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Placar:
-UnBall 0x0 Oponente</property>
-                <property name="justify">center</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel" id="gameCommands_estado">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Equipe UnBall</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">2</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton">
-                <property name="label" translatable="yes">Início de jogo</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <signal name="clicked" handler="gameCommands_IniciodeJogo" swapped="no"/>
-                <style>
-                  <class name="blueButton"/>
-                </style>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">3</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton" id="gameCommands_playpause">
-                <property name="label" translatable="yes">Play</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <signal name="clicked" handler="gameCommands_mudarTexto" swapped="no"/>
-                <style>
-                  <class name="playButton"/>
-                </style>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">4</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton">
-                <property name="label" translatable="yes">Goal :)</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <signal name="clicked" handler="gameCommands_ally" swapped="no"/>
-                <style>
-                  <class name="blueButton"/>
-                </style>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">5</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkButton">
-                <property name="label" translatable="yes">Goal :(</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <signal name="clicked" handler="gameCommands_enemy" swapped="no"/>
-                <style>
-                  <class name="redButton"/>
-                </style>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">6</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkFrame">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="label_xalign">0</property>
-                <property name="shadow_type">none</property>
+                <property name="orientation">vertical</property>
+                <property name="spacing">4</property>
                 <child>
-                  <object class="GtkBox">
+                  <object class="GtkImage">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <child>
-                      <object class="GtkButton">
-                        <property name="label" translatable="yes">LEFT</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <signal name="clicked" handler="gameCommands_left" swapped="no"/>
-                        <style>
-                          <class name="leftButton"/>
-                        </style>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkButton">
-                        <property name="label" translatable="yes">RIGHT</property>
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="receives_default">True</property>
-                        <signal name="clicked" handler="gameCommands_right" swapped="no"/>
-                        <style>
-                          <class name="rightButton"/>
-                        </style>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">1</property>
-                      </packing>
-                    </child>
+                    <property name="halign">center</property>
+                    <property name="valign">start</property>
+                    <property name="pixbuf">logo.png</property>
                   </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
                 </child>
-                <child type="label">
-                  <object class="GtkLabel">
+                <child>
+                  <object class="GtkLabel" id="gameCommands_placar">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">Lado:</property>
+                    <property name="label" translatable="yes">Placar:
+UnBall 0x0 Oponente</property>
+                    <property name="justify">center</property>
                   </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
                 </child>
+                <child>
+                  <object class="GtkLabel" id="gameCommands_estado">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Equipe UnBall</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton">
+                    <property name="label" translatable="yes">Início de jogo</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <signal name="clicked" handler="gameCommands_IniciodeJogo" swapped="no"/>
+                    <style>
+                      <class name="blueButton"/>
+                    </style>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">3</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton" id="gameCommands_playpause">
+                    <property name="label" translatable="yes">Play</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <signal name="clicked" handler="gameCommands_mudarTexto" swapped="no"/>
+                    <style>
+                      <class name="playButton"/>
+                    </style>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">4</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton">
+                    <property name="label" translatable="yes">Goal :)</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <signal name="clicked" handler="gameCommands_ally" swapped="no"/>
+                    <style>
+                      <class name="blueButton"/>
+                    </style>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">5</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton">
+                    <property name="label" translatable="yes">Goal :(</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <signal name="clicked" handler="gameCommands_enemy" swapped="no"/>
+                    <style>
+                      <class name="redButton"/>
+                    </style>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">6</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkFrame">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label_xalign">0</property>
+                    <property name="shadow_type">none</property>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <child>
+                          <object class="GtkButton">
+                            <property name="label" translatable="yes">LEFT</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">True</property>
+                            <signal name="clicked" handler="gameCommands_left" swapped="no"/>
+                            <style>
+                              <class name="leftButton"/>
+                            </style>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkButton">
+                            <property name="label" translatable="yes">RIGHT</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">True</property>
+                            <signal name="clicked" handler="gameCommands_right" swapped="no"/>
+                            <style>
+                              <class name="rightButton"/>
+                            </style>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                      </object>
+                    </child>
+                    <child type="label">
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Lado:</property>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">7</property>
+                  </packing>
+                </child>
+                <style>
+                  <class name="leftbar"/>
+                </style>
               </object>
               <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">7</property>
+                <property name="name">gameLoop</property>
+                <property name="title" translatable="yes">Comandos de jogo</property>
+                <property name="position">1</property>
               </packing>
             </child>
-            <style>
-              <class name="leftbar"/>
-            </style>
           </object>
           <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">0</property>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
           </packing>
         </child>
       </object>
