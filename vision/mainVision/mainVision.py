@@ -42,6 +42,8 @@ class MainVision(vision.vision.Vision):
 		self.time_hsv = np.array(statics.configFile.getValue("time_hsv_interval", self.default_time_hsv))
 		self.bola_hsv = np.array(statics.configFile.getValue("bola_hsv_interval", self.default_bola_hsv))
 		self.homography = np.array(statics.configFile.getValue("homography_matrix"), None)
+		self.use_homography = statics.configFile.getValue("use_homography", True)
+		self.crop_points = statics.configFile.getValue("crop_points")
 
 
 	def ui_init(self):
@@ -98,12 +100,30 @@ class MainVision(vision.vision.Vision):
 		
 		self.homography = h
 	
+	def updateCropPoints(self, points):
+		self.crop_points = points
+		statics.configFile.setValue("crop_points", points)
+	
+	def setUseHomography(self, value):
+		self.use_homography = value
+		statics.configFile.setValue("use_homography", value)
+	
 	def warp(self, frame):
+		if not self.use_homography:
+			if self.crop_points:
+				x  = self.crop_points[0][0]
+				xf = self.crop_points[1][0]
+				y  = self.crop_points[0][1]
+				yf = self.crop_points[1][1]
+				return frame[y:yf, x:xf]
+			else:
+				return frame
+		
 		homography_matrix = self.homography
 		try:
-		    return cv2.warpPerspective(frame, homography_matrix, (frame.shape[1], frame.shape[0]))
+			return cv2.warpPerspective(frame, homography_matrix, (frame.shape[1], frame.shape[0]))
 		except:
-		    return frame
+			return frame
 		
 	
 	def definePoly(self, countor):

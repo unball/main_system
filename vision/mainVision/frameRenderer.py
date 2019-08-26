@@ -19,6 +19,7 @@ class cortarCampo(gui.frameRenderer.frameRenderer):
 		self.frame_shape = None
 		
 		self.points = statics.configFile.getValue("points", [])
+		self.crop_points = statics.configFile.getValue("cortarCampo_crop_points", [])
 		
 	def sortPoints(self,points):
 		if len(points) == 4:
@@ -32,28 +33,54 @@ class cortarCampo(gui.frameRenderer.frameRenderer):
 	def update_points(self, point):
 		if self.show_warpped: return
 		
-		if len(self.points) >= 4:
-			self.points.clear()
+		if self.parentVision.use_homography:
+			if len(self.points) >= 4:
+				self.points.clear()
+				
+			if len(self.points) < 4:
+				self.points.append(point)
+				
+			if len(self.points) == 4 and self.frame_shape is not None:
+				statics.configFile.setValue("points", self.points)
+				
+				self.parentVision.updateHomography(self.sortPoints(self.points.copy()), self.frame_shape)
+		else:
+			if len(self.crop_points) >= 2:
+				self.crop_points.clear()
+				
+			if len(self.crop_points) < 2:
+				self.crop_points.append(point)
+				
+			if len(self.crop_points) == 2 and self.frame_shape is not None:
+				statics.configFile.setValue("cortarCampo_crop_points", self.crop_points)
+				
+				self.parentVision.updateCropPoints(self.crop_points.copy())
 			
-		if len(self.points) < 4:
-			self.points.append(point)
-			
-		if len(self.points) == 4 and self.frame_shape is not None:
-			statics.configFile.setValue("points", self.points)
-			
-			self.parentVision.updateHomography(self.sortPoints(self.points.copy()), self.frame_shape)
 	
 	def set_pointer_position(self, position):
 		self.pointer_position = position
 	
 	def set_show_mode(self, widget, value):
 		self.show_warpped = value
+	
+	def set_crop_mode(self, widget, value):
+		self.parentVision.setUseHomography(value)
 		
 	def transformFrame(self, frame, originalFrame):
 		self.frame_shape = frame.shape
 		
 		if(self.show_warpped):
 			return cv2.cvtColor(self.parentVision.warp(frame), cv2.COLOR_RGB2BGR)
+		
+		if not self.parentVision.use_homography:
+			if len(self.crop_points) == 1:
+				cv2.circle(frame, (self.crop_points[0][0], self.crop_points[0][1]), 5, (255,255,255), thickness=-1)
+				cv2.rectangle(frame, (self.crop_points[0][0], self.crop_points[0][1]), (self.pointer_position[0], self.pointer_position[1]), (255,255,255))
+			elif len(self.crop_points) == 2:
+				cv2.circle(frame, (self.crop_points[0][0], self.crop_points[0][1]), 5, (0,255,0), thickness=-1)
+				cv2.circle(frame, (self.crop_points[1][0], self.crop_points[1][1]), 5, (0,255,0), thickness=-1)
+				cv2.rectangle(frame, (self.crop_points[0][0], self.crop_points[0][1]), (self.crop_points[1][0], self.crop_points[1][1]), (0,255,0), thickness=2)
+			return cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 		
 		color = (0,255,0) if len(self.points) == 4 else (255,255,255)
 		
@@ -92,6 +119,8 @@ class cortarCampo(gui.frameRenderer.frameRenderer):
 	def create_ui_content(self):
 		builder = Gtk.Builder.new_from_file("vision/mainVision/cortarCampo.ui")
 		builder.get_object("campo_switch").connect("state-set", self.set_show_mode)
+		builder.get_object("homografia_switch").connect("state-set", self.set_crop_mode)
+		builder.get_object("homografia_switch").set_state(self.parentVision.use_homography)
 		gui.mainWindow.MainWindow().getObject("frame_event").connect("button-press-event", self.cortarCampo_update_points)
 		gui.mainWindow.MainWindow().getObject("frame_event").connect("motion-notify-event", self.cortarCampo_mouseOver)
 
