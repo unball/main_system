@@ -142,7 +142,7 @@ class MainVision(vision.vision.Vision):
 	
 	def detectarCamisa(self, component_mask):
 		# Encontra um contorno para a camisa com base no maior contorno
-		mainContours,_ = cv2.findContours(component_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+		_,mainContours,_ = cv2.findContours(component_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 		mainContour = sorted(mainContours, key=cv2.contourArea)[-1]
 		
 		# Encontra o menor retângulo que se inscreve na camisa
@@ -160,9 +160,8 @@ class MainVision(vision.vision.Vision):
 		renderFrame = img.copy()
 		
 		# Encontra os contornos internos com área maior que um certo limiar e ordena
-		internalContours,_ = cv2.findContours(componentTeamMask, cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_L1)
+		_,internalContours,_ = cv2.findContours(componentTeamMask, cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_L1)
 		internalContours = [countor for countor in internalContours if cv2.contourArea(countor)>10]
-		internalContours = sorted(internalContours, key=cv2.contourArea)
 		
 		countInternalContours = len(internalContours)
 			
@@ -171,10 +170,10 @@ class MainVision(vision.vision.Vision):
 		
 		# Não é do nosso time
 		if countInternalContours == 0:
-			return None, centerMeters, angle, renderFrame
+			return None, centerMeters, angle, renderFrame, center
 		
 		# Seleciona a forma principal
-		mainShape = internalContours[-1]
+		mainShape = max(internalContours, key=cv2.contourArea)
 		
 		# Desenha o contorno no frame
 		cv2.drawContours(renderFrame, mainShape, 0, (255,0,0), 1)
@@ -198,7 +197,7 @@ class MainVision(vision.vision.Vision):
 		# Insere o número do robô no frame
 		cv2.putText(renderFrame, str(identificador), (int(center[0])-10, int(center[1])+10), cv2.FONT_HERSHEY_TRIPLEX, 1, (0,0,0))
 		
-		return identificador, centerMeters, estimatedAngle, renderFrame
+		return identificador, centerMeters, estimatedAngle, renderFrame, center
 	
 	def segmentarFundo(self, frame):
 		img_filtered = cv2.GaussianBlur(frame, (5,5), 0)
@@ -224,31 +223,49 @@ class MainVision(vision.vision.Vision):
 	def ui_process(self, frame):
 		robosAliadosIdentificados, robosAdversariosIdentificados, bola, processed_image = self.process_frame(frame)
 		return processed_image
-
-	def process_frame(self, frame):
-		# Corta o campo
-		img_warpped = self.warp(frame)
+	
+	def converterHSV(self, img):
+		img_filtered = cv2.GaussianBlur(img, (5,5), 0)
+		return cv2.cvtColor(img_filtered, cv2.COLOR_BGR2HSV)
+	
+	def obterMascaraElementos(self,img):
+		return cv2.inRange(img, self.preto_hsv[0:3], self.preto_hsv[3:6])
 		
-		# Segmenta o fundo
-		img_filtered = cv2.GaussianBlur(img_warpped, (5,5), 0)
-		img_hsv = cv2.cvtColor(img_filtered, cv2.COLOR_BGR2HSV)
-		mask = cv2.inRange(img_hsv, self.preto_hsv[0:3], self.preto_hsv[3:6])
-		
-		# Segmenta o time
-		teamMask = cv2.inRange(img_hsv, self.time_hsv[0:3], self.time_hsv[3:6])
-		
-		# Encontra componentes conectados e aplica operações de abertura e dilatação
+	def obterMascaraTime(self, img):
+		return cv2.inRange(img, self.time_hsv[0:3], self.time_hsv[3:6])
+	
+	def obterComponentesConectados(self, mask):
 		num_components, components = cv2.connectedComponents(mask)
 		kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (7,7))
 		components = cv2.morphologyEx(np.uint8(components), cv2.MORPH_OPEN, kernel)
 		kernel = cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
-		components = cv2.dilate(np.uint8(components), kernel, iterations=1)
+		return cv2.dilate(np.uint8(components), kernel, iterations=1)
+	
+	def process_frame(self, frame):
+		# Corta o campo
+		img_warpped = self.warp(frame)
+
+					
+				
+				
+		
+		# Formata como HSV
+		img_hsv = self.converterHSV(img_warpped)
+		
+		# Segmenta o fundo
+		mask = self.obterMascaraElementos(img_hsv)
+		
+		# Segmenta o time
+		teamMask = self.obterMascaraTime(img_hsv)
+		
+		# Encontra componentes conectados e aplica operações de abertura e dilatação
+		components = self.obterComponentesConectados(mask)
 		
 		# Frame zerado a ser renderizado
 		processed_image = np.zeros(img_warpped.shape, np.uint8)
 		
 		# Listas com aliados e inimigos
-		robosAliados = [(i,(0,0),0,False) for i in range(5)]
+		robosAliados = [(i,(0,0),0,False,(0,0)) for i in range(5)]
 		robosAdversariosIdentificados = []
 		
 		# Itera por cada elemento conectado
@@ -263,40 +280,20 @@ class MainVision(vision.vision.Vision):
 			componentTeamMask = componentMask & teamMask
 			
 			# Tenta detectar o elemento como sendo do nosso time ou adversário
-			identificador, centro, angulo, component_image = self.detectarTime(comp, componentMask, componentTeamMask)
+			identificador, centro, angulo, component_image, centroPixels = self.detectarTime(comp, componentMask, componentTeamMask)
 			
 			# Adiciona às listas de aliados ou inimigos
 			if identificador is not None and identificador < 5:
-				robosAliados[identificador] = (identificador, centro, angulo, True)
+				robosAliados[identificador] = (identificador, centro, angulo, True, centroPixels)
 			else:
 				robosAdversariosIdentificados.append((centro, angulo))
 				
 			if component_image is not None:
 				processed_image = cv2.add(processed_image, component_image)
 				
-			# Detecta círculos
-#			cnts,_ = cv2.findContours(componentMask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-#			c = max(cnts, key=cv2.contourArea)
-#			
-#			ellipse = cv2.fitEllipse(c)
-#			((x, y), radius) = cv2.minEnclosingCircle(c)
-#			
-#			(center,axes,orientation) = ellipse
-#			majoraxis_length = max(axes)
-#			minoraxis_length = min(axes)
-#			eccentricity=(np.sqrt(1-(minoraxis_length/majoraxis_length)**2))
-#			areaRatio = abs((np.pi * (majoraxis_length/2 * minoraxis_length/2)) / cv2.contourArea(c)-1)
-#			lengthRatio = abs(cv2.arcLength(c,True) / (2 * np.pi * (majoraxis_length/4+minoraxis_length/4)) - 1)
-#			axisDifference = majoraxis_length - minoraxis_length
-#			ellipseAverageAxisLength = (majoraxis_length+minoraxis_length)/2
-#			
-#			print("eccentricity: {:.5f}\tare: {:.5f}\taxis difference: {:.5f}\tlre: {:.5f}\tradius: {:10.5f}\teaal: {:.5f}".format(eccentricity, areaRatio, axisDifference, lengthRatio, radius, ellipseAverageAxisLength))
-#	 
-#			if axisDifference < 1.4: cv2.ellipse(processed_image,ellipse,(0,255,0),2)
-
 		# Segmenta a bola
 		bolaMask = mask & cv2.inRange(img_hsv, self.bola_hsv[0:3], self.bola_hsv[3:6])
-		bolaContours,_ = cv2.findContours(bolaMask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+		_,bolaContours,_ = cv2.findContours(bolaMask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 		bolaContours = [countor for countor in bolaContours if cv2.contourArea(countor)>10]
 		
 		if len(bolaContours) != 0:
