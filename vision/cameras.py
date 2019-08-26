@@ -5,12 +5,14 @@ from os import listdir
 import gui.singleton
 import statics.configFile
 import cv2
+import time
 
 class uiCamerasList(metaclass=gui.singleton.Singleton):
     def __init__(self):
         self.cameras = set()
         self.__camera_changed = False
         self.cap = None
+        self.frame = cv2.imread("gui/frame.png")
         
         # Load configuration file
         self.camera_index = statics.configFile.getValue("camera", 0)
@@ -37,8 +39,8 @@ class uiCamerasList(metaclass=gui.singleton.Singleton):
         statics.configFile.setValue("camera", self.camera_index)
     
     def getFrame(self):
-        frame_ = cv2.imread("gui/frame.png")
-        return frame_
+        time.sleep(0.0001)
+        return self.frame.copy()
         
 #        if self.__camera_changed:
 #            self.__camera_changed = False
