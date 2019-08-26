@@ -138,7 +138,7 @@ class MainVision(vision.vision.Vision):
 		contourArea = cv2.contourArea(countor)
 		rectArea = rect[1][0]*rect[1][1]
 		
-		return 4 if contourArea/rectArea > 0.7 else 3
+		return 4 if contourArea/rectArea > 0.75 else 3
 	
 	def detectarCamisa(self, component_mask):
 		# Encontra um contorno para a camisa com base no maior contorno
