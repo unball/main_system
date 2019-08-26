@@ -15,6 +15,7 @@ class RoboAliado():
 	def __init__(self, identificador):
 		self.identificador = identificador
 		self.centro = (-1,-1)
+		self.centroPixels = (-1,-1)
 		self.angulo = -1
 		self.estado = "Não-Identificado"
 		self.ui = None
@@ -28,6 +29,7 @@ class MainVision(vision.vision.Vision):
 			RoboAliado(3),
 			RoboAliado(4)
 		]
+		self.todosReconhecidos = False
 		self.robosAdversarios = []
 		self.bola = None
 		self.angles = np.array([0, 90, 180, -90, -180])
@@ -85,12 +87,17 @@ class MainVision(vision.vision.Vision):
 		# Atualiza posição da bola
 		self.bola = bola
 		
+		todosReconhecidos = True
 		for i,r in enumerate(robosAliados):
-			if r[-1] == True:
+			if r[3] == True:
 				self.robosAliados[i].centro = r[1]
+				self.robosAliados[i].centroPixels = r[4]
 				self.robosAliados[i].angulo = r[2]
 				self.robosAliados[i].estado = "Identificado"
-			else: self.robosAliados[i].estado = "Não-Identificado"
+			else:
+				todosReconhecidos = False
+				self.robosAliados[i].estado = "Não-Identificado"
+		self.todosReconhecidos = todosReconhecidos
 	
 	def updateHomography(self, points, shape):
 		height, width, _ = shape
