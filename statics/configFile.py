@@ -15,7 +15,7 @@ def saveConfig(config):
 def getValue(key, default_key=None):
 	config = getConfig()
 	
-	if(config.get(key)):
+	if config.get(key) is not None:
 		ret = config[key]
 	else:
 		config[key] = default_key
