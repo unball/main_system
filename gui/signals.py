@@ -16,6 +16,9 @@ class Signals:
         
     def select_camera(self, widget, widget_selected):
         vision.cameras.uiCamerasList().setCamera(widget_selected.index)
+    
+    def update_camera_scale(self, widget):
+        vision.cameras.uiCamerasList().set_camera_scale(widget.get_value())
         
     def onConfigPageChange(self, page, widget, num):
         self.pageSelected = num

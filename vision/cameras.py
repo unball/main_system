@@ -6,6 +6,7 @@ import gui.singleton
 import statics.configFile
 import cv2
 import time
+import gui.mainWindow
 
 class uiCamerasList(metaclass=gui.singleton.Singleton):
     def __init__(self):
@@ -16,6 +17,8 @@ class uiCamerasList(metaclass=gui.singleton.Singleton):
         
         # Load configuration file
         self.camera_index = statics.configFile.getValue("camera", 0)
+        self.frame_scale = statics.configFile.getValue("frame_scale", 1)
+        if self.frame_scale <= 0: self.set_camera_scale(1)
         
         self.cap = cv2.VideoCapture(self.camera_index)
     
@@ -23,6 +26,7 @@ class uiCamerasList(metaclass=gui.singleton.Singleton):
         return set(enumerate(sorted([c for c in listdir("/sys/class/video4linux/")])))
 
     def updateCameras(self, widget_list):
+        gui.mainWindow.MainWindow().getObject("camera_scale").set_value(self.frame_scale)
         for camera in sorted([c for c in self.getCameras().difference(self.cameras)]):
             self.cameras.add(camera)
             row = Gtk.ListBoxRow()
@@ -38,9 +42,15 @@ class uiCamerasList(metaclass=gui.singleton.Singleton):
         self.__camera_changed = True
         statics.configFile.setValue("camera", self.camera_index)
     
+    def set_camera_scale(self, value):
+        if value <= 0: return
+        self.frame_scale = value
+        statics.configFile.setValue("frame_scale", value)
+    
     def getFrame(self):
         time.sleep(0.0001)
-        return self.frame.copy()
+        frame_resized = cv2.resize(self.frame, (round(self.frame.shape[1]*self.frame_scale),round(self.frame.shape[0]*self.frame_scale)))
+        return frame_resized
         
 #        if self.__camera_changed:
 #            self.__camera_changed = False
@@ -49,7 +59,8 @@ class uiCamerasList(metaclass=gui.singleton.Singleton):
 #        
 #        if self.cap.isOpened():
 #            ret, frame = self.cap.read()
-#            return frame
+#            frame_resized = cv2.resize(frame, (round(frame.shape[1]*self.frame_scale),round(frame.shape[0]*self.frame_scale)))
+#            return frame_resized
 #        
 #        return None
 #            
