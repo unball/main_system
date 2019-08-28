@@ -108,6 +108,13 @@ class World(object):
     @property
     def isPaused(self):
         return self._isPaused
+    
+    def increaseGameScore(self):
+        self.gameScore = self.gameScore + 1
+    
+    def decreaseGameScore(self):
+        self.gameScore = self.gameScore - 1
+
 
 
 if __name__ == '__main__':

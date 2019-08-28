@@ -3,6 +3,7 @@
 import gui.mainWindow
 from gi.repository import Gtk, Gdk
 import gui.singleton
+from statics.static_classes import world
 
 class gameCommands(metaclass=gui.singleton.Singleton):
 	def __init__(self):
@@ -31,6 +32,7 @@ class gameCommands(metaclass=gui.singleton.Singleton):
 		if estadoLabel.get_text() == "O jogo está rodando":
 			print("Goal")
 			self.goalAlly += 1
+			world.increaseGameScore()
 			placarLabel.set_text("Placar\nUnBall " + str(self.goalAlly) + " x " + str(self.goalEnemy) + " " + self.oponente)
 			estadoLabel.set_text("O jogo está pausado")
 			estadoLabel.modify_fg(Gtk.StateFlags.NORMAL, Gdk.color_parse("red"))
@@ -47,6 +49,7 @@ class gameCommands(metaclass=gui.singleton.Singleton):
 		if estadoLabel.get_text() == "O jogo está rodando":
 			print("E Goal")
 			self.goalEnemy += 1
+			world.decreaseGameScore()
 			placarLabel.set_text("Placar\nUnBall " + str(self.goalAlly) + " x " + str(self.goalEnemy) + " " + self.oponente)
 			estadoLabel.set_text("O jogo está pausado")
 			estadoLabel.modify_fg(Gtk.StateFlags.NORMAL, Gdk.color_parse("red"))
