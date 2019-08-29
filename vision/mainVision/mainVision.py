@@ -1,10 +1,11 @@
 import cv2
 import statics.configFile
 import numpy as np
-import gui.pixel2metric
+import vision.pixel2metric
 import vision.mainVision.frameRenderer
 from gi.repository import GLib
 import vision.vision
+import gui.mainWindow
 
 class RoboAdversario():
 	def __init__(self, centro, angulo):
@@ -150,7 +151,7 @@ class MainVision(vision.vision.Vision):
 		
 		# Calcula a posição e ângulo parcial da camisa com base no retângulo
 		center = rectangle[0]
-		centerMeters = gui.pixel2metric.pixel2meters(center, component_mask.shape)
+		centerMeters = vision.pixel2metric.pixel2meters(center, component_mask.shape)
 		angle = rectangle[-1]
 		
 		return center, centerMeters, angle
@@ -301,7 +302,7 @@ class MainVision(vision.vision.Vision):
 			((x,y), radius) = cv2.minEnclosingCircle(bolaContour)
 			cv2.circle(processed_image, (int(x),int(y)), int(radius), (0,255,0), 1)
 			
-			bola = (gui.pixel2metric.pixel2meters((x,y), bolaMask.shape), radius)
+			bola = (vision.pixel2metric.pixel2meters((x,y), bolaMask.shape), radius)
 		else: bola = None
 		
 		self.atualizarRobos(robosAliados, robosAdversariosIdentificados, bola)

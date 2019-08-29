@@ -5,7 +5,6 @@ import gui.mainWindow
 import cv2
 import gui.singleton
 import time
-import gui.pixel2metric
 import vision.mainVision
 import gui.frameRenderer
 
