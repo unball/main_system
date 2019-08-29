@@ -6,6 +6,8 @@ import vision.mainVision.frameRenderer
 from gi.repository import GLib
 import vision.vision
 import gui.mainWindow
+from statics.static_classes import world
+from statics import field
 
 class RoboAdversario():
 	def __init__(self, centro, angulo):
@@ -274,6 +276,12 @@ class MainVision(vision.vision.Vision):
 		# Frame zerado a ser renderizado
 		processed_image = np.zeros(img_warpped.shape, np.uint8)
 		
+		# Desenha lado do campo
+		height, width, _ = processed_image.shape
+		self.draw_left_rectangle(processed_image, (255,0,0) if world.fieldSide == field.LEFT else (0,255,0))
+		self.draw_right_rectangle(processed_image, (255,0,0) if world.fieldSide == field.RIGHT else (0,255,0))
+		cv2.line(processed_image, (int(width/2),0), (int(width/2),height), (100,100,100), 1)
+		
 		# Listas com aliados e inimigos
 		robosAliados = [(i,(0,0),0,False,(0,0)) for i in range(5)]
 		robosAdversariosIdentificados = []
@@ -317,3 +325,15 @@ class MainVision(vision.vision.Vision):
 		self.atualizarRobos(robosAliados, robosAdversariosIdentificados, bola)
 
 		return robosAliados, robosAdversariosIdentificados, bola, processed_image
+	
+	def draw_left_rectangle(self, image, color, thickness=10):
+		height, width, _ = image.shape
+		cv2.line(image, (int(width/2)-thickness,0), (0,0), color, thickness)
+		cv2.line(image, (0,0), (0, height), color, thickness)
+		cv2.line(image, (int(width/2)-thickness,height), (0, height), color, thickness)
+		
+	def draw_right_rectangle(self, image, color, thickness=10):
+		height, width, _ = image.shape
+		cv2.line(image, (int(width/2)+thickness,0), (width,0), color, thickness)
+		cv2.line(image, (width,0), (width, height), color, thickness)
+		cv2.line(image, (width, height), (int(width/2)+thickness, height), color, thickness)

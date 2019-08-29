@@ -15,16 +15,15 @@ class VisionMessage():
         self.ball_y = ball_y
         self.found = found_list
 
-class Vision():
+class Vision(ABC):
     def __init__(self):
         self.config_init()
         self.ui_init()
     
     @abstractmethod
-    def process(self):
+    def process(self, frame):
         pass
     
-    @abstractmethod
     def update(self):
         frame = vision.cameras.uiCamerasList().getFrame()
         if frame is None:

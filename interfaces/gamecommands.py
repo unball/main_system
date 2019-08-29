@@ -4,6 +4,7 @@ import gui.mainWindow
 from gi.repository import Gtk, Gdk
 import gui.singleton
 from statics.static_classes import world
+from statics import field
 
 class gameCommands(metaclass=gui.singleton.Singleton):
 	def __init__(self):
@@ -16,10 +17,12 @@ class gameCommands(metaclass=gui.singleton.Singleton):
 		
 	def left(self):
 		print ("L")
+		world.change_field_side(field.LEFT)
 		#pub.publish("L")
 		#rate.sleep()
 	
 	def right(self):
+		world.change_field_side(field.RIGHT)
 		print ("R")
 		#pub.publish("R")
 		#rate.sleep()
