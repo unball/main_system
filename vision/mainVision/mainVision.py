@@ -278,8 +278,8 @@ class MainVision(vision.vision.Vision):
 		
 		# Desenha lado do campo
 		height, width, _ = processed_image.shape
-		self.draw_left_rectangle(processed_image, (255,0,0) if world.fieldSide == field.LEFT else (0,255,0))
-		self.draw_right_rectangle(processed_image, (255,0,0) if world.fieldSide == field.RIGHT else (0,255,0))
+		self.draw_left_rectangle(processed_image, (0,255,0) if world.fieldSide == field.LEFT else (0,0,255))
+		self.draw_right_rectangle(processed_image, (0,255,0) if world.fieldSide == field.RIGHT else (0,0,255))
 		cv2.line(processed_image, (int(width/2),0), (int(width/2),height), (100,100,100), 1)
 		
 		# Listas com aliados e inimigos
