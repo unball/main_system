@@ -37,7 +37,7 @@ class cortarCampo(gui.frameRenderer.frameRenderer):
 				self.points.clear()
 				
 			if len(self.points) < 4:
-				self.points.append(point)
+				self.points.append([point[0]/self.frame_shape[0], point[1]/self.frame_shape[1]])
 				
 			if len(self.points) == 4 and self.frame_shape is not None:
 				statics.configFile.setValue("points", self.points)
@@ -48,7 +48,7 @@ class cortarCampo(gui.frameRenderer.frameRenderer):
 				self.crop_points.clear()
 				
 			if len(self.crop_points) < 2:
-				self.crop_points.append(point)
+				self.crop_points.append([point[0]/self.frame_shape[0], point[1]/self.frame_shape[1]])
 				
 			if len(self.crop_points) == 2 and self.frame_shape is not None:
 				statics.configFile.setValue("cortarCampo_crop_points", self.crop_points)
@@ -64,6 +64,13 @@ class cortarCampo(gui.frameRenderer.frameRenderer):
 	
 	def set_crop_mode(self, widget, value):
 		self.parentVision.setUseHomography(value)
+	
+	def get_point_pixels(self, index):
+		return (round(self.points[index][0]*self.frame_shape[0]), round(self.points[index][1]*self.frame_shape[1]))
+		#return (self.points[index][0], self.points[index][1])
+		
+	def get_crop_point_pixels(self, index):
+		return (round(self.crop_points[index][0]*self.frame_shape[0]), round(self.crop_points[index][1]*self.frame_shape[1]))
 		
 	def transformFrame(self, frame, originalFrame):
 		self.frame_shape = frame.shape
@@ -73,12 +80,15 @@ class cortarCampo(gui.frameRenderer.frameRenderer):
 		
 		if not self.parentVision.use_homography:
 			if len(self.crop_points) == 1:
-				cv2.circle(frame, (self.crop_points[0][0], self.crop_points[0][1]), 5, (255,255,255), thickness=-1)
-				cv2.rectangle(frame, (self.crop_points[0][0], self.crop_points[0][1]), (self.pointer_position[0], self.pointer_position[1]), (255,255,255))
+				p0 = self.get_crop_point_pixels(0)
+				cv2.circle(frame, p0, 5, (255,255,255), thickness=-1)
+				cv2.rectangle(frame, p0, (self.pointer_position[0], self.pointer_position[1]), (255,255,255))
 			elif len(self.crop_points) == 2:
-				cv2.circle(frame, (self.crop_points[0][0], self.crop_points[0][1]), 5, (0,255,0), thickness=-1)
-				cv2.circle(frame, (self.crop_points[1][0], self.crop_points[1][1]), 5, (0,255,0), thickness=-1)
-				cv2.rectangle(frame, (self.crop_points[0][0], self.crop_points[0][1]), (self.crop_points[1][0], self.crop_points[1][1]), (0,255,0), thickness=2)
+				p0 = self.get_crop_point_pixels(0)
+				p1 = self.get_crop_point_pixels(1)
+				cv2.circle(frame, p0, 5, (0,255,0), thickness=-1)
+				cv2.circle(frame, p1, 5, (0,255,0), thickness=-1)
+				cv2.rectangle(frame, p0, p1, (0,255,0), thickness=2)
 			return cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 		
 		color = (0,255,0) if len(self.points) == 4 else (255,255,255)
@@ -86,21 +96,21 @@ class cortarCampo(gui.frameRenderer.frameRenderer):
 		# Draw line for each pair of points
 		if len(self.points) > 1:
 			for i in range(len(self.points)-1):
-				cv2.line(frame, (self.points[i][0], self.points[i][1]), (self.points[i+1][0], self.points[i+1][1]), color, thickness=2)
+				cv2.line(frame, self.get_point_pixels(i), self.get_point_pixels(i+1), color, thickness=2)
 		
 		# Closes rectangle
 		if len(self.points) == 4:
-			cv2.line(frame, (self.points[0][0], self.points[0][1]), (self.points[3][0], self.points[3][1]), color, thickness=2)
+			cv2.line(frame, self.get_point_pixels(0), self.get_point_pixels(3), color, thickness=2)
 		
 		# Draw helping line from last chosen point to current mouse position
 		if self.pointer_position and len(self.points) > 0 and len(self.points) < 4:
-			cv2.line(frame, (self.points[-1][0], self.points[-1][1]), (self.pointer_position[0], self.pointer_position[1]), (255,255,255))
+			cv2.line(frame, self.get_point_pixels(-1), (self.pointer_position[0], self.pointer_position[1]), (255,255,255))
 			# Draw extra line from first chosen point to current position when it's the last point to be chosen
 			if len(self.points) == 3:
-				cv2.line(frame, (self.points[0][0], self.points[0][1]), (self.pointer_position[0], self.pointer_position[1]), color)
+				cv2.line(frame, self.get_point_pixels(0), (self.pointer_position[0], self.pointer_position[1]), color)
 		
-		for point in self.points:
-			cv2.circle(frame, (point[0], point[1]), 5, color, thickness=-1)
+		for i in range(len(self.points)):
+			cv2.circle(frame, self.get_point_pixels(i), 5, color, thickness=-1)
 		
 		return cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 		

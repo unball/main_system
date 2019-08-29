@@ -38,6 +38,7 @@ class MainVision(vision.vision.Vision):
 		self.default_preto_hsv = [0,94,163,360,360,360]
 		self.default_time_hsv = [13,0,0,32,360,360]
 		self.default_bola_hsv = [0, 117, 0, 98, 360, 360]
+		self.current_frame_shape = None
 		super().__init__()
 
 	def config_init(self):
@@ -47,6 +48,7 @@ class MainVision(vision.vision.Vision):
 		self.homography = np.array(statics.configFile.getValue("homography_matrix"), None)
 		self.use_homography = statics.configFile.getValue("use_homography", True)
 		self.crop_points = statics.configFile.getValue("crop_points")
+		self.homography_points = statics.configFile.getValue("homography_points")
 
 
 	def ui_init(self):
@@ -100,11 +102,20 @@ class MainVision(vision.vision.Vision):
 				self.robosAliados[i].estado = "Não-Identificado"
 		self.todosReconhecidos = todosReconhecidos
 	
+	def getHomography(self, shape):
+		if self.current_frame_shape != shape:
+			self.updateHomography(self.homography_points, shape)
+		return self.homography
+	
 	def updateHomography(self, points, shape):
 		height, width, _ = shape
+		self.current_frame_shape = shape
+		self.homography_points = points
+		key_points = np.array(points) * np.array([height, width])
 		frame_points = np.array([[0,0],[0, height],[width,0],[width,height]])
-		h, mask = cv2.findHomography(np.array(points), frame_points, cv2.RANSAC)
+		h, mask = cv2.findHomography(key_points, frame_points, cv2.RANSAC)
 		statics.configFile.setValue("homography_matrix", h.tolist())
+		statics.configFile.setValue("homography_points", points)
 		
 		self.homography = h
 	
@@ -119,15 +130,17 @@ class MainVision(vision.vision.Vision):
 	def warp(self, frame):
 		if not self.use_homography:
 			if self.crop_points:
-				x  = self.crop_points[0][0]
-				xf = self.crop_points[1][0]
-				y  = self.crop_points[0][1]
-				yf = self.crop_points[1][1]
+				p0 = (round(self.crop_points[0][0]*frame.shape[0]), round(self.crop_points[0][1]*frame.shape[1]))
+				p1 = (round(self.crop_points[1][0]*frame.shape[0]), round(self.crop_points[1][1]*frame.shape[1]))
+				x  = p0[0]
+				xf = p1[0]
+				y  = p0[1]
+				yf = p1[1]
 				return frame[y:yf, x:xf]
 			else:
 				return frame
 		
-		homography_matrix = self.homography
+		homography_matrix = self.getHomography(frame.shape)
 		try:
 			return cv2.warpPerspective(frame, homography_matrix, (frame.shape[1], frame.shape[0]))
 		except:
