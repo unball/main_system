@@ -2,6 +2,9 @@ from abc import ABC, abstractmethod
 from statics.static_classes import world
 import vision.cameras
 import time
+import gui.mainWindow
+from gi.repository import GLib
+import cv2
 
 class VisionMessage():
     def __init__(self, x_list, y_list, th_list, ball_x, ball_y, found_list):
@@ -27,7 +30,7 @@ class Vision():
         if frame is None:
             time.sleep(0.03)
             return
-        robosAliados, robosAdversariosIdentificados, bola = self.process(frame)
+        robosAliados, robosAdversariosIdentificados, bola, processed_image = self.process(frame)
         world.update(VisionMessage(
             [r[1][0] for r in robosAliados],
             [r[1][1] for r in robosAliados],
@@ -36,6 +39,10 @@ class Vision():
             bola[0][1] if bola is not None else 0,
             [r[3] for r in robosAliados]
         ))
+        
+        converted_image = cv2.cvtColor(processed_image, cv2.COLOR_RGB2BGR)
+        height, width, depth = converted_image.shape
+        GLib.idle_add(gui.mainWindow.MainWindow().game_loop_ui_frame.do_update_frame, (converted_image, width, height, depth))
     
     @abstractmethod
     def ui_init(self):

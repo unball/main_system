@@ -232,7 +232,7 @@ class MainVision(vision.vision.Vision):
 	
 	def process(self, frame):
 		robosAliadosIdentificados, robosAdversariosIdentificados, bola, processed_image = self.process_frame(frame)
-		return robosAliadosIdentificados, robosAdversariosIdentificados, bola
+		return robosAliadosIdentificados, robosAdversariosIdentificados, bola, processed_image
 
 	def ui_process(self, frame):
 		robosAliadosIdentificados, robosAdversariosIdentificados, bola, processed_image = self.process_frame(frame)
@@ -258,10 +258,6 @@ class MainVision(vision.vision.Vision):
 	def process_frame(self, frame):
 		# Corta o campo
 		img_warpped = self.warp(frame)
-
-					
-				
-				
 		
 		# Formata como HSV
 		img_hsv = self.converterHSV(img_warpped)

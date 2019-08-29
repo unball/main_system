@@ -52,8 +52,11 @@ class MainWindow(metaclass=gui.singleton.Singleton):
 		window = self.getObject("window1")
 		window.show_all()
 		
-		# Creates uiFrame object that handles frame drawning on screen
+		# Creates uiFrame object that handles frame drawning on config screen
 		self.ui_frame = gui.uiFrame.uiFrame(self.getObject("frame"), self.getObject("frame_event"))
+		
+		# Creates uiFrame object that handles frame drawning on game loop screen
+		self.game_loop_ui_frame = gui.uiFrame.uiFrame(self.getObject("game_loop_frame"), self.getObject("game_loop_frame_event"))
 		
 		# Creates game thread
 		self.gameThread = states.gameThread.GameThread()
