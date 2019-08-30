@@ -28,6 +28,9 @@ class Signals:
     
     def update_camera_scale(self, widget):
         vision.cameras.uiCamerasList().set_camera_scale(widget.get_value())
+    
+    def camera_switch_test_frame(self, widget, value):
+        vision.cameras.uiCamerasList().use_test_frame(value)
         
     def onConfigPageChange(self, page, widget, num):
         gui.mainWindow.MainWindow().set_frame_renderer(num)

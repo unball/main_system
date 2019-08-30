@@ -7,6 +7,7 @@ import statics.configFile
 import cv2
 import time
 import gui.mainWindow
+from gi.repository import GLib
 
 class uiCamerasList(metaclass=gui.singleton.Singleton):
     def __init__(self):
@@ -18,15 +19,24 @@ class uiCamerasList(metaclass=gui.singleton.Singleton):
         # Load configuration file
         self.__camera_index = statics.configFile.getValue("camera", 0)
         self.__frame_scale = statics.configFile.getValue("frame_scale", 1)
+        
+        self.__use_test_frame = statics.configFile.getValue("use_test_frame", True)
+        
         if self.__frame_scale <= 0: self.set_camera_scale(1)
         
         self.__cap = cv2.VideoCapture(self.__camera_index)
+        
+        GLib.idle_add(self.ui_config)
+    
+    def ui_config(self):
+        gui.mainWindow.MainWindow().getObject("test_frame_switch").set_state(self.__use_test_frame)
+        gui.mainWindow.MainWindow().getObject("camera_scale").set_value(self.__frame_scale)
+        
     
     def getCameras(self):
         return set(enumerate(sorted([c for c in listdir("/sys/class/video4linux/")])))
 
     def updateCameras(self, widget_list):
-        gui.mainWindow.MainWindow().getObject("camera_scale").set_value(self.__frame_scale)
         for camera in sorted([c for c in self.getCameras().difference(self.__cameras)]):
             self.__cameras.add(camera)
             row = Gtk.ListBoxRow()
@@ -47,10 +57,15 @@ class uiCamerasList(metaclass=gui.singleton.Singleton):
         self.__frame_scale = value
         statics.configFile.setValue("frame_scale", value)
     
+    def use_test_frame(self, value):
+        self.__use_test_frame = value
+        statics.configFile.setValue("use_test_frame", value)
+    
     def getFrame(self):
-#        time.sleep(0.001)
-#        frame_resized = cv2.resize(self.__frame, (round(self.__frame.shape[1]*self.__frame_scale),round(self.__frame.shape[0]*self.__frame_scale)))
-#        return frame_resized
+        if self.__use_test_frame:
+            time.sleep(0.001)
+            frame_resized = cv2.resize(self.__frame, (round(self.__frame.shape[1]*self.__frame_scale),round(self.__frame.shape[0]*self.__frame_scale)))
+            return frame_resized
         
         if self.__camera_changed:
             self.__camera_changed = False
