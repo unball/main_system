@@ -180,13 +180,16 @@ class MainVision(vision.vision.Vision):
 		
 		return 4 if contourArea/rectArea > 0.75 else 3
 	
-	def detectarCamisa(self, component_mask):
+	def detectarCamisa(self, renderFrame, component_mask):
 		# Encontra um contorno para a camisa com base no maior contorno
 		_,mainContours,_ = cv2.findContours(component_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 		mainContour = sorted(mainContours, key=cv2.contourArea)[-1]
 		
 		# Encontra o menor retângulo que se inscreve na camisa
 		rectangle = cv2.minAreaRect(mainContour)
+		box = cv2.boxPoints(rectangle)
+		box = np.int0(box)
+		cv2.drawContours(renderFrame, [box], 0, (255,0,0), 2)
 		
 		# Calcula a posição e ângulo parcial da camisa com base no retângulo
 		center = rectangle[0]
@@ -206,7 +209,7 @@ class MainVision(vision.vision.Vision):
 		countInternalContours = len(internalContours)
 			
 		# Obtém centro e ângulo da camisa
-		center, centerMeters, angle = self.detectarCamisa(componentMask)
+		center, centerMeters, angle = self.detectarCamisa(renderFrame, componentMask)
 		
 		# Não é do nosso time
 		if countInternalContours == 0:
