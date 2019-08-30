@@ -25,32 +25,32 @@ class RoboAliado():
 
 class MainVision(vision.vision.Vision):
 	def __init__(self):
-		self.robosAliados = [
+		self.__robosAliados = [
 			RoboAliado(0),
 			RoboAliado(1),
 			RoboAliado(2),
 			RoboAliado(3),
 			RoboAliado(4)
 		]
-		self.todosReconhecidos = False
-		self.robosAdversarios = []
-		self.bola = None
-		self.angles = np.array([0, 90, 180, -90, -180])
-		self.homography = None
-		self.default_preto_hsv = [0,94,163,360,360,360]
-		self.default_time_hsv = [13,0,0,32,360,360]
-		self.default_bola_hsv = [0, 117, 0, 98, 360, 360]
-		self.current_frame_shape = None
+		self.__todosReconhecidos = False
+		self.__robosAdversarios = []
+		self.__bola = None
+		self.__angles = np.array([0, 90, 180, -90, -180])
+		self.__homography = None
+		self.__default_preto_hsv = [0,94,163,360,360,360]
+		self.__default_time_hsv = [13,0,0,32,360,360]
+		self.__default_bola_hsv = [0, 117, 0, 98, 360, 360]
+		self.__current_frame_shape = None
 		super().__init__()
 
 	def config_init(self):
-		self.preto_hsv = np.array(statics.configFile.getValue("preto_hsv_interval", self.default_preto_hsv))
-		self.time_hsv = np.array(statics.configFile.getValue("time_hsv_interval", self.default_time_hsv))
-		self.bola_hsv = np.array(statics.configFile.getValue("bola_hsv_interval", self.default_bola_hsv))
-		self.homography = np.array(statics.configFile.getValue("homography_matrix"), None)
-		self.use_homography = statics.configFile.getValue("use_homography", True)
-		self.crop_points = statics.configFile.getValue("crop_points")
-		self.homography_points = statics.configFile.getValue("homography_points")
+		self.__preto_hsv = np.array(statics.configFile.getValue("preto_hsv_interval", self.__default_preto_hsv))
+		self.__time_hsv = np.array(statics.configFile.getValue("time_hsv_interval", self.__default_time_hsv))
+		self.__bola_hsv = np.array(statics.configFile.getValue("bola_hsv_interval", self.__default_bola_hsv))
+		self.__homography = np.array(statics.configFile.getValue("homography_matrix"), None)
+		self.__use_homography = statics.configFile.getValue("use_homography", True)
+		self.__crop_points = statics.configFile.getValue("crop_points")
+		self.__homography_points = statics.configFile.getValue("homography_points")
 
 
 	def ui_init(self):
@@ -64,76 +64,100 @@ class MainVision(vision.vision.Vision):
 		#self.selectedFrameRenderer = self.frameRenderers[0]
 		GLib.idle_add(gui.mainWindow.MainWindow().set_frame_renderer, 0)
 	
+	@property
+	def robosAliados(self):
+		return self.__robosAliados
+	
+	@property
+	def bola(self):
+		return self.__bola
+	
+	@property
+	def use_homography(self):
+		return self.__use_homography
+	
+	@property
+	def preto_hsv(self):
+		return self.__preto_hsv
+	
+	@property
+	def time_hsv(self):
+		return self.__time_hsv
+	
+	@property
+	def bola_hsv(self):
+		return self.__bola_hsv
+	
 	def atualizarPretoHSV(self, value, index):
-		self.preto_hsv[index] = value
+		self.__preto_hsv[index] = value
 		config = statics.configFile.getConfig()
 		config["preto_hsv_interval"][index] = value
 		statics.configFile.saveConfig(config)
 	
 	def atualizarTimeHSV(self, value, index):
-		self.time_hsv[index] = value
+		self.__time_hsv[index] = value
 		config = statics.configFile.getConfig()
 		config["time_hsv_interval"][index] = value
 		statics.configFile.saveConfig(config)
 	
 	def atualizarBolaHSV(self, value, index):
-		self.bola_hsv[index] = value
+		self.__bola_hsv[index] = value
 		config = statics.configFile.getConfig()
 		config["bola_hsv_interval"][index] = value
 		statics.configFile.saveConfig(config)
 	
 	def obterRobosAliados(self):
-		return self.robosAliados
+		return self.__robosAliados
 		
 	def atualizarRobos(self, robosAliados, robosAdversariosIdentificados, bola):
 		# Computa novos robos inimigos
-		self.robosAdversarios = [RoboAdversario(robo[0], robo[1]) for robo in robosAdversariosIdentificados]
+		self.__robosAdversarios = [RoboAdversario(robo[0], robo[1]) for robo in robosAdversariosIdentificados]
 		
 		# Atualiza posição da bola
-		self.bola = bola
+		self.__bola = bola
 		
 		todosReconhecidos = True
 		for i,r in enumerate(robosAliados):
 			if r[3] == True:
-				self.robosAliados[i].centro = r[1]
-				self.robosAliados[i].centroPixels = r[4]
-				self.robosAliados[i].angulo = r[2]
-				self.robosAliados[i].estado = "Identificado"
+				self.__robosAliados[i].centro = r[1]
+				self.__robosAliados[i].centroPixels = r[4]
+				self.__robosAliados[i].angulo = r[2]
+				self.__robosAliados[i].estado = "Identificado"
 			else:
 				todosReconhecidos = False
-				self.robosAliados[i].estado = "Não-Identificado"
-		self.todosReconhecidos = todosReconhecidos
+				self.__robosAliados[i].estado = "Não-Identificado"
+		self.__todosReconhecidos = todosReconhecidos
 	
 	def getHomography(self, shape):
-		if self.current_frame_shape != shape:
-			self.updateHomography(self.homography_points, shape)
-		return self.homography
+		if self.__current_frame_shape != shape:
+			self.updateHomography(self.__homography_points, shape)
+		return self.__homography
 	
 	def updateHomography(self, points, shape):
 		height, width, _ = shape
-		self.current_frame_shape = shape
-		self.homography_points = points
+		self.__current_frame_shape = shape
+		self.__homography_points = points
 		key_points = np.array(points) * np.array([height, width])
 		frame_points = np.array([[0,0],[0, height],[width,0],[width,height]])
 		h, mask = cv2.findHomography(key_points, frame_points, cv2.RANSAC)
 		statics.configFile.setValue("homography_matrix", h.tolist())
 		statics.configFile.setValue("homography_points", points)
 		
-		self.homography = h
+		self.__homography = h
 	
 	def updateCropPoints(self, points):
-		self.crop_points = points
+		self.__crop_points = points
 		statics.configFile.setValue("crop_points", points)
 	
 	def setUseHomography(self, value):
-		self.use_homography = value
+		self.__use_homography = value
 		statics.configFile.setValue("use_homography", value)
 	
 	def warp(self, frame):
-		if not self.use_homography:
-			if self.crop_points:
-				p0 = (round(self.crop_points[0][0]*frame.shape[0]), round(self.crop_points[0][1]*frame.shape[1]))
-				p1 = (round(self.crop_points[1][0]*frame.shape[0]), round(self.crop_points[1][1]*frame.shape[1]))
+		if not self.__use_homography:
+			if self.__crop_points:
+				p0 = (round(self.__crop_points[0][0]*frame.shape[0]), round(self.__crop_points[0][1]*frame.shape[1]))
+				p1 = (round(self.__crop_points[1][0]*frame.shape[0]), round(self.__crop_points[1][1]*frame.shape[1]))
 				x  = p0[0]
 				xf = p1[0]
 				y  = p0[1]
@@ -201,7 +225,7 @@ class MainVision(vision.vision.Vision):
 		
 		# Calcula o ângulo com base no vetor entre o centro do contorno principal e o centro da camisa
 		calculatedAngle = 180.0/np.pi *np.arctan2(-(center[1]-cY), center[0]-cX)
-		partialAngles =  -calculatedAngle + self.angles
+		partialAngles =  -calculatedAngle + self.__angles
 		estimatedAngle = partialAngles[np.abs(calculatedAngle - partialAngles).argmin()]
 		
 		# Define qual o polígono da figura principal
@@ -218,19 +242,19 @@ class MainVision(vision.vision.Vision):
 	def segmentarFundo(self, frame):
 		img_filtered = cv2.GaussianBlur(frame, (5,5), 0)
 		img_hsv = cv2.cvtColor(img_filtered, cv2.COLOR_BGR2HSV)
-		return cv2.inRange(img_hsv, self.preto_hsv[0:3], self.preto_hsv[3:6])
+		return cv2.inRange(img_hsv, self.__preto_hsv[0:3], self.__preto_hsv[3:6])
 	
 	def segmentarTime(self, frame):
 		img_filtered = cv2.GaussianBlur(frame, (5,5), 0)
 		img_hsv = cv2.cvtColor(img_filtered, cv2.COLOR_BGR2HSV)
-		mask = cv2.inRange(img_hsv, self.preto_hsv[0:3], self.preto_hsv[3:6])
-		return mask & cv2.inRange(img_hsv, self.time_hsv[0:3], self.time_hsv[3:6])
+		mask = cv2.inRange(img_hsv, self.__preto_hsv[0:3], self.__preto_hsv[3:6])
+		return mask & cv2.inRange(img_hsv, self.__time_hsv[0:3], self.__time_hsv[3:6])
 	
 	def segmentarBola(self, frame):
 		img_filtered = cv2.GaussianBlur(frame, (5,5), 0)
 		img_hsv = cv2.cvtColor(img_filtered, cv2.COLOR_BGR2HSV)
-		mask = cv2.inRange(img_hsv, self.preto_hsv[0:3], self.preto_hsv[3:6])
-		return mask & cv2.inRange(img_hsv, self.bola_hsv[0:3], self.bola_hsv[3:6])
+		mask = cv2.inRange(img_hsv, self.__preto_hsv[0:3], self.__preto_hsv[3:6])
+		return mask & cv2.inRange(img_hsv, self.__bola_hsv[0:3], self.__bola_hsv[3:6])
 	
 	def process(self, frame):
 		robosAliadosIdentificados, robosAdversariosIdentificados, bola, processed_image = self.process_frame(frame)
@@ -245,10 +269,10 @@ class MainVision(vision.vision.Vision):
 		return cv2.cvtColor(img_filtered, cv2.COLOR_BGR2HSV)
 	
 	def obterMascaraElementos(self,img):
-		return cv2.inRange(img, self.preto_hsv[0:3], self.preto_hsv[3:6])
+		return cv2.inRange(img, self.__preto_hsv[0:3], self.__preto_hsv[3:6])
 		
 	def obterMascaraTime(self, img):
-		return cv2.inRange(img, self.time_hsv[0:3], self.time_hsv[3:6])
+		return cv2.inRange(img, self.__time_hsv[0:3], self.__time_hsv[3:6])
 	
 	def obterComponentesConectados(self, mask):
 		num_components, components = cv2.connectedComponents(mask)
@@ -310,8 +334,8 @@ class MainVision(vision.vision.Vision):
 				processed_image = cv2.add(processed_image, component_image)
 				
 		# Segmenta a bola
-		bolaMask = mask & cv2.inRange(img_hsv, self.bola_hsv[0:3], self.bola_hsv[3:6])
-		_,bolaContours,_ = cv2.findContours(bolaMask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+		bolaMask = mask & cv2.inRange(img_hsv, self.__bola_hsv[0:3], self.__bola_hsv[3:6])
+		bolaContours,_ = cv2.findContours(bolaMask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 		bolaContours = [countor for countor in bolaContours if cv2.contourArea(countor)>10]
 		
 		if len(bolaContours) != 0:
