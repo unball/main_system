@@ -382,6 +382,8 @@
                       <object class="GtkNotebook" id="fr_notebook">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <property name="scrollable">True</property>
+                        <property name="enable_popup">True</property>
                         <signal name="switch-page" handler="onConfigPageChange" swapped="no"/>
                       </object>
                       <packing>
