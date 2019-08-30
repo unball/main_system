@@ -23,6 +23,8 @@ class World(object):
         self._isPaused = False
         if setting != 0:
             self._number_of_robots = setting['number_of_robots']
+            self._field_x_length = setting['field_x_length']
+            self._field_y_length = setting['field_y_length']
         else:
             self._number_of_robots = None
             print("WARNING: no setting of world defined!")
@@ -104,6 +106,14 @@ class World(object):
     def number_of_robots(self):
         """number_of_robots property to improve access outside this scope."""
         return self._number_of_robots
+        
+    @property
+    def field_x_length(self):
+        return self._field_x_length
+        
+    @property
+    def field_y_length(self):
+        return self._field_y_length
 
     @property
     def isPaused(self):
