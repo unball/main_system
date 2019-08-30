@@ -191,7 +191,7 @@ class segmentarBola(gui.frameRenderer.frameRenderer):
 	def __init__(self, vision):
 		super().__init__(vision)
 		# Variables
-		self.ui_elements = ["bola_hmin", "bola_smin", "bola_vmin", "bola_hmax", "bola_smax", "bola_vmax"]
+		self.__ui_elements = ["bola_hmin", "bola_smin", "bola_vmin", "bola_hmax", "bola_smax", "bola_vmax"]
 	
 	def update_hsv_interval(self, widget, index):
 		self.parentVision.atualizarBolaHSV(int(widget.get_value()), index)
@@ -205,7 +205,7 @@ class segmentarBola(gui.frameRenderer.frameRenderer):
 		
 	def create_ui_content(self):
 		builder = Gtk.Builder.new_from_file("vision/mainVision/segmentarBola.ui")
-		for index,name in enumerate(self.ui_elements):
+		for index,name in enumerate(self.__ui_elements):
 			element = builder.get_object(name)
 			element.set_value(self.parentVision.bola_hsv[index])
 			element.connect("value-changed", self.update_hsv_interval, index)
