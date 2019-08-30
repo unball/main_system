@@ -8,33 +8,44 @@ import states.gameThread
 class MainWindow(metaclass=gui.singleton.Singleton):
 
 	def __init__(self):
-		self.builder = None
-		self.update_frame_thread = None
-		self.selectedFrameRenderer = None
-		self.frameRenderers = []
-		self.ui_frame = None
-		self.gameThread = None
+		self._builder = None
+		self._selectedFrameRenderer = None
+		self._frameRenderers = []
+		self._ui_frame = None
+		self._gameThread = None
 
 	def loadBuilder(self):
-		if self.builder is None:
-			self.builder = Gtk.Builder()
-			self.builder.add_from_file("gui/ui.glade")
+		if self._builder is None:
+			self._builder = Gtk.Builder()
+			self._builder.add_from_file("gui/ui.glade")
 	
 	def getObject(self, name):
 		self.loadBuilder()
-		return self.builder.get_object(name)
+		return self._builder.get_object(name)
 
 	def add_frame_renderer(self, fr):
 		frNotebook = self.getObject("fr_notebook")
 		frNotebook.append_page(fr.create_ui_content(), fr.create_ui_label())
 		frNotebook.show_all()
-		self.frameRenderers.append(fr)
+		self._frameRenderers.append(fr)
 
 	def set_frame_renderer(self, index):
 		try:
-			self.selectedFrameRenderer = self.frameRenderers[index]
+			self._selectedFrameRenderer = self._frameRenderers[index]
 		except:
 			pass
+	
+	@property
+	def selectedFrameRenderer(self):
+		return self._selectedFrameRenderer
+		
+	@property
+	def ui_frame(self):
+		return self._ui_frame
+		
+	@property
+	def gameThread(self):
+		return self._gameThread
 	
 	def run(self):
 		# Load static UI
@@ -46,28 +57,26 @@ class MainWindow(metaclass=gui.singleton.Singleton):
 		Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 		
 		# Connect signals
-		self.builder.connect_signals(gui.signals.Signals())
+		self._builder.connect_signals(gui.signals.Signals())
 		
 		# Show window
 		window = self.getObject("window1")
 		window.show_all()
 		
 		# Creates uiFrame object that handles frame drawning on config screen
-		self.ui_frame = gui.uiFrame.uiFrame(self.getObject("frame"), self.getObject("frame_event"))
+		self._ui_frame = gui.uiFrame.uiFrame(self.getObject("frame"), self.getObject("frame_event"))
 		
 		# Creates uiFrame object that handles frame drawning on game loop screen
 		self.game_loop_ui_frame = gui.uiFrame.uiFrame(self.getObject("game_loop_frame"), self.getObject("game_loop_frame_event"))
 		
 		# Creates game thread
-		self.gameThread = states.gameThread.GameThread()
-		self.gameThread.run()
-		#self.update_frame_thread = gui.frameUpdater.frameUpdater(ui_frame)
-		#self.update_frame_thread.run()
+		self._gameThread = states.gameThread.GameThread()
+		self._gameThread.run()
 		
 		# Start GTK main loop
 		Gtk.main()
 		
 		# Stops threads
 		#self.update_frame_thread.stop()
-		self.gameThread.stop()
+		self._gameThread.stop()
 		
