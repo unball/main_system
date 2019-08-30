@@ -219,7 +219,7 @@ class MainVision(vision.vision.Vision):
 		mainShape = max(internalContours, key=cv2.contourArea)
 		
 		# Desenha o contorno no frame
-		cv2.drawContours(renderFrame, mainShape, 0, (255,0,0), 1)
+		cv2.drawContours(renderFrame, internalContours, -1, (255,255,255), 1)
 		
 		# Calcula o centro do contorno principal
 		M = cv2.moments(mainShape)
