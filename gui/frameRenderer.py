@@ -5,7 +5,7 @@ import cv2
 
 class frameRenderer(ABC):
 	def __init__(self, vision):
-		self.parentVision = vision
+		self._parentVision = vision
 		GLib.idle_add(gui.mainWindow.MainWindow().add_frame_renderer, self)
 
 	@abstractmethod
@@ -19,6 +19,10 @@ class frameRenderer(ABC):
 	@abstractmethod
 	def transformFrame(self, frame, originalFrame):
 		pass
+	
+	@property
+	def parentVision(self):
+		return self._parentVision
 
 class Identity(frameRenderer):
 
