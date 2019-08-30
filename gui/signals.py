@@ -6,7 +6,7 @@ import interfaces.gamecommands
 
 class Signals:
     def __init__(self):
-        self.pageSelected = 0
+        pass
         
     def onDestroy(self, *args):
         Gtk.main_quit()
@@ -21,7 +21,6 @@ class Signals:
         vision.cameras.uiCamerasList().set_camera_scale(widget.get_value())
         
     def onConfigPageChange(self, page, widget, num):
-        self.pageSelected = num
         gui.mainWindow.MainWindow().set_frame_renderer(num)
     
     def mainPageChange(self, widget, page):
