@@ -3,6 +3,8 @@ import gui.mainWindow
 import gui.frameRenderer
 import vision.cameras
 import interfaces.gamecommands
+from statics.static_classes import world
+from statics.world_standards import *
 
 class Signals:
     def __init__(self):
@@ -13,7 +15,14 @@ class Signals:
         
     def list_cameras(self, widget_list):
         vision.cameras.uiCamerasList().updateCameras(widget_list)
-        
+    
+    def select_world_standard(self, widget, widget_selected):
+        index = widget_selected.get_index()
+        if index == 0:
+            world.setSetting(STANDARD5)
+        elif index == 1:
+            world.setSetting(STANDARD3)
+    
     def select_camera(self, widget, widget_selected):
         vision.cameras.uiCamerasList().setCamera(widget_selected.index)
     
