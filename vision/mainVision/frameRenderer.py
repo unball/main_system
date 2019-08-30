@@ -215,7 +215,6 @@ class segmentarBola(gui.frameRenderer.frameRenderer):
 class identificarRobos(gui.frameRenderer.frameRenderer):
 	def __init__(self, vision):
 		super().__init__(vision)
-		pass
 	
 	def updateRobotsInfo(self, robos, bola):
 		for robo in robos:
@@ -255,15 +254,15 @@ class identificarRobos(gui.frameRenderer.frameRenderer):
 				columnBox.add(idBox)
 				columnBox.add(infoBox)
 				flowBoxChild.add(columnBox)
-				self.timeFlow.add(flowBoxChild)
+				self.__timeFlow.add(flowBoxChild)
 				robo.ui = {"idLabel": idLabel, "posicaoLabel": posicaoLabel, "anguloLabel": anguloLabel, "estadoLabel": estadoLabel}
-			self.timeFlow.show_all()
+			self.__timeFlow.show_all()
 			
 		if bola is not None:
-			self.bolaEstado.set_text("Estado: Identificada")
-			self.bolaPosicao.set_text("Posição: x: {:.2f} m, y: {:.2f} m".format(bola[0][0], bola[0][1]))
+			self.__bolaEstado.set_text("Estado: Identificada")
+			self.__bolaPosicao.set_text("Posição: x: {:.2f} m, y: {:.2f} m".format(bola[0][0], bola[0][1]))
 		else:
-			self.bolaEstado.set_text("Estado: Não-Identificada")
+			self.__bolaEstado.set_text("Estado: Não-Identificada")
 			
 	
 	def transformFrame(self, frame, originalFrame):
@@ -281,7 +280,7 @@ class identificarRobos(gui.frameRenderer.frameRenderer):
 	
 	def create_ui_content(self):
 		builder = Gtk.Builder.new_from_file("vision/mainVision/identificarRobos.ui")
-		self.timeFlow = builder.get_object("time_flow")
-		self.bolaEstado = builder.get_object("bola_estado")
-		self.bolaPosicao = builder.get_object("bola_posicao")
+		self.__timeFlow = builder.get_object("time_flow")
+		self.__bolaEstado = builder.get_object("bola_estado")
+		self.__bolaPosicao = builder.get_object("bola_posicao")
 		return builder.get_object("main")
