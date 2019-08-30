@@ -10,25 +10,25 @@ import gui.mainWindow
 
 class uiCamerasList(metaclass=gui.singleton.Singleton):
     def __init__(self):
-        self.cameras = set()
+        self.__cameras = set()
         self.__camera_changed = False
-        self.cap = None
-        self.frame = cv2.imread("gui/frame.png")
+        self.__cap = None
+        self.__frame = cv2.imread("gui/frame.png")
         
         # Load configuration file
-        self.camera_index = statics.configFile.getValue("camera", 0)
-        self.frame_scale = statics.configFile.getValue("frame_scale", 1)
-        if self.frame_scale <= 0: self.set_camera_scale(1)
+        self.__camera_index = statics.configFile.getValue("camera", 0)
+        self.__frame_scale = statics.configFile.getValue("frame_scale", 1)
+        if self.__frame_scale <= 0: self.set_camera_scale(1)
         
-        self.cap = cv2.VideoCapture(self.camera_index)
+        self.__cap = cv2.VideoCapture(self.__camera_index)
     
     def getCameras(self):
         return set(enumerate(sorted([c for c in listdir("/sys/class/video4linux/")])))
 
     def updateCameras(self, widget_list):
-        gui.mainWindow.MainWindow().getObject("camera_scale").set_value(self.frame_scale)
-        for camera in sorted([c for c in self.getCameras().difference(self.cameras)]):
-            self.cameras.add(camera)
+        gui.mainWindow.MainWindow().getObject("camera_scale").set_value(self.__frame_scale)
+        for camera in sorted([c for c in self.getCameras().difference(self.__cameras)]):
+            self.__cameras.add(camera)
             row = Gtk.ListBoxRow()
             row.index = camera[0]
             row.add(Gtk.Label(camera[1]))
@@ -37,30 +37,30 @@ class uiCamerasList(metaclass=gui.singleton.Singleton):
             widget_list.show_all()
         
     def setCamera(self, index):
-        if self.camera_index == index: return
-        self.camera_index = index
+        if self.__camera_index == index: return
+        self.__camera_index = index
         self.__camera_changed = True
-        statics.configFile.setValue("camera", self.camera_index)
+        statics.configFile.setValue("camera", self.__camera_index)
     
     def set_camera_scale(self, value):
         if value <= 0: return
-        self.frame_scale = value
+        self.__frame_scale = value
         statics.configFile.setValue("frame_scale", value)
     
     def getFrame(self):
-        time.sleep(0.0001)
-        frame_resized = cv2.resize(self.frame, (round(self.frame.shape[1]*self.frame_scale),round(self.frame.shape[0]*self.frame_scale)))
-        return frame_resized
+#        time.sleep(0.001)
+#        frame_resized = cv2.resize(self.__frame, (round(self.__frame.shape[1]*self.__frame_scale),round(self.__frame.shape[0]*self.__frame_scale)))
+#        return frame_resized
         
-#        if self.__camera_changed:
-#            self.__camera_changed = False
-#            if self.cap is not None: self.cap.release()
-#            self.cap = cv2.VideoCapture(self.camera_index)
-#        
-#        if self.cap.isOpened():
-#            ret, frame = self.cap.read()
-#            frame_resized = cv2.resize(frame, (round(frame.shape[1]*self.frame_scale),round(frame.shape[0]*self.frame_scale)))
-#            return frame_resized
-#        
-#        return None
-#            
+        if self.__camera_changed:
+            self.__camera_changed = False
+            if self.__cap is not None: self.__cap.release()
+            self.__cap = cv2.VideoCapture(self.__camera_index)
+        
+        if self.__cap.isOpened():
+            ret, frame = self.__cap.read()
+            frame_resized = cv2.resize(frame, (round(frame.shape[1]*self.__frame_scale),round(frame.shape[0]*self.__frame_scale)))
+            return frame_resized
+        
+        return None
+            
