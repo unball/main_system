@@ -227,6 +227,33 @@ class segmentarBola(gui.frameRenderer.frameRenderer):
 			element.connect("value-changed", self.update_hsv_interval, index)
 		
 		return builder.get_object("main")
+		
+class parametrosVisao(gui.frameRenderer.frameRenderer):
+
+	def __init__(self, vision):
+		super().__init__(vision)
+		
+	def transformFrame(self, frame, originalFrame):
+		processed_frame = self.parentVision.ui_process(frame)
+		return cv2.cvtColor(processed_frame, cv2.COLOR_RGB2BGR)
+
+	def create_ui_label(self):
+		return Gtk.Label("Parâmetros da visão")
+	
+	def update_area_ratio(self, widget):
+		self.parentVision.atualizarAreaRatio(widget.get_value())
+	
+	def update_min_internal_area_contour(self, widget):
+		self.parentVision.atualizarMinInternalArea(widget.get_value())
+	
+	def create_ui_content(self):
+		builder = Gtk.Builder.new_from_file("vision/mainVision/parametrosVisao.ui")
+		builder.get_object("adj_area_cont_rect").set_value(self.parentVision.areaRatio)
+		builder.get_object("adj_area_cont_rect").connect("value-changed", self.update_area_ratio)
+		builder.get_object("adj_min_area_internal_contour").set_value(self.parentVision.minInternalAreaContour)
+		builder.get_object("adj_min_area_internal_contour").connect("value-changed", self.update_min_internal_area_contour)
+		
+		return builder.get_object("main")
 
 class identificarRobos(gui.frameRenderer.frameRenderer):
 	def __init__(self, vision):

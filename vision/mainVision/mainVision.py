@@ -51,6 +51,8 @@ class MainVision(vision.vision.Vision):
 		self.__use_homography = statics.configFile.getValue("use_homography", True)
 		self.__crop_points = statics.configFile.getValue("crop_points")
 		self.__homography_points = statics.configFile.getValue("homography_points")
+		self.__cont_rect_area_ratio = statics.configFile.getValue("cont_rect_area_ratio", 0.75)
+		self.__min_internal_area_contour = statics.configFile.getValue("min_internal_area_contour", 10)
 
 
 	def ui_init(self):
@@ -59,6 +61,7 @@ class MainVision(vision.vision.Vision):
 			"segmentarFundo": vision.mainVision.frameRenderer.segmentarPreto(self),
 			"segmentarTime": vision.mainVision.frameRenderer.segmentarTime(self),
 			"segmentarBola": vision.mainVision.frameRenderer.segmentarBola(self),
+			"parametrosVisao": vision.mainVision.frameRenderer.parametrosVisao(self),
 			"identificarRobos": vision.mainVision.frameRenderer.identificarRobos(self),
 		}
 		#self.selectedFrameRenderer = self.frameRenderers[0]
@@ -88,6 +91,14 @@ class MainVision(vision.vision.Vision):
 	def bola_hsv(self):
 		return self.__bola_hsv
 	
+	@property
+	def areaRatio(self):
+		return self.__cont_rect_area_ratio
+		
+	@property
+	def minInternalAreaContour(self):
+		return self.__min_internal_area_contour
+	
 	def atualizarPretoHSV(self, value, index):
 		self.__preto_hsv[index] = value
 		config = statics.configFile.getConfig()
@@ -105,6 +116,14 @@ class MainVision(vision.vision.Vision):
 		config = statics.configFile.getConfig()
 		config["bola_hsv_interval"][index] = value
 		statics.configFile.saveConfig(config)
+	
+	def atualizarAreaRatio(self, value):
+		self.__cont_rect_area_ratio = value
+		statics.configFile.setValue("cont_rect_area_ratio", value)
+	
+	def atualizarMinInternalArea(self, value):
+		self.__min_internal_area_contour = value
+		statics.configFile.setValue("min_internal_area_contour", value)
 	
 	def obterRobosAliados(self):
 		return self.__robosAliados
@@ -180,7 +199,7 @@ class MainVision(vision.vision.Vision):
 		contourArea = cv2.contourArea(countor)
 		rectArea = rect[1][0]*rect[1][1]
 		
-		return 4 if contourArea/rectArea > 0.75 else 3
+		return 4 if contourArea/rectArea > self.__cont_rect_area_ratio else 3
 	
 	def detectarCamisa(self, renderFrame, component_mask):
 		# Encontra um contorno para a camisa com base no maior contorno
@@ -206,7 +225,7 @@ class MainVision(vision.vision.Vision):
 		
 		# Encontra os contornos internos com área maior que um certo limiar e ordena
 		internalContours,_ = cv2.findContours(componentTeamMask, cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_L1)
-		internalContours = [countor for countor in internalContours if cv2.contourArea(countor)>10]
+		internalContours = [countor for countor in internalContours if cv2.contourArea(countor)>self.__min_internal_area_contour]
 		
 		countInternalContours = len(internalContours)
 			
@@ -341,7 +360,7 @@ class MainVision(vision.vision.Vision):
 		# Segmenta a bola
 		bolaMask = mask & cv2.inRange(img_hsv, self.__bola_hsv[0:3], self.__bola_hsv[3:6])
 		bolaContours,_ = cv2.findContours(bolaMask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-		bolaContours = [countor for countor in bolaContours if cv2.contourArea(countor)>10]
+		bolaContours = [countor for countor in bolaContours if cv2.contourArea(countor)>self.__min_internal_area_contour]
 		
 		if len(bolaContours) != 0:
 			bolaContour = max(bolaContours, key=cv2.contourArea)
