@@ -5,7 +5,7 @@ class State(ABC):
         super().__init__()
         self.__quitRequested = False
         self.__stateChangeRequested = False
-        self.thread = thread
+        self.__thread = thread
         self.__nextState = None
 
     @abstractmethod
@@ -19,6 +19,10 @@ class State(ABC):
     @property
     def StateChangeRequested(self):
         return self.__stateChangeRequested
+        
+    @property
+    def thread(self):
+        return self.__thread
 
     def request_quit(self):
         self.__quitRequested = True
