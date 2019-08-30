@@ -138,7 +138,7 @@ class MainVision(vision.vision.Vision):
 		self.__current_frame_shape = shape
 		self.__homography_points = points
 		key_points = np.array(points) * np.array([height, width])
-		frame_points = np.array([[0,0],[0, height],[width,0],[width,height]])
+		frame_points = np.array(sorted([[0,0],[0, height],[width,0],[width,height]], key=sum))
 		h, mask = cv2.findHomography(key_points, frame_points, cv2.RANSAC)
 		statics.configFile.setValue("homography_matrix", h.tolist())
 		statics.configFile.setValue("homography_points", points)

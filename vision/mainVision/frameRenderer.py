@@ -45,8 +45,8 @@ class cortarCampo(gui.frameRenderer.frameRenderer):
 		self.__show_warpped = False
 		self.__frame_shape = None
 		
-		self.__points = statics.configFile.getValue("points", [])
-		self.__crop_points = statics.configFile.getValue("cortarCampo_crop_points", [])
+		self.__points = clickedPoints("points", 4)
+		self.__crop_points = clickedPoints("cortarCampo_crop_points", 2)
 		
 	def sortPoints(self,points):
 		if len(points) == 4:
@@ -61,27 +61,16 @@ class cortarCampo(gui.frameRenderer.frameRenderer):
 		if self.__show_warpped: return
 		
 		if self.parentVision.use_homography:
-			if len(self.__points) >= 4:
-				self.__points.clear()
-				
-			if len(self.__points) < 4:
-				self.__points.append([point[0]/self.__frame_shape[0], point[1]/self.__frame_shape[1]])
-				
-			if len(self.__points) == 4 and self.__frame_shape is not None:
-				statics.configFile.setValue("points", self.__points)
-				
-				self.parentVision.updateHomography(self.sortPoints(self.__points.copy()), self.__frame_shape)
+			self.__points.append([point[0]/self.__frame_shape[0], point[1]/self.__frame_shape[1]])
+			
+			if self.__points.isFilled():
+				self.parentVision.updateHomography(self.__points.getSorted(), self.__frame_shape)
+		
 		else:
-			if len(self.__crop_points) >= 2:
-				self.__crop_points.clear()
-				
-			if len(self.__crop_points) < 2:
-				self.__crop_points.append([point[0]/self.__frame_shape[0], point[1]/self.__frame_shape[1]])
-				
-			if len(self.__crop_points) == 2 and self.__frame_shape is not None:
-				statics.configFile.setValue("cortarCampo_crop_points", self.__crop_points)
-				
-				self.parentVision.updateCropPoints(self.__crop_points.copy())
+			self.__crop_points.append([point[0]/self.__frame_shape[0], point[1]/self.__frame_shape[1]])
+			
+			if self.__points.isFilled():
+				self.parentVision.updateCropPoints(self.__crop_points.getSorted())
 			
 	
 	def set_pointer_position(self, position):
@@ -94,11 +83,10 @@ class cortarCampo(gui.frameRenderer.frameRenderer):
 		self.parentVision.setUseHomography(value)
 	
 	def get_point_pixels(self, index):
-		return (round(self.__points[index][0]*self.__frame_shape[0]), round(self.__points[index][1]*self.__frame_shape[1]))
-		#return (self.__points[index][0], self.__points[index][1])
+		return self.__points.getPointPixels(index, self.__frame_shape)
 		
 	def get_crop_point_pixels(self, index):
-		return (round(self.__crop_points[index][0]*self.__frame_shape[0]), round(self.__crop_points[index][1]*self.__frame_shape[1]))
+		return self.__crop_points.getPointPixels(index, self.__frame_shape)
 		
 	def transformFrame(self, frame, originalFrame):
 		self.__frame_shape = frame.shape
@@ -107,11 +95,11 @@ class cortarCampo(gui.frameRenderer.frameRenderer):
 			return cv2.cvtColor(self.parentVision.warp(frame), cv2.COLOR_RGB2BGR)
 		
 		if not self.parentVision.use_homography:
-			if len(self.__crop_points) == 1:
+			if self.__crop_points.length() == 1:
 				p0 = self.get_crop_point_pixels(0)
 				cv2.circle(frame, p0, 5, (255,255,255), thickness=-1)
 				cv2.rectangle(frame, p0, (self.__pointer_position[0], self.__pointer_position[1]), (255,255,255))
-			elif len(self.__crop_points) == 2:
+			elif self.__crop_points.length() == 2:
 				p0 = self.get_crop_point_pixels(0)
 				p1 = self.get_crop_point_pixels(1)
 				cv2.circle(frame, p0, 5, (0,255,0), thickness=-1)
@@ -119,25 +107,25 @@ class cortarCampo(gui.frameRenderer.frameRenderer):
 				cv2.rectangle(frame, p0, p1, (0,255,0), thickness=2)
 			return cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 		
-		color = (0,255,0) if len(self.__points) == 4 else (255,255,255)
+		color = (0,255,0) if self.__points.length() == 4 else (255,255,255)
 		
 		# Draw line for each pair of points
-		if len(self.__points) > 1:
-			for i in range(len(self.__points)-1):
+		if self.__points.length() > 1:
+			for i in range(self.__points.length()-1):
 				cv2.line(frame, self.get_point_pixels(i), self.get_point_pixels(i+1), color, thickness=2)
 		
 		# Closes rectangle
-		if len(self.__points) == 4:
+		if self.__points.length() == 4:
 			cv2.line(frame, self.get_point_pixels(0), self.get_point_pixels(3), color, thickness=2)
 		
 		# Draw helping line from last chosen point to current mouse position
-		if self.__pointer_position and len(self.__points) > 0 and len(self.__points) < 4:
+		if self.__pointer_position and self.__points.length() > 0 and self.__points.length() < 4:
 			cv2.line(frame, self.get_point_pixels(-1), (self.__pointer_position[0], self.__pointer_position[1]), (255,255,255))
 			# Draw extra line from first chosen point to current position when it's the last point to be chosen
-			if len(self.__points) == 3:
+			if self.__points.length() == 3:
 				cv2.line(frame, self.get_point_pixels(0), (self.__pointer_position[0], self.__pointer_position[1]), color)
 		
-		for i in range(len(self.__points)):
+		for i in range(self.__points.length()):
 			cv2.circle(frame, self.get_point_pixels(i), 5, color, thickness=-1)
 		
 		return cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
