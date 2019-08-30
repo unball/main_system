@@ -27,24 +27,19 @@ class MainMenu(State):
         
         frame = vision.cameras.uiCamerasList().getFrame()
         if frame is None:
-            #GLib.idle_add(gui.mainWindow.MainWindow().ui_frame.clear_image)
-            #time.sleep(0.03)
+            GLib.idle_add(gui.mainWindow.MainWindow().ui_frame.clear_image)
+            time.sleep(0.03)
             return
-            
 
         fr = gui.mainWindow.MainWindow().selectedFrameRenderer
         if fr is None: return
         
-        #frame = frame_.copy()
-        #frame_resized = cv2.resize(frame, (round(frame.shape[1]/frame.shape[0]*600),600))
         processing_time = time.time()
         frame_processed = fr.transformFrame(frame, frame)
         processing_time = time.time()-processing_time
         
         height, width, depth = frame_processed.shape
         GLib.idle_add(gui.mainWindow.MainWindow().ui_frame.do_update_frame, (frame_processed, width, height, depth))
-        
-        #time.sleep(0.03)
             
         loop_time = time.time()-loop_time
         GLib.idle_add(self.update_stats, processing_time, loop_time)
