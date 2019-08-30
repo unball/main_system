@@ -141,7 +141,7 @@ class segmentarPreto(gui.frameRenderer.frameRenderer):
 	def __init__(self, vision):
 		super().__init__(vision)
 		# Variables
-		self.ui_elements = ["fundo_hmin", "fundo_smin", "fundo_vmin", "fundo_hmax", "fundo_smax", "fundo_vmax"]
+		self.__ui_elements = ["fundo_hmin", "fundo_smin", "fundo_vmin", "fundo_hmax", "fundo_smax", "fundo_vmax"]
 		
 	def update_hsv_interval(self, widget, index):
 		self.parentVision.atualizarPretoHSV(int(widget.get_value()), index)
@@ -155,7 +155,7 @@ class segmentarPreto(gui.frameRenderer.frameRenderer):
 	
 	def create_ui_content(self):
 		builder = Gtk.Builder.new_from_file("vision/mainVision/segmentarPreto.ui")
-		for index,name in enumerate(self.ui_elements):
+		for index,name in enumerate(self.__ui_elements):
 			element = builder.get_object(name)
 			element.set_value(self.parentVision.preto_hsv[index])
 			element.connect("value-changed", self.update_hsv_interval, index)
