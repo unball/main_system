@@ -8,6 +8,34 @@ import time
 import vision.mainVision
 import gui.frameRenderer
 
+class clickedPoints():
+	def __init__(self, configFileVariableName, maxSize):
+		self.__points = statics.configFile.getValue(configFileVariableName, [])
+		self.__max_size = maxSize
+		self.__config_file_variable_name = configFileVariableName
+	
+	def append(self, point):
+		if len(self.__points) >= self.__max_size:
+			self.__points.clear()
+			
+		if len(self.__points) < self.__max_size:
+			self.__points.append(point)
+			
+		if len(self.__points) == self.__max_size:
+			statics.configFile.setValue(self.__config_file_variable_name, self.__points)
+	
+	def isFilled(self):
+		return len(self.__points) == self.__max_size
+		
+	def length(self):
+		return len(self.__points)
+	
+	def getSorted(self):
+		return sorted(self.__points.copy(), key=sum)
+	
+	def getPointPixels(self, index, shape):
+		return (round(self.__points[index][0]*shape[0]), round(self.__points[index][1]*shape[1]))
+
 class cortarCampo(gui.frameRenderer.frameRenderer):
 	
 	def __init__(self, vision):
