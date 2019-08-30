@@ -69,7 +69,7 @@ class cortarCampo(gui.frameRenderer.frameRenderer):
 		else:
 			self.__crop_points.append([point[0]/self.__frame_shape[0], point[1]/self.__frame_shape[1]])
 			
-			if self.__points.isFilled():
+			if self.__crop_points.isFilled():
 				self.parentVision.updateCropPoints(self.__crop_points.getSorted())
 			
 	

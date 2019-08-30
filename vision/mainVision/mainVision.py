@@ -130,6 +130,8 @@ class MainVision(vision.vision.Vision):
 	
 	def getHomography(self, shape):
 		if self.__current_frame_shape != shape:
+			if self.__homography_points is None:
+				return None
 			self.updateHomography(self.__homography_points, shape)
 		return self.__homography
 	
