@@ -17,23 +17,39 @@ class GameThread():
     
     def __init__(self):
         # Private
-        self.state = states.main_menu.MainMenu(self)
+        self._state = states.main_menu.MainMenu(self)
         
-        self.visionSystem = MainVision()
-        self.strategySystem = Strategy()
-        self.controlSystem = ssRegulator()
-        self.radioComm = RadioCommunicator()
+        self._visionSystem = MainVision()
+        self._strategySystem = Strategy()
+        self._controlSystem = ssRegulator()
+        self._radioComm = RadioCommunicator()
     
     def set_state(self, stateName):
         if stateName == "mainMenu":
-            self.state.request_state_change(states.main_menu.MainMenu(self))
+            self._state.request_state_change(states.main_menu.MainMenu(self))
         elif stateName == "gameLoop":
-            self.state.request_state_change(states.main_menu.GameLoop(self))
+            self._state.request_state_change(states.main_menu.GameLoop(self))
         else:
             pass
     
+    @property
+    def visionSystem(self):
+        return self._visionSystem
+    
+    @property
+    def strategySystem(self):
+        return self._strategySystem
+    
+    @property
+    def controlSystem(self):
+        return self._controlSystem
+    
+    @property
+    def radioComm(self):
+        return self._radioComm
+    
     def stop(self):
-        self.state.request_quit()
+        self._state.request_quit()
     
     def run(self):
         self.thread = Thread(target=self.__loop__)
@@ -41,11 +57,11 @@ class GameThread():
         
     def __loop__(self):
         while True:
-            self.state.update()
-            if self.state.QuitRequested:
+            self._state.update()
+            if self._state.QuitRequested:
                 break
-            if self.state.StateChangeRequested:
-                self.state = self.state.next_state()
+            if self._state.StateChangeRequested:
+                self._state = self._state.next_state()
             #time.sleep(1)
         
         
