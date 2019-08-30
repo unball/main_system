@@ -166,7 +166,7 @@ class segmentarTime(gui.frameRenderer.frameRenderer):
 	def __init__(self, vision):
 		super().__init__(vision)
 		# Variables
-		self.ui_elements = ["time_hmin", "time_smin", "time_vmin", "time_hmax", "time_smax", "time_vmax"]
+		self.__ui_elements = ["time_hmin", "time_smin", "time_vmin", "time_hmax", "time_smax", "time_vmax"]
 
 	def update_hsv_interval(self, widget, index):
 		self.parentVision.atualizarTimeHSV(int(widget.get_value()), index)
@@ -180,7 +180,7 @@ class segmentarTime(gui.frameRenderer.frameRenderer):
 	
 	def create_ui_content(self):
 		builder = Gtk.Builder.new_from_file("vision/mainVision/segmentarTime.ui")
-		for index,name in enumerate(self.ui_elements):
+		for index,name in enumerate(self.__ui_elements):
 			element = builder.get_object(name)
 			element.set_value(self.parentVision.time_hsv[index])
 			element.connect("value-changed", self.update_hsv_interval, index)
