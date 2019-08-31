@@ -1,8 +1,8 @@
 import numpy as np
 from random import randint
 
-finalTarget = np.array([.75*fieldSide, randint(-1, 1) *.2])
 fieldSide = -1
+finalTarget = np.array([.75*fieldSide, randint(-1, 1) *.2])
 
 def goToBallPlus(ballPos, pos):
     ballTarget = finalTarget - ballPos  
@@ -29,7 +29,7 @@ def goalkeep():
     #Se não acompanha o y
     return np.array([xGoal, ballPos[1], np.pi/2])
 
-  def mirrorPos(posDom):
+    def mirrorPos(posDom):
         radiusMin = .1                      #raio minimo para simetria
         mirrorCenter = np.array([.375*fieldSide, .0]) #centro da simetria radial
         rectangle = fieldSide * np.array([[.1,.4], [.55, -.4]])

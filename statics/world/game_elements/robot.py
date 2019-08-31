@@ -1,6 +1,7 @@
 """Robot class module."""
 import numpy as np
 from statics.world.game_elements.element import Element
+import numpy as np
 
 
 class Robot(Element):
