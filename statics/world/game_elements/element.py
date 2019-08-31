@@ -1,7 +1,10 @@
+import numpy as np
+
 """Element module."""
 
 alpha = 0.1
 
+#TODO: subs inst_x, inst_y, inst_th to np.array([])
 class Element(object):
     """Parent class of an element of game such as robot or ball."""
 
@@ -18,6 +21,8 @@ class Element(object):
         self.inst_vx = 0
         self.inst_vy = 0
         self.inst_w = 0
+
+
 
     def __repr__(self):
         """Docstring for the method."""
@@ -38,12 +43,18 @@ class Element(object):
         self.inst_x = x
         self.inst_y = y
         self.inst_th = th
+        self.pose = np.array([x,y,th])
         return self
 
     @property
     def pos(self):
         """Getter property of self.inst_pos."""
         return [self.inst_x, self.inst_y]
+
+    @property
+    def pose(self):
+        """Getter property of self.inst_pos.""")
+        return np.array([self.inst_x, self.inst_y, self.inst_th])
 
     @pos.setter
     def pos(self, x, y):
