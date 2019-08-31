@@ -27,7 +27,7 @@ def goalkeep():
         #projetando vetor até um xGoal-> y = (xGoal-Xball) * Vyball/Vxball + yBall 
         return (xGoal, (((xGoal-ballPos[0])/ballVel[0])*ballVel[1])+ballPos[1], np.pi/2)
     #Se não acompanha o y
-    return (xGoal, ballPos[1], np.pi/2)
+    return np.array([xGoal, ballPos[1], np.pi/2])
 
   def mirrorPos(posDom):
         radiusMin = .1                      #raio minimo para simetria
