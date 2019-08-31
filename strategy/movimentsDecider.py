@@ -10,26 +10,15 @@ import moviments
 turning_radius = 0.0375
 step = 0.001
 
-class Robot():
-    def __init__(self):
-        self.__pose = np.array([0,0,0]) 
-        def.__vel = np.array([0,0])  
-        
-class RobotOwn(Robot):
-    def __init__(self):
-        super().__init__(self)
-        self.__target =  np.array([0,0,0])
-        self.__trajectory = [] 
 
 class Entity(ABC):
     def __init__(self):
         self.host = None
         self.__target = np.array([0,0,0])
         self.__path = None
-    def possession(path, id):
+    def possess(path, id):
         self.__path = path
         self.host = id
-        static_classes.world.robots[id].target = self.__target
         static_classes.world.robots[id].trajectory = self.__path.sample_many(step)
 
     @abstractmethod
@@ -61,6 +50,7 @@ class Midfielder(Entity):
         super().__init__()
     def tatic(self, pose):
         pass
+
 
 class MovimentsDecider():
     def __init__(self):

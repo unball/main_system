@@ -1,4 +1,5 @@
 """Robot class module."""
+import numpy as np
 from statics.world.game_elements.element import Element
 
 
@@ -8,26 +9,24 @@ class Robot(Element):
     def __init__(self):
         """Responsible to instantiate the attributes of the parent class."""
         super().__init__()
-        self.__target =  np.array([0,0,0])
         self.__trajectory = [] 
+        self.entity = None
+
+    def discretize(self, step):
+        self.trajectory =  self.entity.__path.sample_many(step)
 
 
-    @property
-    def target(self):
-        return self.__target
 
     @property
     def trajectory(self):
         return self.__trajectory
 
-    @target.setter
-    def target(self,pose):
-        self.__target = pose
 
     @trajectory.setter
     def trajectory(self, trajectory):
         self.__trajectory = trajectory
 
+    
 
 
 if __name__ == "__main__":
