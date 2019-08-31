@@ -1,7 +1,7 @@
 import dubins 
 import numpy as np 
 from abc import ABC, abstractmethod
-import strategy.moviments
+import strategy.moviments as moviments
 import sys
 #sys.path.append("../..") # Adds higher directory to python modules path.
 from statics import static_classes 

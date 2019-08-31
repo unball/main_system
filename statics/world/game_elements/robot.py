@@ -13,6 +13,8 @@ class Robot(Element):
         self.__trajectory = [] 
         self.entity = None
 
+    def nextStep(self):
+        return self.__trajectory[1]
 
     @property
     def target(self):
