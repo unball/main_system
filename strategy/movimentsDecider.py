@@ -10,7 +10,8 @@ from statics import static_classes
 
 #TODO: encontrar valores otimos 
 turning_radius = 0.0375
-step = 0.001 
+step = 0.001
+
 
 class Entity(ABC):
     def __init__(self):
@@ -54,6 +55,7 @@ class Midfielder(Entity):
         super().__init__()
     def tatic(self, pose):
         pass
+
 
 class MovimentsDecider():
     def __init__(self):
