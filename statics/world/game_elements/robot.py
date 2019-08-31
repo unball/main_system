@@ -1,5 +1,6 @@
 """Robot class module."""
 from statics.world.game_elements.element import Element
+import numpy as np
 
 
 class Robot(Element):
@@ -10,6 +11,7 @@ class Robot(Element):
         super().__init__()
         self.__target =  np.array([0,0,0])
         self.__trajectory = [] 
+        self.entity = None
 
 
     @property

@@ -53,7 +53,7 @@ class Element(object):
 
     @property
     def pose(self):
-        """Getter property of self.inst_pos.""")
+        """Getter property of self.inst_pos."""
         return np.array([self.inst_x, self.inst_y, self.inst_th])
 
     @pos.setter
