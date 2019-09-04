@@ -11,7 +11,7 @@ from statics import static_classes
 #TODO: encontrar valores otimos 
 turning_radius = 0.0375
 step = 0.001
-
+centerGoal = np.array([0.72*static_classes.world.fieldSide,0])
 
 class Entity(ABC):
     def __init__(self):
@@ -35,7 +35,8 @@ class Attacker(Entity):
     def __init__(self):
         super().__init__()
     def tatic(self, pose):
-        pass
+        self.__target = moviments.goToBallPlus(static_classes.world.ball.pos)
+        return self.__target
 
 class Goalkeeper(Entity):
     def __init__(self):
@@ -48,7 +49,8 @@ class Defender(Entity):
     def __init__(self):
         super().__init__()
     def tatic(self, pose):
-        pass
+        self.__target = moviments.blockBallElipse(centerGoal, static_classes.world.ball.pos,static_classes.world.ball.vel)
+        return self.__target
 
 class Midfielder(Entity):
     def __init__(self):
@@ -71,23 +73,26 @@ class MovimentsDecider():
 
     def updadeHost(self):
         possessed = []
-        for entity in self.listEntity:
-            
+        for entity in self.listEntity:  
             minPath = None
-            minPathLength = 1000
-            host = None
+            minCost = 1000
+            host = -1
             for indx,robot in enumerate(static_classes.world.robots):
                 if indx in possessed:
                     continue
                 target = entity.tatic(robot.pose)
                 path = self.shortestTragectory(robot.pose, target, turning_radius) 
-                length = path.path_length()
-                if length < minPathLength:
-                    minPathLength = length
+                cost = path.path_length()
+                if cost < minCost:
+                    minCost = cost
                     minPath = path
                     host = indx
                     possessed.append(indx)
-            entity.possession(minPath, host)
+            entity.possess(minPath, host)
+
+    def calcPath(self):
+        for robot in static_classes.world.robots:
+            robot.entity.path = self.shortestTragectory(robot.pose, robot.entity.tatic(), turning_radius) 
 
 if __name__ == '__main__':
     r = static_classes.world.robots[0]

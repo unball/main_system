@@ -1,16 +1,18 @@
 import numpy as np
 from random import randint
 
+#TODO: implementar spin
+
 fieldSide = -1
 finalTarget = np.array([.75*fieldSide, randint(-1, 1) *.2])
 
-def goToBallPlus(ballPos, pos):
+def goToBallPlus(ballPos):
     ballTarget = finalTarget - ballPos  
     return (ballPos[0], ballPos[1], np.arctan2(ballTarget[1],ballTarget[0]))
 
 def blockBallElipse(goal, ballPos, ballVel):
-    goalTarget = target-goal
     ########definir z = [a**2, b**2]###########
+    goalTarget = target-goal
     z = np.array([.4**2, .2**2])
     c =  [sum((ballVel**2)*z), 2*np.dot(z*ballVel, ballPos-goal), sum(z*(ballPos-goal)**2) - np.prod(z)]
     k = min(np.roots(c))

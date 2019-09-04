@@ -1,10 +1,7 @@
 """Strategy system module."""
 
-from strategy.firstleveldecider import FirstLvlDecider
-from strategy.secondleveldeciders.attack_decider import AttackDecider
-from strategy.players.goalkeeper import Goalkeeper
-from strategy.players.striker import Striker
-from strategy.players.defender import Defender
+from strategy.movimentsDecider import Attacker, Defender, Goalkeeper, Midfielder, MovimentsDecider
+from statics.static_classes import world
 
 def error():
     """Print the standard error message for STRATEGY scope."""
@@ -16,14 +13,16 @@ class Strategy(object):
 
     def __init__(self):
         """Init method."""
-        self.firstLvlDec = FirstLvlDecider()
+        self.coach = None
         self.tactic = None
-        self.formation = [Goalkeeper(), Defender(), Striker()]
-        self.decider = AttackDecider()
+        self.listEntity = [Goalkeeper(), Defender(), Attacker()]
+        self.decider = MovimentsDecider()
+        self.targets = []
+        self.spin = [0,0,0]
+        self.dynamicPossession = True
 
-    def plan(self, world):
+    def plan(self):
         """Toplevel planner which contains all the deciders of the system."""
-        self.world = world
         # TODO: VERIFICATION TEST FOR THE WORLD STATE
 
         # # Fuzzy
@@ -31,8 +30,16 @@ class Strategy(object):
         # self.decider.setParams(world)
         # self.decider.setFormation(world)
         # self.targets = self.decider.updateTargets()
-        self.targets = list(player.calc_target(self.world) for player in self.formation)
-        self.spin =  list(player.spin for player in self.formation)
+        
+        if self.dynamicPossession:
+            self.decider.updadeHost()
+        else:
+            self.decider.calcPath()
+
+        self.targets = []
+        for robot in world.robots:
+            robot.discretize()
+            self.targets.append(robot.nextStep())
 
     def get_targets(self):
         """Getter of each robot target planned."""

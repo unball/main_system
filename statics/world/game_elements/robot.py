@@ -12,6 +12,7 @@ class Robot(Element):
         super().__init__()
         self.__trajectory = [] 
         self.entity = None
+        self.spin = 0
 
     def nextStep(self):
         return self.__trajectory[1]
