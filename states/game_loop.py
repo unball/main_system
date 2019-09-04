@@ -16,7 +16,7 @@ class GameLoop(State):
         # Vision System
         t0 = time.time()
         self.thread.visionSystem.update()
-        self.thread.strategySystem.plan(static_classes.world)
+        self.thread.strategySystem.plan()
         targets, spin = self.thread.strategySystem.get_targets()
         velocities = self.thread.controlSystem.actuate(targets, static_classes.world)
         self.thread.radioComm.send(velocities)

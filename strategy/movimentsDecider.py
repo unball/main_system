@@ -42,7 +42,7 @@ class Goalkeeper(Entity):
     def __init__(self):
         super().__init__()
     def tatic(self, pose):
-       self.__target =  moviments.goalkeep()
+       self.__target =  moviments.goalkeep(static_classes.world.ball.pos, static_classes.world.ball.vel)
        return self.__target
 
 class Defender(Entity):
@@ -61,7 +61,7 @@ class Midfielder(Entity):
 
 class MovimentsDecider():
     def __init__(self):
-        self.listEntity = []
+        self.listEntity = [Goalkeeper(), Defender(), Attacker()]
 
     def shortestTragectory(self, startPose, endPose, radius):
         altStartPose = (startPose[0], startPose[1], startPose[2] + np.pi)

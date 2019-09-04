@@ -15,11 +15,11 @@ class Strategy(object):
         """Init method."""
         self.coach = None
         self.tactic = None
-        self.listEntity = [Goalkeeper(), Defender(), Attacker()]
         self.decider = MovimentsDecider()
         self.targets = []
         self.spin = [0,0,0]
         self.dynamicPossession = True
+        self.step = 0.005
 
     def plan(self):
         """Toplevel planner which contains all the deciders of the system."""
@@ -38,7 +38,7 @@ class Strategy(object):
 
         self.targets = []
         for robot in world.robots:
-            robot.discretize()
+            robot.discretize(self.step)
             self.targets.append(robot.nextStep())
 
     def get_targets(self):

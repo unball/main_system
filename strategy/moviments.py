@@ -12,16 +12,19 @@ def goToBallPlus(ballPos):
 
 def blockBallElipse(goal, ballPos, ballVel):
     ########definir z = [a**2, b**2]###########
-    goalTarget = target-goal
+    # TODO: Corrigir problema da velocidade 0
     z = np.array([.4**2, .2**2])
+    ballPos = np.array(ballPos)
+    ballVel = np.array(ballVel)
     c =  [sum((ballVel**2)*z), 2*np.dot(z*ballVel, ballPos-goal), sum(z*(ballPos-goal)**2) - np.prod(z)]
     k = min(np.roots(c))
     if k.imag == 0:
         target = k*ballVel + ballPos
+        goalTarget = target-goal
         return (target[1],target[0], np.pi/2 + np.arctan2(goalTarget[1],goalTarget[0]))
-    return (.15*fieldSide, (ballPos[1]+.1, np.pi/2 + np.arctan2(goalTarget[1],goalTarget[0])) )
+    return (.15*fieldSide, (ballPos[1]+.1, np.pi/2) )
 
-def goalkeep():
+def goalkeep(ballPos, ballVel):
     xGoal = fieldSide * .72
     #testar velocidade minima (=.15?)
     if ((ballVel[0]*fieldSide) > .15) and  ((ballPos*fieldSide)> .15):

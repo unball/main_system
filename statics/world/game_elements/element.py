@@ -43,7 +43,6 @@ class Element(object):
         self.inst_x = x
         self.inst_y = y
         self.inst_th = th
-        self.pose = np.array([x,y,th])
         return self
 
     @property
