@@ -3,7 +3,6 @@ import statics.configFile
 import numpy as np
 import vision.pixel2metric
 import vision.mainVision.frameRenderer
-from gi.repository import GLib
 import vision.vision
 import gui.mainWindow
 from statics.static_classes import world
@@ -65,7 +64,7 @@ class MainVision(vision.vision.Vision):
 			"identificarRobos": vision.mainVision.frameRenderer.identificarRobos(self),
 		}
 		#self.selectedFrameRenderer = self.frameRenderers[0]
-		GLib.idle_add(gui.mainWindow.MainWindow().set_frame_renderer, 0)
+		gui.mainWindow.MainWindow().set_frame_renderer(0)
 	
 	@property
 	def robosAliados(self):

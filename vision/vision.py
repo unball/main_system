@@ -3,7 +3,6 @@ from statics.static_classes import world
 import vision.cameras
 import time
 import gui.mainWindow
-from gi.repository import GLib
 import cv2
 
 class VisionMessage():
@@ -41,7 +40,7 @@ class Vision(ABC):
         
         converted_image = cv2.cvtColor(processed_image, cv2.COLOR_RGB2BGR)
         height, width, depth = converted_image.shape
-        GLib.idle_add(gui.mainWindow.MainWindow().game_loop_ui_frame.do_update_frame, (converted_image, width, height, depth))
+        gui.mainWindow.MainWindow().game_loop_ui_frame.do_update_frame((converted_image, width, height, depth))
     
     @abstractmethod
     def ui_init(self):
