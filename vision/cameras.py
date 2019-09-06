@@ -7,7 +7,7 @@ import statics.configFile
 import cv2
 import time
 import gui.mainWindow
-from gi.repository import GLib
+from gui.guiMethod import guiMethod
 
 class uiCamerasList(metaclass=gui.singleton.Singleton):
     def __init__(self):
@@ -26,8 +26,9 @@ class uiCamerasList(metaclass=gui.singleton.Singleton):
         
         self.__cap = cv2.VideoCapture(self.__camera_index)
         
-        GLib.idle_add(self.ui_config)
+        self.ui_config()
     
+    @guiMethod
     def ui_config(self):
         gui.mainWindow.MainWindow().getObject("test_frame_switch").set_state(self.__use_test_frame)
         gui.mainWindow.MainWindow().getObject("camera_scale").set_value(self.__frame_scale)

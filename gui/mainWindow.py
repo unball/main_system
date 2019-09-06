@@ -4,6 +4,7 @@ import gui.signals
 import gui.uiFrame
 import gui.singleton
 import states.gameThread
+from gui.guiMethod import guiMethod
 
 class MainWindow(metaclass=gui.singleton.Singleton):
 
@@ -22,13 +23,15 @@ class MainWindow(metaclass=gui.singleton.Singleton):
 	def getObject(self, name):
 		self.loadBuilder()
 		return self._builder.get_object(name)
-
+	
+	@guiMethod
 	def add_frame_renderer(self, fr):
 		frNotebook = self.getObject("fr_notebook")
 		frNotebook.append_page(fr.create_ui_content(), fr.create_ui_label())
 		frNotebook.show_all()
 		self._frameRenderers.append(fr)
 
+	@guiMethod
 	def set_frame_renderer(self, index):
 		try:
 			self._selectedFrameRenderer = self._frameRenderers[index]

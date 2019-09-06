@@ -1,12 +1,11 @@
 from abc import ABC, abstractmethod
-from gi.repository import GLib
 import gui.mainWindow
 import cv2
 
 class frameRenderer(ABC):
 	def __init__(self, vision):
 		self._parentVision = vision
-		GLib.idle_add(gui.mainWindow.MainWindow().add_frame_renderer, self)
+		gui.mainWindow.MainWindow().add_frame_renderer(self)
 
 	@abstractmethod
 	def create_ui_content(self):

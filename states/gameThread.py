@@ -1,5 +1,4 @@
 from threading import Thread, Event
-from gi.repository import GLib
 import gui.frameRenderer
 import cv2
 import time

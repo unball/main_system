@@ -1,4 +1,4 @@
-from gi.repository import Gtk, GLib
+from gi.repository import Gtk
 import statics.configFile
 import numpy as np
 import gui.mainWindow
@@ -7,6 +7,7 @@ import gui.singleton
 import time
 import vision.mainVision
 import gui.frameRenderer
+from gui.guiMethod import guiMethod
 
 class clickedPoints():
 	def __init__(self, configFileVariableName, maxSize):
@@ -259,6 +260,7 @@ class identificarRobos(gui.frameRenderer.frameRenderer):
 	def __init__(self, vision):
 		super().__init__(vision)
 	
+	@guiMethod
 	def updateRobotsInfo(self, robos, bola):
 		for robo in robos:
 			if robo.ui:
@@ -294,7 +296,7 @@ class identificarRobos(gui.frameRenderer.frameRenderer):
 		robosAliados = self.parentVision.robosAliados
 		bola = self.parentVision.bola
 		
-		GLib.idle_add(self.updateRobotsInfo, robosAliados, bola)
+		self.updateRobotsInfo(robosAliados, bola)
 		
 		return cv2.cvtColor(processed_frame, cv2.COLOR_RGB2BGR)
 
