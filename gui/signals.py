@@ -35,10 +35,10 @@ class Signals:
     def onConfigPageChange(self, page, widget, num):
         gui.mainWindow.MainWindow().set_frame_renderer(num)
     
-    def mainPageChange(self, widget, page):
+    def mainPageChange(self, stack):
         gameThread = gui.mainWindow.MainWindow().gameThread
         if gameThread is not None:
-            gameThread.set_state(widget.get_stack().get_visible_child_name())
+            gameThread.set_state(stack.get_visible_child_name())
     
     def gameCommands_IniciodeJogo(self, widget):
         interfaces.gamecommands.gameCommands().IniciodeJogo()
