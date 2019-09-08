@@ -7,6 +7,7 @@ import statics.configFile
 import gui.mainWindow
 import states.main_menu
 import states.game_loop
+import queue
 from vision.mainVision.mainVision import MainVision
 from strategy.strategy import Strategy
 from controllers.ssRegulator import ssRegulator
@@ -17,6 +18,7 @@ class GameThread():
     def __init__(self):
         # Private
         self._state = states.main_menu.MainMenu(self)
+        self._events = queue.Queue()
         
         self._visionSystem = MainVision()
         self._strategySystem = Strategy()
@@ -54,8 +56,20 @@ class GameThread():
         self.thread = Thread(target=self.__loop__)
         self.thread.start()
         
+    def addEvent(self, method, *args):
+        self._events.put({"method": method, "args": args})
+    
+    def runQueuedEvents(self):
+        while not self._events.empty():
+            try:
+                event = self._events.get_nowait()
+                event["method"](*event["args"])
+            except:
+                pass
+        
     def __loop__(self):
         while True:
+            self.runQueuedEvents()
             self._state.update()
             if self._state.QuitRequested:
                 break

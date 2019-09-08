@@ -19,9 +19,11 @@ class Signals:
     def select_world_standard(self, widget, widget_selected):
         index = widget_selected.get_index()
         if index == 0:
-            world.setSetting(STANDARD5)
+            gui.mainWindow.MainWindow().gameThread.addEvent(world.setSetting, STANDARD5)
+            #world.setSetting(STANDARD5)
         elif index == 1:
-            world.setSetting(STANDARD3)
+            gui.mainWindow.MainWindow().gameThread.addEvent(world.setSetting, STANDARD3)
+            #world.setSetting(STANDARD3)
     
     def select_camera(self, widget, widget_selected):
         vision.cameras.uiCamerasList().setCamera(widget_selected.index)
