@@ -11,19 +11,21 @@ def goToBallPlus(ballPos):
     return (ballPos[0], ballPos[1], np.arctan2(ballTarget[1],ballTarget[0]))
 
 def blockBallElipse(goal, ballPos, ballVel):
-    ########definir z = [a**2, b**2]###########
-    # TODO: Corrigir problema da velocidade 0
-    z = np.array([.4**2, .2**2])
-    ballPos = np.array(ballPos)
-    ballVel = np.array(ballVel)
-    c =  [sum((ballVel**2)*z), 2*np.dot(z*ballVel, ballPos-goal), sum(z*(ballPos-goal)**2) - np.prod(z)]
-    k = min(np.roots(c))
-    if k.imag == 0:
-        target = k*ballVel + ballPos
-        goalTarget = target-goal
-        return (target[1],target[0], np.pi/2 + np.arctan2(goalTarget[1],goalTarget[0]))
-    return (.15*fieldSide, (ballPos[1]+.1, np.pi/2) )
-
+    try:
+        ########definir z = [a**2, b**2]###########
+        # TODO: Corrigir problema da velocidade 0
+        z = np.array([.4**2, .2**2])
+        ballPos = np.array(ballPos)
+        ballVel = np.array(ballVel)
+        c =  [sum((ballVel**2)*z), 2*np.dot(z*ballVel, ballPos-goal), sum(z*(ballPos-goal)**2) - np.prod(z)]
+        k = min(np.roots(c))
+        if k.imag == 0:
+            target = k*ballVel + ballPos
+            goalTarget = target-goal
+            return (target[1],target[0], np.pi/2 + np.arctan2(goalTarget[1],goalTarget[0]))
+        return (.15*fieldSide, (ballPos[1]+.1, np.pi/2) )
+    except:
+        return (0,0,0)
 def goalkeep(ballPos, ballVel):
     xGoal = fieldSide * .72
     #testar velocidade minima (=.15?)

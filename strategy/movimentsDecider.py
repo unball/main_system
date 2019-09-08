@@ -17,10 +17,10 @@ class Entity(ABC):
     def __init__(self):
         self.host = None
         self.__target = np.array([0,0,0])
-        self.__path = None
+        self._path = None
 
     def possess(self, path, id):
-        self.__path = path
+        self._path = path
         self.host = id
         static_classes.world.robots[id].target = self.__target
         static_classes.world.robots[id].entity = self

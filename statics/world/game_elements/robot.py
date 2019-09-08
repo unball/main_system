@@ -15,10 +15,14 @@ class Robot(Element):
         self.spin = 0
 
     def nextStep(self):
-        return self.__trajectory[1]
+        if len(self.__trajectory) >= 1:
+            return self.__trajectory[1]
+        # !TODO: Decidir o que fazer quando não há uma trajetória
+        else: return (0,0,0)
 
     def discretize(self, step):
-        self.trajectory =  self.entity.__path.sample_many(step)
+        if self.entity is not None:
+            self.trajectory =  self.entity._path.sample_many(step)
 
     @property
     def trajectory(self):
