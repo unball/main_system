@@ -8,12 +8,7 @@ import gui.mainWindow
 from statics.static_classes import world
 from statics import field
 
-class RoboAdversario():
-	def __init__(self, centro, angulo):
-		self.centro = centro
-		self.angulo = angulo
-		
-class RoboAliado():
+class Robo():
 	def __init__(self, identificador):
 		self.identificador = identificador
 		self.centro = (-1,-1)
@@ -24,15 +19,7 @@ class RoboAliado():
 
 class MainVision(vision.vision.Vision):
 	def __init__(self):
-		self.__robosAliados = [
-			RoboAliado(0),
-			RoboAliado(1),
-			RoboAliado(2),
-			RoboAliado(3),
-			RoboAliado(4)
-		]
-		self.__todosReconhecidos = False
-		self.__robosAdversarios = []
+		self.__robos = [Robo(i) for i in range(10)]
 		self.__bola = None
 		self.__angles = np.array([0, 90, 180, -90, -180])
 		self.__homography = None
@@ -67,8 +54,8 @@ class MainVision(vision.vision.Vision):
 		gui.mainWindow.MainWindow().set_frame_renderer(0)
 	
 	@property
-	def robosAliados(self):
-		return self.__robosAliados
+	def robos(self):
+		return self.__robos
 	
 	@property
 	def bola(self):
@@ -127,24 +114,18 @@ class MainVision(vision.vision.Vision):
 	def obterRobosAliados(self):
 		return self.__robosAliados
 		
-	def atualizarRobos(self, robosAliados, robosAdversariosIdentificados, bola):
-		# Computa novos robos inimigos
-		self.__robosAdversarios = [RoboAdversario(robo[0], robo[1]) for robo in robosAdversariosIdentificados]
-		
+	def atualizarRobos(self, robos, bola):
 		# Atualiza posição da bola
 		self.__bola = bola
 		
-		todosReconhecidos = True
-		for i,r in enumerate(robosAliados):
+		for i,r in enumerate(robos):
 			if r[3] == True:
-				self.__robosAliados[i].centro = r[1]
-				self.__robosAliados[i].centroPixels = r[4]
-				self.__robosAliados[i].angulo = r[2]
-				self.__robosAliados[i].estado = "Identificado"
+				self.__robos[i].centro = r[1]
+				self.__robos[i].centroPixels = r[4]
+				self.__robos[i].angulo = r[2]
+				self.__robos[i].estado = "Identificado"
 			else:
-				todosReconhecidos = False
-				self.__robosAliados[i].estado = "Não-Identificado"
-		self.__todosReconhecidos = todosReconhecidos
+				self.__robos[i].estado = "Não-Identificado"
 	
 	def getHomography(self, shape):
 		if self.__current_frame_shape != shape:
@@ -205,35 +186,27 @@ class MainVision(vision.vision.Vision):
 		mainContours,_ = cv2.findContours(component_mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 		mainContour = sorted(mainContours, key=cv2.contourArea)[-1]
 		
-		# Encontra o menor retângulo que se inscreve na camisa
+		# Encontra o menor retângulo que se inscreve no contorno
 		rectangle = cv2.minAreaRect(mainContour)
-		box = cv2.boxPoints(rectangle)
-		box = np.int0(box)
-		cv2.drawContours(renderFrame, [box], 0, (255,0,0), 2)
 		
 		# Calcula a posição e ângulo parcial da camisa com base no retângulo
 		center = rectangle[0]
 		centerMeters = vision.pixel2metric.pixel2meters(center, component_mask.shape)
 		angle = rectangle[-1]
 		
-		return center, centerMeters, angle
+		return center, centerMeters, angle, mainContour
 		
-	def detectarTime(self, img, componentMask, componentTeamMask):
-		# Frame a ser renderizado
-		renderFrame = img.copy()
+	def detectarTime(self, renderFrame, componentTeamMask, center):
 		
 		# Encontra os contornos internos com área maior que um certo limiar e ordena
 		internalContours,_ = cv2.findContours(componentTeamMask, cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_L1)
 		internalContours = [countor for countor in internalContours if cv2.contourArea(countor)>self.__min_internal_area_contour]
 		
 		countInternalContours = len(internalContours)
-			
-		# Obtém centro e ângulo da camisa
-		center, centerMeters, angle = self.detectarCamisa(renderFrame, componentMask)
 		
 		# Não é do nosso time
 		if countInternalContours == 0:
-			return None, centerMeters, angle, renderFrame, center
+			return None
 		
 		# Seleciona a forma principal
 		mainShape = max(internalContours, key=cv2.contourArea)
@@ -257,10 +230,9 @@ class MainVision(vision.vision.Vision):
 		# Computa o identificador com base na forma e no número de contornos internos
 		identificador = (0 if poligono == 3 else 2) + countInternalContours -1
 		
-		# Insere o número do robô no frame
-		cv2.putText(renderFrame, str(identificador), (int(center[0])-10, int(center[1])+10), cv2.FONT_HERSHEY_TRIPLEX, 1, (0,0,0))
+		if identificador >= 5: return None
 		
-		return identificador, centerMeters, estimatedAngle, renderFrame, center
+		return identificador, estimatedAngle
 	
 	def segmentarFundo(self, frame):
 		img_filtered = cv2.GaussianBlur(frame, (5,5), 0)
@@ -280,11 +252,11 @@ class MainVision(vision.vision.Vision):
 		return mask & cv2.inRange(img_hsv, self.__bola_hsv[0:3], self.__bola_hsv[3:6])
 	
 	def process(self, frame):
-		robosAliadosIdentificados, robosAdversariosIdentificados, bola, processed_image = self.process_frame(frame)
-		return robosAliadosIdentificados, robosAdversariosIdentificados, bola, processed_image
+		robos, bola, processed_image = self.process_frame(frame)
+		return robos[0:5], robos[5:10], bola, processed_image
 
 	def ui_process(self, frame):
-		robosAliadosIdentificados, robosAdversariosIdentificados, bola, processed_image = self.process_frame(frame)
+		robos, bola, processed_image = self.process_frame(frame)
 		return processed_image
 	
 	def converterHSV(self, img):
@@ -296,13 +268,30 @@ class MainVision(vision.vision.Vision):
 		
 	def obterMascaraTime(self, img):
 		return cv2.inRange(img, self.__time_hsv[0:3], self.__time_hsv[3:6])
+		
+	def obterMascaraBola(self, img):
+		return cv2.inRange(img, self.__bola_hsv[0:3], self.__bola_hsv[3:6])
 	
 	def obterComponentesConectados(self, mask):
 		num_components, components = cv2.connectedComponents(mask)
 		kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (7,7))
 		components = cv2.morphologyEx(np.uint8(components), cv2.MORPH_OPEN, kernel)
 		kernel = cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
-		return cv2.dilate(np.uint8(components), kernel, iterations=1)
+		dilated = cv2.dilate(np.uint8(components), kernel, iterations=1)
+		return [np.uint8(np.where(dilated == label, 255, 0)) for label in np.unique(dilated)[1:]]
+	
+	def identificarBola(self, frameToDraw, mask):
+		bolaContours,_ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+		bolaContours = [countor for countor in bolaContours if cv2.contourArea(countor)>self.__min_internal_area_contour]
+
+		if len(bolaContours) != 0:
+			bolaContour = max(bolaContours, key=cv2.contourArea)
+			((x,y), radius) = cv2.minEnclosingCircle(bolaContour)
+			cv2.circle(frameToDraw, (int(x),int(y)), int(radius), (0,255,0), 1)
+			
+			return (vision.pixel2metric.pixel2meters((x,y), mask.shape), radius)
+		
+		else: return None
 	
 	def process_frame(self, frame):
 		# Corta o campo
@@ -317,61 +306,61 @@ class MainVision(vision.vision.Vision):
 		# Segmenta o time
 		teamMask = self.obterMascaraTime(img_hsv)
 		
+		# Segmenta a bola
+		bolaMask = self.obterMascaraBola(img_hsv)
+		
 		# Encontra componentes conectados e aplica operações de abertura e dilatação
 		components = self.obterComponentesConectados(mask)
 		
 		# Frame zerado a ser renderizado
-		processed_image = np.zeros(img_warpped.shape, np.uint8)
+		processed_image = cv2.bitwise_and(img_warpped, img_warpped, mask=mask)
 		
 		# Desenha lado do campo
-		height, width, _ = processed_image.shape
 		self.draw_left_rectangle(processed_image, (0,255,0) if world.fieldSide == field.LEFT else (0,0,255))
 		self.draw_right_rectangle(processed_image, (0,255,0) if world.fieldSide == field.RIGHT else (0,0,255))
-		cv2.line(processed_image, (int(width/2),0), (int(width/2),height), (100,100,100), 1)
+		self.draw_middle_line(processed_image)
 		
-		# Listas com aliados e inimigos
-		robosAliados = [(i,(0,0),0,False,(0,0)) for i in range(5)]
-		robosAdversariosIdentificados = []
+		# Listas com aliados e inimigos e bola
+		robos = [(i,(0,0),0,False,(0,0)) for i in range(10)]
+		bola = None
+		advId = 5
 		
 		# Itera por cada elemento conectado
-		for label in np.unique(components)[1:]:
-			# Máscara do elemento
-			componentMask = np.uint8(np.where(components == label, 255, 0))
+		for componentMask in components:
+			# Máscara com a bola
+			componentBolaMask = componentMask & bolaMask
 			
-			# Imagem com apenas o elemento
-			comp = cv2.bitwise_and(img_warpped, img_warpped, mask=componentMask)
+			# Tenta identificar uma bola
+			bola_ = self.identificarBola(processed_image, componentBolaMask)
+			if bola_ is not None:
+				bola = bola_
+				continue
+				
+			# Obtém dados do componente como uma camisa
+			centro, centerMeters, angulo, camisaContour = self.detectarCamisa(processed_image, componentMask)
 			
 			# Máscara dos componentes internos do elemento
 			componentTeamMask = componentMask & teamMask
 			
-			# Tenta detectar o elemento como sendo do nosso time ou adversário
-			identificador, centro, angulo, component_image, centroPixels = self.detectarTime(comp, componentMask, componentTeamMask)
+			# Tenta identificar um aliado
+			aliado = self.detectarTime(processed_image, componentTeamMask, centro)
+			if aliado is not None:
+				robos[aliado[0]] = (aliado[0], centerMeters, aliado[1], True, centro)
+				cv2.putText(processed_image, str(aliado[0]), (int(centro[0])-10, int(centro[1])+10), cv2.FONT_HERSHEY_TRIPLEX, 1, (0,0,0))
+				self.draw_contour_rectangle(processed_image, camisaContour, (0,255,0))
+				continue
 			
-			# Adiciona às listas de aliados ou inimigos
-			if identificador is not None and identificador < 5:
-				robosAliados[identificador] = (identificador, centro, angulo, True, centroPixels)
-			else:
-				robosAdversariosIdentificados.append((centro, angulo))
-				
-			if component_image is not None:
-				processed_image = cv2.add(processed_image, component_image)
-				
-		# Segmenta a bola
-		bolaMask = mask & cv2.inRange(img_hsv, self.__bola_hsv[0:3], self.__bola_hsv[3:6])
-		bolaContours,_ = cv2.findContours(bolaMask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-		bolaContours = [countor for countor in bolaContours if cv2.contourArea(countor)>self.__min_internal_area_contour]
-		
-		if len(bolaContours) != 0:
-			bolaContour = max(bolaContours, key=cv2.contourArea)
-			((x,y), radius) = cv2.minEnclosingCircle(bolaContour)
-			cv2.circle(processed_image, (int(x),int(y)), int(radius), (0,255,0), 1)
+			# Adiciona camisa como adversário
+			if advId < 10:
+				robos[advId] = (advId, centerMeters, angulo, True, centro)
+				cv2.putText(processed_image, str(advId), (int(centro[0])-10, int(centro[1])+10), cv2.FONT_HERSHEY_TRIPLEX, 1, (0,0,0))
+				self.draw_contour_rectangle(processed_image, camisaContour, (0,0,255))
+				advId = advId + 1
 			
-			bola = (vision.pixel2metric.pixel2meters((x,y), bolaMask.shape), radius)
-		else: bola = None
-		
-		self.atualizarRobos(robosAliados, robosAdversariosIdentificados, bola)
+		# Atualiza listas da visão
+		self.atualizarRobos(robos, bola)
 
-		return robosAliados, robosAdversariosIdentificados, bola, processed_image
+		return robos, bola, processed_image
 	
 	def draw_left_rectangle(self, image, color, thickness=10):
 		height, width, _ = image.shape
@@ -384,3 +373,14 @@ class MainVision(vision.vision.Vision):
 		cv2.line(image, (int(width/2)+thickness,0), (width,0), color, thickness)
 		cv2.line(image, (width,0), (width, height), color, thickness)
 		cv2.line(image, (width, height), (int(width/2)+thickness, height), color, thickness)
+	
+	def draw_middle_line(self, image):
+		height, width, _ = image.shape
+		cv2.line(image, (int(width/2),0), (int(width/2),height), (100,100,100), 1)
+	
+	def draw_contour_rectangle(self, image, contour, color=(255,0,0)):
+		# Encontra o menor retângulo que se inscreve no contorno
+		rectangle = cv2.minAreaRect(contour)
+		box = cv2.boxPoints(rectangle)
+		box = np.int0(box)
+		cv2.drawContours(image, [box], 0, color, 2)

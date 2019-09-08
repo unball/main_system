@@ -259,10 +259,11 @@ class parametrosVisao(gui.frameRenderer.frameRenderer):
 class identificarRobos(gui.frameRenderer.frameRenderer):
 	def __init__(self, vision):
 		super().__init__(vision)
+		self.__adversarioFlowChild = []
 	
 	@guiMethod
 	def updateRobotsInfo(self, robos, bola):
-		for robo in robos:
+		for idx,robo in enumerate(robos):
 			if robo.ui:
 				robo.ui["idLabel"].set_text("{0}".format(robo.identificador))
 				robo.ui["posicaoLabel"].set_text("Posição: x: {:.2f} m, y: {:.2f} m".format(robo.centro[0], robo.centro[1]))
@@ -278,11 +279,17 @@ class identificarRobos(gui.frameRenderer.frameRenderer):
 				estadoLabel = builder.get_object("estadoLabel")
 				anguloLabel = builder.get_object("anguloLabel")
 				
+				if idx < 5:
+					builder.get_object("tipoRoboLabel").set_text("Tipo: Aliado")
+				else:
+					builder.get_object("tipoRoboLabel").set_text("Tipo: Inimigo")
+				
 				flowBoxChild.add(builder.get_object("main"))
 				self.__timeFlow.add(flowBoxChild)
 				robo.ui = {"idLabel": idLabel, "posicaoLabel": posicaoLabel, "anguloLabel": anguloLabel, "estadoLabel": estadoLabel}
-			self.__timeFlow.show_all()
-			
+				
+		self.__timeFlow.show_all()
+		
 		if bola is not None:
 			self.__bolaEstado.set_text("Estado: Identificada")
 			self.__bolaPosicao.set_text("Posição: x: {:.2f} m, y: {:.2f} m".format(bola[0][0], bola[0][1]))
@@ -293,10 +300,10 @@ class identificarRobos(gui.frameRenderer.frameRenderer):
 	def transformFrame(self, frame, originalFrame):
 		processed_frame = self.parentVision.ui_process(frame)
 		
-		robosAliados = self.parentVision.robosAliados
+		robos = self.parentVision.robos
 		bola = self.parentVision.bola
 		
-		self.updateRobotsInfo(robosAliados, bola)
+		self.updateRobotsInfo(robos, bola)
 		
 		return cv2.cvtColor(processed_frame, cv2.COLOR_RGB2BGR)
 
@@ -306,6 +313,7 @@ class identificarRobos(gui.frameRenderer.frameRenderer):
 	def create_ui_content(self):
 		builder = Gtk.Builder.new_from_file("vision/mainVision/identificarRobos.ui")
 		self.__timeFlow = builder.get_object("time_flow")
+		self.__timeAdversarioFlow = builder.get_object("time_adversario_flow")
 		self.__bolaEstado = builder.get_object("bola_estado")
 		self.__bolaPosicao = builder.get_object("bola_posicao")
 		return builder.get_object("main")
