@@ -259,18 +259,30 @@ class parametrosVisao(gui.frameRenderer.frameRenderer):
 class identificarRobos(gui.frameRenderer.frameRenderer):
 	def __init__(self, vision):
 		super().__init__(vision)
-		self.__adversarioFlowChild = []
+		self.__n_robos = None
+		self.fbcs = []
 	
 	@guiMethod
 	def updateRobotsInfo(self, robos, bola):
+		if self.__n_robos != len(robos)/2:
+			for fbc in self.fbcs:
+				self.__timeFlow.remove(fbc)
+			self.fbcs = []
+			self.__n_robos = len(robos)/2
+		
 		for idx,robo in enumerate(robos):
 			if robo.ui:
 				robo.ui["idLabel"].set_text("{0}".format(robo.identificador))
 				robo.ui["posicaoLabel"].set_text("Posição: x: {:.2f} m, y: {:.2f} m".format(robo.centro[0], robo.centro[1]))
 				robo.ui["anguloLabel"].set_text("Ângulo {:.1f}º".format(robo.angulo))
 				robo.ui["estadoLabel"].set_text("Estado: " + robo.estado)
+				if robo.estado == "Identificado":
+					robo.ui["fbc"].set_opacity(1)
+				else:
+					robo.ui["fbc"].set_opacity(0.5)
 			else:
 				flowBoxChild = Gtk.FlowBoxChild()
+				self.fbcs.append(flowBoxChild)
 				Gtk.StyleContext.add_class(flowBoxChild.get_style_context(), "roboRow")
 				
 				builder = Gtk.Builder.new_from_file("vision/mainVision/robo.ui")
@@ -279,16 +291,20 @@ class identificarRobos(gui.frameRenderer.frameRenderer):
 				estadoLabel = builder.get_object("estadoLabel")
 				anguloLabel = builder.get_object("anguloLabel")
 				
-				if idx < 5:
+				if idx < self.__n_robos:
+					Gtk.StyleContext.add_class(flowBoxChild.get_style_context(), "roboAliado")
 					builder.get_object("tipoRoboLabel").set_text("Tipo: Aliado")
+					self.__timeFlow.add(flowBoxChild)
 				else:
+					Gtk.StyleContext.add_class(flowBoxChild.get_style_context(), "roboInimigo")
 					builder.get_object("tipoRoboLabel").set_text("Tipo: Inimigo")
+					self.__timeAdversarioFlow.add(flowBoxChild)
 				
 				flowBoxChild.add(builder.get_object("main"))
-				self.__timeFlow.add(flowBoxChild)
-				robo.ui = {"idLabel": idLabel, "posicaoLabel": posicaoLabel, "anguloLabel": anguloLabel, "estadoLabel": estadoLabel}
+				robo.ui = {"idLabel": idLabel, "posicaoLabel": posicaoLabel, "anguloLabel": anguloLabel, "estadoLabel": estadoLabel, "fbc": flowBoxChild}
 				
 		self.__timeFlow.show_all()
+		self.__timeAdversarioFlow.show_all()
 		
 		if bola is not None:
 			self.__bolaEstado.set_text("Estado: Identificada")

@@ -19,7 +19,8 @@ class Robo():
 
 class MainVision(vision.vision.Vision):
 	def __init__(self):
-		self.__robos = [Robo(i) for i in range(10)]
+		self.__robos = [Robo(i) for i in range(2*world.number_of_robots)]
+		self.__n_robos = 2*world.number_of_robots
 		self.__bola = None
 		self.__angles = np.array([0, 90, 180, -90, -180])
 		self.__homography = None
@@ -110,15 +111,17 @@ class MainVision(vision.vision.Vision):
 	def atualizarMinInternalArea(self, value):
 		self.__min_internal_area_contour = value
 		statics.configFile.setValue("min_internal_area_contour", value)
-	
-	def obterRobosAliados(self):
-		return self.__robosAliados
 		
 	def atualizarRobos(self, robos, bola):
 		# Atualiza posição da bola
 		self.__bola = bola
 		
+		if self.__n_robos != world.number_of_robots:
+			self.__robos = [Robo(i) for i in range(2*world.number_of_robots)]
+			self.__n_robos = world.number_of_robots
+		
 		for i,r in enumerate(robos):
+			if i >= 2*self.__n_robos: break
 			if r[3] == True:
 				self.__robos[i].centro = r[1]
 				self.__robos[i].centroPixels = r[4]
@@ -230,7 +233,7 @@ class MainVision(vision.vision.Vision):
 		# Computa o identificador com base na forma e no número de contornos internos
 		identificador = (0 if poligono == 3 else 2) + countInternalContours -1
 		
-		if identificador >= 5: return None
+		if identificador >= self.__n_robos: return None
 		
 		return identificador, estimatedAngle
 	
@@ -253,7 +256,7 @@ class MainVision(vision.vision.Vision):
 	
 	def process(self, frame):
 		robos, bola, processed_image = self.process_frame(frame)
-		return robos[0:5], robos[5:10], bola, processed_image
+		return robos[0:self.__n_robos], robos[self.__n_robos:2*self.__n_robos], bola, processed_image
 
 	def ui_process(self, frame):
 		robos, bola, processed_image = self.process_frame(frame)
@@ -321,9 +324,9 @@ class MainVision(vision.vision.Vision):
 		self.draw_middle_line(processed_image)
 		
 		# Listas com aliados e inimigos e bola
-		robos = [(i,(0,0),0,False,(0,0)) for i in range(10)]
+		robos = [(i,(0,0),0,False,(0,0)) for i in range(2*self.__n_robos)]
 		bola = None
-		advId = 5
+		advId = self.__n_robos
 		
 		# Itera por cada elemento conectado
 		for componentMask in components:
@@ -351,7 +354,7 @@ class MainVision(vision.vision.Vision):
 				continue
 			
 			# Adiciona camisa como adversário
-			if advId < 10:
+			if advId < 2*self.__n_robos:
 				robos[advId] = (advId, centerMeters, angulo, True, centro)
 				cv2.putText(processed_image, str(advId), (int(centro[0])-10, int(centro[1])+10), cv2.FONT_HERSHEY_TRIPLEX, 1, (0,0,0))
 				self.draw_contour_rectangle(processed_image, camisaContour, (0,0,255))
