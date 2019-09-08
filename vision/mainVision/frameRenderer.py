@@ -8,34 +8,65 @@ import time
 import vision.mainVision
 import gui.frameRenderer
 from gui.guiMethod import guiMethod
+from abc import ABC, abstractmethod
 
-class clickedPoints():
+class clickedPoints(ABC):
 	def __init__(self, configFileVariableName, maxSize):
-		self.__points = statics.configFile.getValue(configFileVariableName, [])
+		self._points = statics.configFile.getValue(configFileVariableName, [])
 		self.__max_size = maxSize
 		self.__config_file_variable_name = configFileVariableName
 	
 	def append(self, point):
-		if len(self.__points) >= self.__max_size:
-			self.__points.clear()
+		if len(self._points) >= self.__max_size:
+			self._points.clear()
 			
-		if len(self.__points) < self.__max_size:
-			self.__points.append(point)
+		if len(self._points) < self.__max_size:
+			self._points.append(point)
 			
-		if len(self.__points) == self.__max_size:
-			statics.configFile.setValue(self.__config_file_variable_name, self.__points)
+		if len(self._points) == self.__max_size:
+			statics.configFile.setValue(self.__config_file_variable_name, self._points)
 	
 	def isFilled(self):
-		return len(self.__points) == self.__max_size
+		return len(self._points) == self.__max_size
 		
 	def length(self):
-		return len(self.__points)
+		return len(self._points)
 	
+	@abstractmethod
 	def getSorted(self):
-		return sorted(self.__points.copy(), key=sum)
+		pass
 	
 	def getPointPixels(self, index, shape):
-		return (round(self.__points[index][0]*shape[0]), round(self.__points[index][1]*shape[1]))
+		return (round(self._points[index][0]*shape[0]), round(self._points[index][1]*shape[1]))
+
+class homographyPoints(clickedPoints):
+	def __init__(self, configFileVariableName, maxSize):
+		super().__init__(configFileVariableName, maxSize)
+	
+	def getSorted(self):
+		points = self._points.copy()
+		if len(points) == 4:
+			points.sort(key=sum)
+			if points[1][0] > points[2][0]:
+				tmp = points[1]
+				points[1] = points[2]
+				points[2] = tmp
+		return points
+
+class cropPoints(clickedPoints):
+	def __init__(self, configFileVariableName, maxSize):
+		super().__init__(configFileVariableName, maxSize)
+	
+	def getSorted(self):
+		points = self._points.copy()
+		if len(points) == 2:
+			x1,y1 = points[0]
+			x2,y2 = points[1]
+			xmin = min([x1,x2])
+			xmax = max([x1,x2])
+			ymin = min([y1,y2])
+			ymax = max([y1,y2])
+			return [(xmin, ymin), (xmax, ymax)]
 
 class cortarCampo(gui.frameRenderer.frameRenderer):
 	
@@ -46,17 +77,8 @@ class cortarCampo(gui.frameRenderer.frameRenderer):
 		self.__show_warpped = False
 		self.__frame_shape = None
 		
-		self.__points = clickedPoints("points", 4)
-		self.__crop_points = clickedPoints("cortarCampo_crop_points", 2)
-		
-	def sortPoints(self,points):
-		if len(points) == 4:
-			points.sort(key=sum)
-			if points[1][0] > points[2][0]:
-				tmp = points[1]
-				points[1] = points[2]
-				points[2] = tmp
-		return points
+		self.__points = homographyPoints("points", 4)
+		self.__crop_points = cropPoints("cortarCampo_crop_points", 2)
 	
 	def update_points(self, point):
 		if self.__show_warpped: return
