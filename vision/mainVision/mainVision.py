@@ -365,13 +365,13 @@ class MainVision(vision.vision.Vision):
 
 		return robos, bola, processed_image
 	
-	def draw_left_rectangle(self, image, color, thickness=10):
+	def draw_left_rectangle(self, image, color, thickness=5):
 		height, width, _ = image.shape
 		cv2.line(image, (int(width/2)-thickness,0), (0,0), color, thickness)
 		cv2.line(image, (0,0), (0, height), color, thickness)
 		cv2.line(image, (int(width/2)-thickness,height), (0, height), color, thickness)
 		
-	def draw_right_rectangle(self, image, color, thickness=10):
+	def draw_right_rectangle(self, image, color, thickness=5):
 		height, width, _ = image.shape
 		cv2.line(image, (int(width/2)+thickness,0), (width,0), color, thickness)
 		cv2.line(image, (width,0), (width, height), color, thickness)
