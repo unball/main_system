@@ -18,7 +18,7 @@ class MainWindow(metaclass=gui.singleton.Singleton):
 	def loadBuilder(self):
 		if self._builder is None:
 			self._builder = Gtk.Builder()
-			self._builder.add_from_file("gui/ui.glade")
+			self._builder.add_from_file("gui/main.ui")
 	
 	def getObject(self, name):
 		self.loadBuilder()
