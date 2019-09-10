@@ -199,7 +199,7 @@ class MainVision(vision.vision.Vision):
 		
 		return center, centerMeters, angle, mainContour
 		
-	def detectarTime(self, renderFrame, componentTeamMask, center):
+	def detectarTime(self, renderFrame, componentTeamMask, center, rectangleAngle):
 		
 		# Encontra os contornos internos com área maior que um certo limiar e ordena
 		internalContours,_ = cv2.findContours(componentTeamMask, cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_L1)
@@ -224,7 +224,7 @@ class MainVision(vision.vision.Vision):
 		
 		# Calcula o ângulo com base no vetor entre o centro do contorno principal e o centro da camisa
 		calculatedAngle = 180.0/np.pi *np.arctan2(-(center[1]-cY), center[0]-cX)
-		partialAngles =  -calculatedAngle + self.__angles
+		partialAngles =  -rectangleAngle + self.__angles
 		estimatedAngle = partialAngles[np.abs(calculatedAngle - partialAngles).argmin()]
 		
 		# Define qual o polígono da figura principal
@@ -346,7 +346,7 @@ class MainVision(vision.vision.Vision):
 			componentTeamMask = componentMask & teamMask
 			
 			# Tenta identificar um aliado
-			aliado = self.detectarTime(processed_image, componentTeamMask, centro)
+			aliado = self.detectarTime(processed_image, componentTeamMask, centro, angulo)
 			if aliado is not None:
 				robos[aliado[0]] = (aliado[0], centerMeters, aliado[1], True, centro)
 				cv2.putText(processed_image, str(aliado[0]), (int(centro[0])-10, int(centro[1])+10), cv2.FONT_HERSHEY_TRIPLEX, 1, (0,0,0))
