@@ -290,7 +290,7 @@ class MainVision(vision.vision.Vision):
 		if len(bolaContours) != 0:
 			bolaContour = max(bolaContours, key=cv2.contourArea)
 			((x,y), radius) = cv2.minEnclosingCircle(bolaContour)
-			cv2.circle(frameToDraw, (int(x),int(y)), int(radius), (255,0,0), 1)
+			cv2.circle(frameToDraw, (int(x),int(y)), int(radius), (255,0,0), 2)
 			
 			return (vision.pixel2metric.pixel2meters((x,y), mask.shape), radius)
 		
