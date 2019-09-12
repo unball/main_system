@@ -22,7 +22,6 @@ class World(object):
         self.gameScore = 0
         self._isPaused = False
         self.setSetting(setting)
-        self._robots = list(Robot() for robot in range(self._number_of_robots))
         self._ball = Ball()
         print("World initiated successfully.")
         print("Number of robots: {}".format(self._number_of_robots))
@@ -32,6 +31,7 @@ class World(object):
             self._number_of_robots = setting['number_of_robots']
             self._field_x_length = setting['field_x_length']
             self._field_y_length = setting['field_y_length']
+            self._robots = list(Robot() for robot in range(self._number_of_robots))
         else:
             self._number_of_robots = None
             self._field_x_length = None
