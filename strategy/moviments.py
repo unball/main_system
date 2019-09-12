@@ -29,7 +29,7 @@ def blockBallElipse(goal, ballPos, ballVel):
 def goalkeep(ballPos, ballVel):
     xGoal = fieldSide * .72
     #testar velocidade minima (=.15?)
-    if ((ballVel[0]*fieldSide) > .15) and  ((ballPos*fieldSide)> .15):
+    if ((ballVel[0]*fieldSide) > .15) and  ((ballPos[0]*fieldSide)> .15):
         #verificar se a projeção está no gol
         #projetando vetor até um xGoal-> y = (xGoal-Xball) * Vyball/Vxball + yBall 
         return (xGoal, (((xGoal-ballPos[0])/ballVel[0])*ballVel[1])+ballPos[1], np.pi/2)
