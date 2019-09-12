@@ -5,8 +5,11 @@ import strategy.moviments as moviments
 import sys
 #sys.path.append("../..") # Adds higher directory to python modules path.
 from statics import static_classes 
+from statics.static_classes import world
 
-
+ATT = 0
+DEF = 1
+SATT = 2
 
 #TODO: encontrar valores otimos 
 turning_radius = 0.0375
@@ -56,12 +59,15 @@ class Midfielder(Entity):
     def __init__(self):
         super().__init__()
     def tatic(self, pose):
-        pass
+        return np.array((0,0,0))
 
 
 class MovimentsDecider():
     def __init__(self):
-        self.listEntity = [Goalkeeper(), Defender(), Attacker()]
+        self.delta_ref = 0.1 * world.field_x_length
+        self.ball_vmax = 1.5
+        self.state = ATT
+        self.listEntity = [Attacker(), Midfielder(), Goalkeeper()]
 
     def shortestTragectory(self, startPose, endPose, radius):
         altStartPose = (startPose[0], startPose[1], startPose[2] + np.pi)
@@ -70,6 +76,31 @@ class MovimentsDecider():
         if(path.path_length() <= path2.path_length()):
             return path
         return path2
+    
+    @property
+    def delta(self):
+        d = self.delta_ref*(1 - abs(world.ball.inst_vx)/self.ball_vmax)
+        print(d)
+        if d < 0:
+            print("Parece que o delta ficou negativo, a bola está rápida demais?")
+            return 0
+        return d
+        
+    def setFormation(self):
+        if world.number_of_robots == 3:
+            if world.ball.inst_x < -self.delta:
+                if self.state != DEF:
+                    self.listEntity = [Attacker(), Goalkeeper(), Defender()]
+                self.state = DEF
+            elif world.ball.inst_x > self.delta:
+                if abs(world.gameScore) >= 8:
+                    if self.state != SATT:
+                        self.listEntity = [Attacker(), Midfielder(), Defender()]
+                    self.state = SATT
+                else:
+                    if self.state != ATT:
+                        self.listEntity = [Attacker(), Midfielder(), Goalkeeper()]
+                    self.state = ATT
 
     def updadeHost(self):
         possessed = []

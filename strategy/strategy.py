@@ -31,6 +31,9 @@ class Strategy(object):
         # self.decider.setFormation(world)
         # self.targets = self.decider.updateTargets()
         
+        self.decider.setFormation()
+        print(self.decider.listEntity)
+        
         if self.dynamicPossession:
             self.decider.updadeHost()
         else:
