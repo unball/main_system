@@ -21,7 +21,7 @@ class Robot(Element):
         else: return (0,0,0)
 
     def discretize(self, step):
-        if self.entity is not None:
+        if self.entity is not None and self.entity._path is not None:
             self.trajectory =  self.entity._path.sample_many(step)
 
     @property
