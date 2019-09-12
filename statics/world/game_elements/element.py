@@ -2,7 +2,7 @@ import numpy as np
 
 """Element module."""
 
-alpha = 0.1
+alpha = 0.5
 
 #TODO: subs inst_x, inst_y, inst_th to np.array([])
 class Element(object):
