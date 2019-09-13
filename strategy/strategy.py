@@ -68,7 +68,7 @@ class Strategy(object):
         
         bola = world.ball
         ballpos = meters2pixel(bola.pos, (height,width))
-        cv2.circle(frame, ballpos, 5, (255,0,0), -1)
+        cv2.circle(frame, (ballpos[1],ballpos[0]), 5, (255,0,0), -1)
         
         return frame
     
