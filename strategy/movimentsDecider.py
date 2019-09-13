@@ -17,10 +17,14 @@ step = 0.001
 centerGoal = np.array([0.72*static_classes.world.fieldSide,0])
 
 class Entity(ABC):
-    def __init__(self):
+    def __init__(self,name):
         self.host = None
         self.__target = np.array([0,0,0])
         self._path = None
+        self.__name = name
+        
+    def __str__(self):
+        return self.__name
 
     def possess(self, path, id):
         self._path = path
@@ -36,28 +40,28 @@ class Entity(ABC):
 
 class Attacker(Entity):
     def __init__(self):
-        super().__init__()
+        super().__init__("Atacante")
     def tatic(self, pose):
         self.__target = moviments.goToBallPlus(static_classes.world.ball.pos)
         return self.__target
 
 class Goalkeeper(Entity):
     def __init__(self):
-        super().__init__()
+        super().__init__("Goleiro")
     def tatic(self, pose):
        self.__target =  moviments.goalkeep(static_classes.world.ball.pos, static_classes.world.ball.vel)
        return self.__target
 
 class Defender(Entity):
     def __init__(self):
-        super().__init__()
+        super().__init__("Defensor")
     def tatic(self, pose):
         self.__target = moviments.blockBallElipse(centerGoal, static_classes.world.ball.pos,static_classes.world.ball.vel)
         return self.__target
 
 class Midfielder(Entity):
     def __init__(self):
-        super().__init__()
+        super().__init__("MeioCampo")
     def tatic(self, pose):
         return np.array((0,0,0))
 
@@ -80,7 +84,6 @@ class MovimentsDecider():
     @property
     def delta(self):
         d = self.delta_ref*(1 - abs(world.ball.inst_vx)/self.ball_vmax)
-        print(d)
         if d < 0:
             print("Parece que o delta ficou negativo, a bola está rápida demais?")
             return 0
@@ -118,8 +121,9 @@ class MovimentsDecider():
                     minCost = cost
                     minPath = path
                     host = indx
-                    possessed.append(indx)
-            entity.possess(minPath, host)
+            if host != -1:
+                possessed.append(host)
+                entity.possess(minPath, host)
 
     def calcPath(self):
         for robot in static_classes.world.robots:

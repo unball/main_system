@@ -39,8 +39,7 @@ class MainMenu(State):
         frame_processed = fr.transformFrame(frame, frame)
         processing_time = time.time()-processing_time
         
-        height, width, depth = frame_processed.shape
-        gui.mainWindow.MainWindow().ui_frame.do_update_frame((frame_processed, width, height, depth))
+        gui.mainWindow.MainWindow().ui_frame("configVision").do_update_frame(frame_processed)
             
         loop_time = time.time()-loop_time
         self.update_stats(processing_time, loop_time)

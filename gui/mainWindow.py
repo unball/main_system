@@ -42,9 +42,8 @@ class MainWindow(metaclass=gui.singleton.Singleton):
 	def selectedFrameRenderer(self):
 		return self._selectedFrameRenderer
 		
-	@property
-	def ui_frame(self):
-		return self._ui_frame
+	def ui_frame(self, name):
+		return self._ui_frames[name]
 		
 	@property
 	def gameThread(self):
@@ -66,11 +65,12 @@ class MainWindow(metaclass=gui.singleton.Singleton):
 		window = self.getObject("window1")
 		window.show_all()
 		
-		# Creates uiFrame object that handles frame drawning on config screen
-		self._ui_frame = gui.uiFrame.uiFrame(self.getObject("frame"), self.getObject("frame_event"))
-		
-		# Creates uiFrame object that handles frame drawning on game loop screen
-		self.game_loop_ui_frame = gui.uiFrame.uiFrame(self.getObject("game_loop_frame"), self.getObject("game_loop_frame_event"))
+		# Creates uiFrame objects that handles all frame drawning
+		self._ui_frames = {
+			"configVision": gui.uiFrame.uiFrame(self.getObject("frame"), self.getObject("frame_event")),
+			"configStrategy": gui.uiFrame.uiFrame(self.getObject("strategy_frame"), self.getObject("strategy_frame_event")),
+			"gameLoop": gui.uiFrame.uiFrame(self.getObject("game_loop_frame"), self.getObject("game_loop_frame_event"))
+		}
 		
 		# Creates game thread
 		self._gameThread = states.gameThread.GameThread()

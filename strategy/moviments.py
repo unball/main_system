@@ -23,7 +23,7 @@ def blockBallElipse(goal, ballPos, ballVel):
             target = k*ballVel + ballPos
             goalTarget = target-goal
             return (target[1],target[0], np.pi/2 + np.arctan2(goalTarget[1],goalTarget[0]))
-        return (.15*fieldSide, (ballPos[1]+.1, np.pi/2) )
+        return (.15*fieldSide, ballPos[1]+.1, np.pi/2 )
     except:
         return (0,0,0)
 def goalkeep(ballPos, ballVel):

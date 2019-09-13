@@ -7,6 +7,7 @@ import statics.configFile
 import gui.mainWindow
 import states.main_menu
 import states.game_loop
+import states.config_strategy
 import queue
 from vision.mainVision.mainVision import MainVision
 from strategy.strategy import Strategy
@@ -30,6 +31,8 @@ class GameThread():
             self._state.request_state_change(states.main_menu.MainMenu(self))
         elif stateName == "gameLoop":
             self._state.request_state_change(states.main_menu.GameLoop(self))
+        elif stateName == "configStrategy":
+            self._state.request_state_change(states.config_strategy.ConfigStrategy(self))
         else:
             pass
     

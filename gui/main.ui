@@ -6,7 +6,6 @@
   <object class="GtkAdjustment" id="camera_scale">
     <property name="upper">2</property>
     <property name="value">1</property>
-    <property name="step_increment">0.01</property>
     <signal name="value-changed" handler="update_camera_scale" swapped="no"/>
   </object>
   <object class="GtkPopoverMenu" id="popovermenu1">
@@ -397,7 +396,43 @@
               </object>
               <packing>
                 <property name="name">mainMenu</property>
-                <property name="title" translatable="yes">Configuração</property>
+                <property name="title" translatable="yes">Visão</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="valign">center</property>
+                <property name="orientation">vertical</property>
+                <signal name="map" handler="mainPageChange" object="stack1" swapped="no"/>
+                <child>
+                  <object class="GtkEventBox" id="strategy_frame_event">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="halign">center</property>
+                    <property name="valign">center</property>
+                    <child>
+                      <object class="GtkImage" id="strategy_frame">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="pixel_size">200</property>
+                        <property name="icon_name">face-crying-symbolic</property>
+                        <property name="icon_size">6</property>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="name">configStrategy</property>
+                <property name="title" translatable="yes">Estratégia</property>
+                <property name="position">1</property>
               </packing>
             </child>
             <child>
@@ -590,7 +625,7 @@ UnBall 0x0 Oponente</property>
               <packing>
                 <property name="name">gameLoop</property>
                 <property name="title" translatable="yes">Comandos de jogo</property>
-                <property name="position">1</property>
+                <property name="position">2</property>
               </packing>
             </child>
           </object>

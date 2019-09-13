@@ -39,8 +39,7 @@ class Vision(ABC):
         ))
         
         converted_image = cv2.cvtColor(processed_image, cv2.COLOR_RGB2BGR)
-        height, width, depth = converted_image.shape
-        gui.mainWindow.MainWindow().game_loop_ui_frame.do_update_frame((converted_image, width, height, depth))
+        gui.mainWindow.MainWindow().ui_frame("gameLoop").do_update_frame(converted_image)
     
     @abstractmethod
     def ui_init(self):
