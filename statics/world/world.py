@@ -18,7 +18,7 @@ class World(object):
 
     def __init__(self, setting=0):
         """Init method."""
-        self.fieldSide = field.LEFT
+        self.__fieldSide = field.LEFT
         self.gameScore = 0
         self._isPaused = False
         self.setSetting(setting)
@@ -76,13 +76,17 @@ class World(object):
 
     def change_field_side(self, new_side):
         print(new_side)
-        self.fieldSide = new_side  
+        self.__fieldSide = new_side  
 
     def pause(self):
         self._isPaused = True
 
     def play(self):
         self._isPaused = False
+        
+    @property
+    def fieldSide(self):
+        return self.__fieldSide
 
     @property
     def info(self):

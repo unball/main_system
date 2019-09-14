@@ -25,7 +25,8 @@ class ssRegulator():
         self.x_r = list(0 for i in range(self.number_of_robots))
         self.y_r = list(0 for i in range(self.number_of_robots))
         self.th_r = list(0 for i in range(self.number_of_robots))
-
+        
+        #!TODO: Suportar N robôs
         self.state_vector = [[0, 0, 0],  # Robot 0 state vector
                              [0, 0, 0],  # Robot 1 state vector
                              [0, 0, 0]]  # Robot 2 state vector

@@ -9,6 +9,7 @@ import states.main_menu
 import states.game_loop
 import states.config_strategy
 import queue
+from gui.guiMethod import guiMethod
 from vision.mainVision.mainVision import MainVision
 from strategy.strategy import Strategy
 from controllers.ssRegulator import ssRegulator
@@ -25,6 +26,19 @@ class GameThread():
         self._strategySystem = Strategy()
         self._controlSystem = ssRegulator()
         self._radioComm = RadioCommunicator()
+        
+        
+        self._loop_time = 0
+        self._processing_time = 0
+        
+    def compute_average(self, v0, v, p=0.1):
+        return v0*(1-p) + v*p
+    
+    @guiMethod
+    def update_stats(self, processing_time, loop_time):
+        self._loop_time = self.compute_average(self._loop_time, loop_time)
+        self._processing_time = self.compute_average(self._processing_time, processing_time)
+        gui.mainWindow.MainWindow().getObject("stats_label").set_text("Tempo de processamento: {:3.0f} ms\nTempo de loop: {:3.0f} ms".format(self._processing_time*1000, self._loop_time*1000))
     
     def set_state(self, stateName):
         if stateName == "mainMenu":
@@ -72,12 +86,17 @@ class GameThread():
         
     def __loop__(self):
         while True:
+            loop_time = time.time()
+            
             self.runQueuedEvents()
             self._state.update()
             if self._state.QuitRequested:
                 break
             if self._state.StateChangeRequested:
                 self._state = self._state.next_state()
+                
+            loop_time = time.time()-loop_time
+            self.update_stats(0, loop_time)
             #time.sleep(1)
         
         

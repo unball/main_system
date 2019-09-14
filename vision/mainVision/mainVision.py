@@ -280,7 +280,7 @@ class MainVision(vision.vision.Vision):
 		kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (7,7))
 		components = cv2.morphologyEx(np.uint8(components), cv2.MORPH_OPEN, kernel)
 		kernel = cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
-		dilated = cv2.dilate(np.uint8(components), kernel, iterations=1)
+		dilated = cv2.erode(np.uint8(components), kernel, iterations=1)
 		return [np.uint8(np.where(dilated == label, 255, 0)) for label in np.unique(dilated)[1:]]
 	
 	def identificarBola(self, frameToDraw, mask):

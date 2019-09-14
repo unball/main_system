@@ -12,7 +12,6 @@ DEF = 1
 SATT = 2
 
 #TODO: encontrar valores otimos 
-turning_radius = 0.0375
 step = 0.001
 centerGoal = np.array([0.72*static_classes.world.fieldSide,0])
 
@@ -56,7 +55,8 @@ class Defender(Entity):
     def __init__(self):
         super().__init__("Defensor")
     def tatic(self, pose):
-        self.__target = moviments.blockBallElipse(centerGoal, static_classes.world.ball.pos,static_classes.world.ball.vel)
+        roboty = pose[1]
+        self.__target = moviments.blockBallElipse(centerGoal, static_classes.world.ball.pos,static_classes.world.ball.vel,roboty)
         return self.__target
 
 class Midfielder(Entity):
@@ -71,7 +71,9 @@ class MovimentsDecider():
         self.delta_ref = 0.1 * world.field_x_length
         self.ball_vmax = 1.5
         self.state = ATT
-        self.listEntity = [Attacker(), Midfielder(), Goalkeeper()]
+        self.listEntity = [Goalkeeper(), Midfielder(), Attacker()]
+        self.turning_radius = 0.0375
+        self.dynamicPossession = False
 
     def shortestTragectory(self, startPose, endPose, radius):
         altStartPose = (startPose[0], startPose[1], startPose[2] + np.pi)
@@ -106,6 +108,13 @@ class MovimentsDecider():
                     self.state = ATT
 
     def updadeHost(self):
+        if self.dynamicPossession == False:
+            for indx,robot in enumerate(static_classes.world.robots):
+                target = self.listEntity[indx].tatic(robot.pose)
+                path = self.shortestTragectory(robot.pose, target, self.turning_radius) 
+                self.listEntity[indx].possess(path, indx)
+            return
+
         possessed = []
         for entity in self.listEntity:  
             minPath = None
@@ -115,7 +124,7 @@ class MovimentsDecider():
                 if indx in possessed:
                     continue
                 target = entity.tatic(robot.pose)
-                path = self.shortestTragectory(robot.pose, target, turning_radius) 
+                path = self.shortestTragectory(robot.pose, target, self.turning_radius) 
                 cost = path.path_length()
                 if cost < minCost:
                     minCost = cost
@@ -127,7 +136,7 @@ class MovimentsDecider():
 
     def calcPath(self):
         for robot in static_classes.world.robots:
-            robot.entity.path = self.shortestTragectory(robot.pose, robot.entity.tatic(), turning_radius) 
+            robot.entity.path = self.shortestTragectory(robot.pose, robot.entity.tatic(), self.turning_radius) 
 
 if __name__ == '__main__':
     r = static_classes.world.robots[0]
