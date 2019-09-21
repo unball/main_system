@@ -18,10 +18,10 @@ class Signals:
     
     def select_world_standard(self, widget, widget_selected):
         index = widget_selected.get_index()
-        if index == 0:
+        if index == 1:
             gui.mainWindow.MainWindow().gameThread.addEvent(world.setSetting, STANDARD5)
             #world.setSetting(STANDARD5)
-        elif index == 1:
+        elif index == 2:
             gui.mainWindow.MainWindow().gameThread.addEvent(world.setSetting, STANDARD3)
             #world.setSetting(STANDARD3)
     
