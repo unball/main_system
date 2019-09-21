@@ -21,7 +21,7 @@ class Signals:
         if index == 1:
             gui.mainWindow.MainWindow().gameThread.addEvent(world.setSetting, STANDARD5)
             #world.setSetting(STANDARD5)
-        elif index == 2:
+        elif index == 0:
             gui.mainWindow.MainWindow().gameThread.addEvent(world.setSetting, STANDARD3)
             #world.setSetting(STANDARD3)
     

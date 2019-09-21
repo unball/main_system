@@ -9,6 +9,7 @@ import states.main_menu
 import states.game_loop
 import states.config_strategy
 import queue
+import traceback
 from gui.guiMethod import guiMethod
 from vision.mainVision.mainVision import MainVision
 from strategy.strategy import Strategy
@@ -89,7 +90,12 @@ class GameThread():
             loop_time = time.time()
             
             self.runQueuedEvents()
-            self._state.update()
+            
+            try:
+                self._state.update()
+            except Exception as e:
+                gui.mainWindow.MainWindow().logErrorMessage(traceback.format_exc())
+                
             if self._state.QuitRequested:
                 break
             if self._state.StateChangeRequested:

@@ -3,6 +3,7 @@ from gi.repository import Gtk, Gdk
 import gui.signals
 import gui.uiFrame
 import gui.singleton
+import gui.logger
 import states.gameThread
 from gui.guiMethod import guiMethod
 
@@ -48,6 +49,9 @@ class MainWindow(metaclass=gui.singleton.Singleton):
 	@property
 	def gameThread(self):
 		return self._gameThread
+		
+	def logErrorMessage(self, message):
+		self.uiLogger.logErrorMessage(message)
 	
 	def run(self):
 		# Load static UI
@@ -71,6 +75,9 @@ class MainWindow(metaclass=gui.singleton.Singleton):
 			"configStrategy": gui.uiFrame.uiFrame(self.getObject("strategy_frame"), self.getObject("strategy_frame_event")),
 			"gameLoop": gui.uiFrame.uiFrame(self.getObject("game_loop_frame"), self.getObject("game_loop_frame_event"))
 		}
+		
+		# Instanciates uiLogger
+		self.uiLogger = gui.logger.uiLogger()
 		
 		# Creates game thread
 		self._gameThread = states.gameThread.GameThread()
