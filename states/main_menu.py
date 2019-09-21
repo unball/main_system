@@ -16,7 +16,7 @@ class MainMenu(State):
         
         frame = vision.cameras.uiCamerasList().getFrame()
         if frame is None:
-            gui.mainWindow.MainWindow().ui_frame.clear_image()
+            gui.mainWindow.MainWindow().ui_frame("configVision").clear_image()
             time.sleep(0.03)
             return
 

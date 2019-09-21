@@ -23,6 +23,7 @@ class World(object):
         self._isPaused = False
         self.setSetting(setting)
         self._ball = Ball()
+        self.__mainPoint = (0,0)
         print("World initiated successfully.")
         print("Number of robots: {}".format(self._number_of_robots))
     
@@ -38,6 +39,13 @@ class World(object):
             self._field_y_length = None
             print("WARNING: no setting of world defined!")
             return None
+        
+    def setMainPoint(self, point):
+        self.__mainPoint = (point[0],point[1])
+    
+    @property
+    def mainPoint(self):
+        return self.__mainPoint
 
     def update(self, vision_message):
         """Follow the 'update' methods from the element's classes."""

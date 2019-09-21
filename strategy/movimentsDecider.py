@@ -6,6 +6,7 @@ import sys
 #sys.path.append("../..") # Adds higher directory to python modules path.
 from statics import static_classes 
 from statics.static_classes import world
+from vision.pixel2metric import pixel2meters
 
 ATT = 0
 DEF = 1
@@ -65,13 +66,21 @@ class Midfielder(Entity):
     def tatic(self, pose):
         return np.array((0,0,0))
 
+class TestPlayer(Entity):
+    def __init__(self):
+        super().__init__("TestPlayer")
+    def tatic(self, pose):
+        point = pixel2meters(world.mainPoint, (520,640))
+        return (point[0],point[1],0)
+
 
 class MovimentsDecider():
     def __init__(self):
         self.delta_ref = 0.1 * world.field_x_length
         self.ball_vmax = 1.5
         self.state = ATT
-        self.listEntity = [Goalkeeper(), Midfielder(), Attacker()]
+        #self.listEntity = [Goalkeeper(), Midfielder(), Attacker()]
+        self.listEntity = [TestPlayer(), TestPlayer(), TestPlayer()]
         self.turning_radius = 0.0375
         self.dynamicPossession = False
 

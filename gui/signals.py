@@ -33,6 +33,9 @@ class Signals:
     
     def update_turning_radius(self, widget):
         gui.mainWindow.MainWindow().gameThread.addEvent(gui.mainWindow.MainWindow().gameThread.strategySystem.setTurningRadius, widget.get_value())
+        
+    def strategy_setPosition(self, widget, event):
+        gui.mainWindow.MainWindow().gameThread.addEvent(world.setMainPoint, (int(event.x), int(event.y)))
     
     def camera_switch_test_frame(self, widget, value):
         vision.cameras.uiCamerasList().use_test_frame(value)
