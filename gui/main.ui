@@ -494,8 +494,6 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="valign">center</property>
-                <property name="margin_left">10</property>
-                <property name="margin_right">10</property>
                 <property name="orientation">vertical</property>
                 <signal name="map" handler="mainPageChange" object="stack1" swapped="no"/>
                 <child>

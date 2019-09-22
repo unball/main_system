@@ -8,7 +8,7 @@ import gui.mainWindow
 from states.game_loop import GameLoop
 from gui.guiMethod import guiMethod
 
-class MainMenu(State):
+class ConfigVision(State):
     def __init__(self, thread):
         super().__init__(thread)
 

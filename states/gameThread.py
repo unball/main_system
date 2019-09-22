@@ -5,7 +5,7 @@ import time
 import vision.cameras
 import statics.configFile
 import gui.mainWindow
-import states.main_menu
+import states.config_vision
 import states.game_loop
 import states.config_strategy
 import queue
@@ -20,7 +20,7 @@ class GameThread():
     
     def __init__(self):
         # Private
-        self._state = states.main_menu.MainMenu(self)
+        self._state = states.config_vision.ConfigVision(self)
         self._events = queue.Queue()
         
         self._visionSystem = MainVision()
@@ -43,9 +43,9 @@ class GameThread():
     
     def set_state(self, stateName):
         if stateName == "mainMenu":
-            self._state.request_state_change(states.main_menu.MainMenu(self))
+            self._state.request_state_change(states.config_vision.ConfigVision(self))
         elif stateName == "gameLoop":
-            self._state.request_state_change(states.main_menu.GameLoop(self))
+            self._state.request_state_change(states.game_loop.GameLoop(self))
         elif stateName == "configStrategy":
             self._state.request_state_change(states.config_strategy.ConfigStrategy(self))
         else:
