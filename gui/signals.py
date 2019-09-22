@@ -30,9 +30,6 @@ class Signals:
     
     def update_camera_scale(self, widget):
         vision.cameras.uiCamerasList().set_camera_scale(widget.get_value())
-    
-    def update_turning_radius(self, widget):
-        gui.mainWindow.MainWindow().gameThread.addEvent(gui.mainWindow.MainWindow().gameThread.strategySystem.setTurningRadius, widget.get_value())
         
     def strategy_setPosition(self, widget, event):
         gui.mainWindow.MainWindow().gameThread.addEvent(world.setMainPoint, (int(event.x), int(event.y)))

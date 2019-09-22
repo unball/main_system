@@ -18,9 +18,12 @@ class ConfigStrategy(State):
         world.calc_velocities(0.03)
         self.thread.strategySystem.plan()
         
-        frame = self.thread.strategySystem.composeUIframe()
+        fr = gui.mainWindow.MainWindow().selectedFrameRenderer("fr_strategy_notebook")
+        if fr is None: return
         
-        gui.mainWindow.MainWindow().ui_frame("configStrategy").do_update_frame(frame)
+        frame_processed = fr.transformFrame(None, None)
+        
+        gui.mainWindow.MainWindow().ui_frame("configStrategy").do_update_frame(frame_processed)
 
 if __name__ == "__main__":
     pass
