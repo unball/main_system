@@ -471,7 +471,6 @@
                         <property name="can_focus">True</property>
                         <property name="scrollable">True</property>
                         <property name="enable_popup">True</property>
-                        <signal name="switch-page" handler="onConfigPageChange" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">True</property>

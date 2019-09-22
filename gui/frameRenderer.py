@@ -3,9 +3,9 @@ import gui.mainWindow
 import cv2
 
 class frameRenderer(ABC):
-	def __init__(self, parent):
+	def __init__(self, parent, notebook_name):
 		self._parent = parent
-		gui.mainWindow.MainWindow().add_frame_renderer(self)
+		gui.mainWindow.MainWindow().add_frame_renderer(self, notebook_name)
 
 	@abstractmethod
 	def create_ui_content(self):

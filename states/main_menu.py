@@ -20,7 +20,7 @@ class MainMenu(State):
             time.sleep(0.03)
             return
 
-        fr = gui.mainWindow.MainWindow().selectedFrameRenderer
+        fr = gui.mainWindow.MainWindow().selectedFrameRenderer("fr_notebook")
         if fr is None: return
         
         #processing_time = time.time()

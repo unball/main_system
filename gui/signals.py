@@ -39,9 +39,6 @@ class Signals:
     
     def camera_switch_test_frame(self, widget, value):
         vision.cameras.uiCamerasList().use_test_frame(value)
-        
-    def onConfigPageChange(self, page, widget, num):
-        gui.mainWindow.MainWindow().set_frame_renderer(num)
     
     def mainPageChange(self, stack):
         gameThread = gui.mainWindow.MainWindow().gameThread

@@ -71,7 +71,7 @@ class cropPoints(clickedPoints):
 class cortarCampo(gui.frameRenderer.frameRenderer):
 	
 	def __init__(self, vision):
-		super().__init__(vision)
+		super().__init__(vision, "fr_notebook")
 		# Variables
 		self.__pointer_position = None
 		self.__show_warpped = False
@@ -154,11 +154,11 @@ class cortarCampo(gui.frameRenderer.frameRenderer):
 		return cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
 		
 	def cortarCampo_update_points(self, widget, event):
-		if gui.mainWindow.MainWindow().selectedFrameRenderer == self:
+		if gui.mainWindow.MainWindow().selectedFrameRenderer("fr_notebook") == self:
 			self.update_points([int(event.x), int(event.y)])
 	
 	def cortarCampo_mouseOver(self, widget, event):
-		if gui.mainWindow.MainWindow().selectedFrameRenderer == self:
+		if gui.mainWindow.MainWindow().selectedFrameRenderer("fr_notebook") == self:
 			self.set_pointer_position((int(event.x), int(event.y)))
 
 	def create_ui_label(self):
@@ -178,7 +178,7 @@ class cortarCampo(gui.frameRenderer.frameRenderer):
 class segmentarPreto(gui.frameRenderer.frameRenderer):
 
 	def __init__(self, vision):
-		super().__init__(vision)
+		super().__init__(vision, "fr_notebook")
 		# Variables
 		self.__ui_elements = ["fundo_hmin", "fundo_smin", "fundo_vmin", "fundo_hmax", "fundo_smax", "fundo_vmax"]
 		
@@ -203,7 +203,7 @@ class segmentarPreto(gui.frameRenderer.frameRenderer):
 
 class segmentarTime(gui.frameRenderer.frameRenderer):
 	def __init__(self, vision):
-		super().__init__(vision)
+		super().__init__(vision, "fr_notebook")
 		# Variables
 		self.__ui_elements = ["time_hmin", "time_smin", "time_vmin", "time_hmax", "time_smax", "time_vmax"]
 
@@ -228,7 +228,7 @@ class segmentarTime(gui.frameRenderer.frameRenderer):
 
 class segmentarBola(gui.frameRenderer.frameRenderer):
 	def __init__(self, vision):
-		super().__init__(vision)
+		super().__init__(vision, "fr_notebook")
 		# Variables
 		self.__ui_elements = ["bola_hmin", "bola_smin", "bola_vmin", "bola_hmax", "bola_smax", "bola_vmax"]
 	
@@ -254,7 +254,7 @@ class segmentarBola(gui.frameRenderer.frameRenderer):
 class parametrosVisao(gui.frameRenderer.frameRenderer):
 
 	def __init__(self, vision):
-		super().__init__(vision)
+		super().__init__(vision, "fr_notebook")
 		
 	def transformFrame(self, frame, originalFrame):
 		processed_frame = self.parent.ui_process(frame)
@@ -280,7 +280,7 @@ class parametrosVisao(gui.frameRenderer.frameRenderer):
 
 class identificarRobos(gui.frameRenderer.frameRenderer):
 	def __init__(self, vision):
-		super().__init__(vision)
+		super().__init__(vision, "fr_notebook")
 		self.__n_robos = None
 		self.fbcs = []
 	

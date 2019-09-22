@@ -11,8 +11,8 @@ class MainWindow(metaclass=gui.singleton.Singleton):
 
 	def __init__(self):
 		self._builder = None
-		self._selectedFrameRenderer = None
-		self._frameRenderers = []
+		self._selectedFrameRenderer = {}
+		self._frameRenderers = {}
 		self._ui_frame = None
 		self._gameThread = None
 
@@ -26,22 +26,26 @@ class MainWindow(metaclass=gui.singleton.Singleton):
 		return self._builder.get_object(name)
 	
 	@guiMethod
-	def add_frame_renderer(self, fr):
-		frNotebook = self.getObject("fr_notebook")
+	def add_frame_renderer(self, fr, notebook_name):
+		frNotebook = self.getObject(notebook_name)
 		frNotebook.append_page(fr.create_ui_content(), fr.create_ui_label())
 		frNotebook.show_all()
-		self._frameRenderers.append(fr)
+		fr_list = self._frameRenderers.get(notebook_name)
+		if fr_list == None:
+			self._frameRenderers[notebook_name] = [fr]
+			self.set_frame_renderer(None, None, 0, notebook_name)
+			frNotebook.connect("switch-page", self.set_frame_renderer, notebook_name)
+		else: fr_list.append(fr)
 
 	@guiMethod
-	def set_frame_renderer(self, index):
+	def set_frame_renderer(self, page, widget, num, notebook_name):
 		try:
-			self._selectedFrameRenderer = self._frameRenderers[index]
+			self._selectedFrameRenderer[notebook_name] = self._frameRenderers[notebook_name][num]
 		except:
 			pass
 	
-	@property
-	def selectedFrameRenderer(self):
-		return self._selectedFrameRenderer
+	def selectedFrameRenderer(self, notebook_name):
+		return self._selectedFrameRenderer.get(notebook_name)
 		
 	def ui_frame(self, name):
 		return self._ui_frames[name]

@@ -52,7 +52,7 @@ class MainVision(vision.vision.Vision):
 			"identificarRobos": vision.mainVision.frameRenderer.identificarRobos(self),
 		}
 		#self.selectedFrameRenderer = self.frameRenderers[0]
-		gui.mainWindow.MainWindow().set_frame_renderer(0)
+		#gui.mainWindow.MainWindow().set_frame_renderer(0)
 	
 	@property
 	def robos(self):
