@@ -3,8 +3,8 @@ import gui.mainWindow
 import cv2
 
 class frameRenderer(ABC):
-	def __init__(self, vision):
-		self._parentVision = vision
+	def __init__(self, parent):
+		self._parent = parent
 		gui.mainWindow.MainWindow().add_frame_renderer(self)
 
 	@abstractmethod
@@ -20,8 +20,8 @@ class frameRenderer(ABC):
 		pass
 	
 	@property
-	def parentVision(self):
-		return self._parentVision
+	def parent(self):
+		return self._parent
 
 class Identity(frameRenderer):
 
