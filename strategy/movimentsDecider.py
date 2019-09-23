@@ -79,10 +79,10 @@ class MovimentsDecider():
         self.delta_ref = 0.1 * world.field_x_length
         self.ball_vmax = 1.5
         self.state = ATT
-        self.listEntity = [Goalkeeper(), Midfielder(), Attacker()]
-        #self.listEntity = [TestPlayer(), TestPlayer(), TestPlayer()]
+        #self.listEntity = [Goalkeeper(), Defender(), Attacker()]
+        self.listEntity = [TestPlayer(), TestPlayer(), TestPlayer()]
         self.turning_radius = 0.0375
-        self.dynamicPossession = True
+        self.dynamicPossession = False
 
     def shortestTragectory(self, startPose, endPose, radius):
         altStartPose = (startPose[0], startPose[1], startPose[2] + np.pi)
