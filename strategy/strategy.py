@@ -23,7 +23,8 @@ class Strategy(object):
         self.step = 0.005
         
         self._frameRenderers = {
-            "parametrosEstrategia": strategy.frameRenderer.parametrosEstrategia(self)
+            "parametrosEstrategia": strategy.frameRenderer.parametrosEstrategia(self),
+            "movementSimulator": strategy.frameRenderer.movementSimulator(self)
         }
 
     def plan(self):
