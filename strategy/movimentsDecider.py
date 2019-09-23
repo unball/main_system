@@ -26,11 +26,11 @@ class Entity(ABC):
     def __str__(self):
         return self.__name
 
-    def possess(self, path, id):
+    def possess(self, path, robot):
         self._path = path
-        self.host = id
-        static_classes.world.robots[id].target = self.__target
-        static_classes.world.robots[id].entity = self
+        self.host = robot
+        robot.target = self.__target
+        robot.entity = self
 
     @abstractmethod
     def tatic(self,pose):
@@ -121,16 +121,16 @@ class MovimentsDecider():
             for indx,robot in enumerate(static_classes.world.robots):
                 target = self.listEntity[indx].tatic(robot.pose)
                 path = self.shortestTragectory(robot.pose, target, self.turning_radius) 
-                self.listEntity[indx].possess(path, indx)
+                self.listEntity[indx].possess(path, robot)
             return
 
         possessed = []
         for entity in self.listEntity:  
             minPath = None
             minCost = 1000
-            host = -1
+            host = None
             for indx,robot in enumerate(static_classes.world.robots):
-                if indx in possessed:
+                if robot in possessed:
                     continue
                 target = entity.tatic(robot.pose)
                 path = self.shortestTragectory(robot.pose, target, self.turning_radius) 
@@ -138,8 +138,8 @@ class MovimentsDecider():
                 if cost < minCost:
                     minCost = cost
                     minPath = path
-                    host = indx
-            if host != -1:
+                    host = robot
+            if host is not None:
                 possessed.append(host)
                 entity.possess(minPath, host)
 
@@ -147,10 +147,10 @@ class MovimentsDecider():
         for robot in static_classes.world.robots:
             robot.entity.path = self.shortestTragectory(robot.pose, robot.entity.tatic(), self.turning_radius) 
 
-if __name__ == '__main__':
-    r = static_classes.world.robots[0]
-    ent = Attacker()
-    path = 0
-    ent.possess(path, 0)
+#if __name__ == '__main__':
+#    r = static_classes.world.robots[0]
+#    ent = Attacker()
+#    path = 0
+#    ent.possess(path, 0)
 
 
