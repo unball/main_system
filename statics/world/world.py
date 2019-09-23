@@ -21,6 +21,7 @@ class World(object):
         self.__fieldSide = field.LEFT
         self.gameScore = 0
         self._isPaused = False
+        self._manualMode = False
         self.setSetting(setting)
         self._ball = Ball()
         self.__mainPoint = (0,0)
@@ -46,6 +47,13 @@ class World(object):
     @property
     def mainPoint(self):
         return self.__mainPoint
+        
+    def setManualMode(self, value):
+        self._manualMode = value
+        
+    @property
+    def manualMode(self):
+        return self._manualMode
 
     def update(self, vision_message):
         """Follow the 'update' methods from the element's classes."""

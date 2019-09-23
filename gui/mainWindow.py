@@ -77,6 +77,7 @@ class MainWindow(metaclass=gui.singleton.Singleton):
 		self._ui_frames = {
 			"configVision": gui.uiFrame.uiFrame(self.getObject("frame"), self.getObject("frame_event")),
 			"configStrategy": gui.uiFrame.uiFrame(self.getObject("strategy_frame"), self.getObject("strategy_frame_event")),
+			"configWorld": gui.uiFrame.uiFrame(self.getObject("world_frame"), self.getObject("world_frame_event")),
 			"gameLoop": gui.uiFrame.uiFrame(self.getObject("game_loop_frame"), self.getObject("game_loop_frame_event"))
 		}
 		

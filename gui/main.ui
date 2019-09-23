@@ -413,9 +413,57 @@
             <property name="can_focus">False</property>
             <property name="transition_type">slide-left-right</property>
             <child>
+              <object class="GtkBox">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="valign">start</property>
+                <property name="orientation">vertical</property>
+                <signal name="map" handler="mainPageChange" object="stack1" swapped="no"/>
+                <child>
+                  <object class="GtkEventBox" id="world_frame_event">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="halign">center</property>
+                    <property name="valign">center</property>
+                    <child>
+                      <object class="GtkImage" id="world_frame">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="pixel_size">200</property>
+                        <property name="icon_name">face-crying-symbolic</property>
+                        <property name="icon_size">6</property>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkNotebook" id="fr_world_notebook">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="scrollable">True</property>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="name">configWorld</property>
+                <property name="title" translatable="yes">Mundo</property>
+              </packing>
+            </child>
+            <child>
               <object class="GtkGrid">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="valign">start</property>
                 <property name="row_homogeneous">True</property>
                 <signal name="map" handler="mainPageChange" object="stack1" swapped="no"/>
                 <child>
@@ -488,13 +536,14 @@
               <packing>
                 <property name="name">mainMenu</property>
                 <property name="title" translatable="yes">Visão</property>
+                <property name="position">1</property>
               </packing>
             </child>
             <child>
               <object class="GtkBox">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="valign">center</property>
+                <property name="valign">start</property>
                 <property name="orientation">vertical</property>
                 <signal name="map" handler="mainPageChange" object="stack1" swapped="no"/>
                 <child>
@@ -536,13 +585,14 @@
               <packing>
                 <property name="name">configStrategy</property>
                 <property name="title" translatable="yes">Estratégia</property>
-                <property name="position">1</property>
+                <property name="position">2</property>
               </packing>
             </child>
             <child>
               <object class="GtkBox">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="valign">start</property>
                 <property name="orientation">vertical</property>
                 <property name="spacing">4</property>
                 <signal name="map" handler="mainPageChange" object="stack1" swapped="no"/>
@@ -729,7 +779,7 @@ UnBall 0x0 Oponente</property>
               <packing>
                 <property name="name">gameLoop</property>
                 <property name="title" translatable="yes">Comandos de jogo</property>
-                <property name="position">2</property>
+                <property name="position">3</property>
               </packing>
             </child>
           </object>

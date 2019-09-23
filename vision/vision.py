@@ -24,6 +24,10 @@ class Vision(ABC):
         pass
     
     def update(self):
+        if world.manualMode: 
+            time.sleep(0.03)
+            return
+        
         frame = vision.cameras.uiCamerasList().getFrame()
         if frame is None:
             time.sleep(0.03)

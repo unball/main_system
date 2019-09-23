@@ -23,8 +23,7 @@ class Strategy(object):
         self.step = 0.005
         
         self._frameRenderers = {
-            "parametrosEstrategia": strategy.frameRenderer.parametrosEstrategia(self),
-            "movementSimulator": strategy.frameRenderer.movementSimulator(self)
+            "parametrosEstrategia": strategy.frameRenderer.parametrosEstrategia(self)
         }
 
     def plan(self):
@@ -51,6 +50,9 @@ class Strategy(object):
             
     def setTurningRadius(self, radius):
         self.decider.turning_radius = radius
+            
+    def setDynamicPossession(self, value):
+        self.decider.dynamicPossession = value
     
     def get_targets(self):
         """Getter of each robot target planned."""

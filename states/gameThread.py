@@ -8,6 +8,7 @@ import gui.mainWindow
 import states.config_vision
 import states.game_loop
 import states.config_strategy
+import states.config_world
 import queue
 import traceback
 from gui.guiMethod import guiMethod
@@ -15,13 +16,19 @@ from vision.mainVision.mainVision import MainVision
 from strategy.strategy import Strategy
 from controllers.ssRegulator import ssRegulator
 from communication_system.radio_comm import RadioCommunicator
+import statics.world.frameRenderer
 
 class GameThread():
     
     def __init__(self):
         # Private
-        self._state = states.config_vision.ConfigVision(self)
+        self._state = states.config_world.ConfigWorld(self)
         self._events = queue.Queue()
+        
+        # World frame renderers
+        self._frameRenderers = {
+            "elementsPositioner": statics.world.frameRenderer.elementsPositioner(self)
+        }
         
         self._visionSystem = MainVision()
         self._strategySystem = Strategy()
@@ -48,6 +55,8 @@ class GameThread():
             self._state.request_state_change(states.game_loop.GameLoop(self))
         elif stateName == "configStrategy":
             self._state.request_state_change(states.config_strategy.ConfigStrategy(self))
+        elif stateName == "configWorld":
+            self._state.request_state_change(states.config_world.ConfigWorld(self))
         else:
             pass
     

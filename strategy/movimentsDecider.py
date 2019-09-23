@@ -79,10 +79,10 @@ class MovimentsDecider():
         self.delta_ref = 0.1 * world.field_x_length
         self.ball_vmax = 1.5
         self.state = ATT
-        #self.listEntity = [Goalkeeper(), Midfielder(), Attacker()]
-        self.listEntity = [TestPlayer(), TestPlayer(), TestPlayer()]
+        self.listEntity = [Goalkeeper(), Midfielder(), Attacker()]
+        #self.listEntity = [TestPlayer(), TestPlayer(), TestPlayer()]
         self.turning_radius = 0.0375
-        self.dynamicPossession = False
+        self.dynamicPossession = True
 
     def shortestTragectory(self, startPose, endPose, radius):
         altStartPose = (startPose[0], startPose[1], startPose[2] + np.pi)
@@ -119,6 +119,7 @@ class MovimentsDecider():
     def updadeHost(self):
         if self.dynamicPossession == False:
             for indx,robot in enumerate(static_classes.world.robots):
+                if(indx >= len(self.listEntity)): break
                 target = self.listEntity[indx].tatic(robot.pose)
                 path = self.shortestTragectory(robot.pose, target, self.turning_radius) 
                 self.listEntity[indx].possess(path, robot)
