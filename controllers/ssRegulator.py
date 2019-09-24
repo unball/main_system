@@ -15,7 +15,8 @@ class ssRegulator():
 
     def __init__(self):
         """Init method."""
-        #self.output_vel = robots_speeds_msg()
+        # self.output_vel = robots_speeds_msg()#
+        self.output_vel = [[], []]
         self.number_of_robots = 3
 
         self.x_i = list(0 for i in range(self.number_of_robots))
@@ -91,8 +92,7 @@ class ssRegulator():
         self.updateStateVector()
         self.controlLaw()
         # print(self.output_vel)
-        #return self.output_vel
-        return None
+        return self.output_vel
 
     def updateIntVariables(self, references, world):
         for i in range(self.number_of_robots):
@@ -128,8 +128,9 @@ class ssRegulator():
     def controlLaw(self):
         for i in range(self.number_of_robots):
             # K, S, E = control.lqr(self.A[i], self.B[i], self.Q, self.R)
-            #K = control.place(self.A[i], self.B[i], self.poles[i])
-            #velocities = np.dot(-K, self.state_vector[i])
-            #self.output_vel.linear_vel[i] = velocities[0] # + np.sign(velocities[0])*0.5
-            #self.output_vel.angular_vel[i] = velocities[1]
-            pass
+            K = control.place(self.A[i], self.B[i], self.poles[i])
+            velocities = np.dot(-K, self.state_vector[i])
+            # self.output_vel.linear_vel[i] = velocities[0]  + np.sign(velocities[0])*0.5
+            # self.output_vel.angular_vel[i] = velocities[1]
+            self.output_vel[0].append(velocities[0]  + np.sign(velocities[0])*0.5)
+            self.output_vel[0].append(velocities[1])
