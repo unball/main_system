@@ -41,6 +41,10 @@ class elementsPositioner(gui.frameRenderer.frameRenderer):
         elif self.__selector == "Ball":
             cv2.circle(frame, self.__mousePosition, 5, (255,0,0), -1)
         
+        ellipseCenter = meters2pixel((0.75*world.fieldSide, 0), self.frameShape)
+        ellipseAxis = (int(0.4*width/1.6),int(0.2*height/1.3))
+        cv2.ellipse(frame, ellipseCenter, ellipseAxis, 0, 0, 360, (255,255,255), 2)
+        
         for robot in world.robots:
             if robot.pos[0] is not None and robot.pos[1] is not None:
                 position = meters2pixel(robot.pos, (height,width))

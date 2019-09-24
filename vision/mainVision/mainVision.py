@@ -203,7 +203,7 @@ class MainVision(vision.vision.Vision):
 		
 		# Encontra os contornos internos com área maior que um certo limiar e ordena
 		internalContours,_ = cv2.findContours(componentTeamMask, cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_L1)
-		internalContours = [countor for countor in internalContours if cv2.contourArea(countor)>self.__min_internal_area_contour]
+		internalContours = [countor for countor in internalContours if cv2.contourArea(countor)>=self.__min_internal_area_contour]
 		
 		countInternalContours = len(internalContours)
 		
@@ -285,7 +285,7 @@ class MainVision(vision.vision.Vision):
 	
 	def identificarBola(self, frameToDraw, mask):
 		bolaContours,_ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-		bolaContours = [countor for countor in bolaContours if cv2.contourArea(countor)>self.__min_internal_area_contour]
+		bolaContours = [countor for countor in bolaContours if cv2.contourArea(countor)>=self.__min_internal_area_contour]
 
 		if len(bolaContours) != 0:
 			bolaContour = max(bolaContours, key=cv2.contourArea)
@@ -316,7 +316,9 @@ class MainVision(vision.vision.Vision):
 		components = self.obterComponentesConectados(mask)
 		
 		# Frame zerado a ser renderizado
-		processed_image = cv2.bitwise_and(img_warpped, img_warpped, mask=mask)
+		processed_image = np.zeros(img_warpped.shape, np.uint8)
+		for c in components:
+			processed_image = cv2.add(processed_image, cv2.bitwise_and(img_warpped, img_warpped, mask=c))
 		
 		# Desenha lado do campo
 		self.draw_left_rectangle(processed_image, (0,255,0) if world.fieldSide == field.LEFT else (0,0,255))
@@ -332,6 +334,9 @@ class MainVision(vision.vision.Vision):
 		for componentMask in components:
 			# Máscara com a bola
 			componentBolaMask = componentMask & bolaMask
+			
+			b,_ = cv2.findContours(componentMask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+			cv2.drawContours(processed_image, b, -1, (255,255,255), 1)
 			
 			# Tenta identificar uma bola
 			bola_ = self.identificarBola(processed_image, componentBolaMask)

@@ -57,7 +57,7 @@ class Defender(Entity):
         super().__init__("Defensor")
     def tatic(self, pose):
         roboty = pose[1]
-        self.__target = moviments.blockBallElipse(centerGoal, static_classes.world.ball.pos,static_classes.world.ball.vel,roboty)
+        self.__target = moviments.blockBallElipse(np.array(static_classes.world.ball.pos), np.array([-1,-1]), np.array(pose))
         return self.__target
 
 class Midfielder(Entity):
