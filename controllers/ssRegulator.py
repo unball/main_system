@@ -134,5 +134,5 @@ class ssRegulator():
             velocities = np.dot(-K, self.state_vector[i])
             # self.output_vel.linear_vel[i] = velocities[0]  + np.sign(velocities[0])*0.5
             # self.output_vel.angular_vel[i] = velocities[1]
-            self.output_vel[0].append(velocities[0]  + np.sign(velocities[0])*0.5)
-            self.output_vel[0].append(velocities[1])
+            self.output_vel[i][0].append(velocities[0]  + np.sign(velocities[0])*0.5)
+            self.output_vel[i][1].append(velocities[1])
