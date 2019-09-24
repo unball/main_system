@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Control system module."""
 import numpy as np
-#import control
+import control
 
 #from communication.msg import robots_speeds_msg
 #from communication.msg import comm_msg
