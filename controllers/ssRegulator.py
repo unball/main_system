@@ -88,6 +88,9 @@ class ssRegulator():
                       [-0.5, -0.5, -0.8]]
 
     def actuate(self, references, world):
+        self.output_vel = [[[], []],
+                           [[], []],
+                           [[], []]]
         """Control system actuator itself. Receives references and world info."""
         self.updateIntVariables(references, world)
         self.updateDynamicMatrices()

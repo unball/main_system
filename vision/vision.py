@@ -4,6 +4,7 @@ import vision.cameras
 import time
 import gui.mainWindow
 import cv2
+import numpy as np
 
 class VisionMessage():
     def __init__(self, x_list, y_list, th_list, ball_x, ball_y, found_list):
@@ -36,7 +37,7 @@ class Vision(ABC):
         world.update(VisionMessage(
             [r[1][0] for r in robosAliados],
             [r[1][1] for r in robosAliados],
-            [r[2] for r in robosAliados],
+            [r[2]/180*np.pi for r in robosAliados],
             bola[0][0] if bola is not None else 0, 
             bola[0][1] if bola is not None else 0,
             [r[3] for r in robosAliados]

@@ -23,11 +23,11 @@ class elementsPositioner(gui.frameRenderer.frameRenderer):
         self.__ball = (0,0)
         
     def draw_rectangle(self, frame, position, size, angle, color=(0,255,0)):
-        rect = (position, size, angle)
+        rect = (position, size, -angle*180/np.pi)
         box = cv2.boxPoints(rect)
         box = np.int0(box)
         cv2.drawContours(frame,[box],0,color,2)
-        cv2.circle(frame, (int(position[0]+size[0]/2*math.cos(angle/180*3.1415)), int(position[1]+size[0]/2*math.sin(angle/180*3.1415))), 3, (255,255,255), -1)
+        cv2.circle(frame, (int(position[0]+size[0]/2*math.cos(-angle)), int(position[1]+size[0]/2*math.sin(-angle))), 3, (255,255,255), -1)
         
     def cursorDistance(self, position):
         return abs(self.__mousePosition[0]-position[0])+abs(self.__mousePosition[1]-position[1])
