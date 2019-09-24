@@ -16,7 +16,9 @@ class ssRegulator():
     def __init__(self):
         """Init method."""
         # self.output_vel = robots_speeds_msg()#
-        self.output_vel = [[], []]
+        self.output_vel = [[[], []],
+                           [[], []],
+                           [[], []]]
         self.number_of_robots = 3
 
         self.x_i = list(0 for i in range(self.number_of_robots))
