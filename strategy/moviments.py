@@ -25,12 +25,7 @@ def blockBallElipse(rb, vb, rr):
     if u.imag == 0:
         r = rb + u*vb
         r_ = r-rm
-        r_angle = math.atan2(r_[1], r_[0])
-        r_ort = (-a*math.sin(r_angle), b*math.cos(r_angle))
-        r_ort_angle = math.atan2(r_ort[1], r_ort[0])
-        if(rr[1] > r[1]): r_ort_angle = -r_ort_angle
-        
-        return (r[0], r[1], r_ort_angle)
+        return (r[0], r[1], 0)
     
     rr = np.array([-1,0])
     coefficients = [sum((rr*e)**2), 2*np.dot((rb-rm)*e, rr*e), sum(((rb-rm)*e)**2)-1]
