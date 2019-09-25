@@ -12,6 +12,7 @@ class uiFrame:
 		height, width, depth = image_data.shape
 		pixbuf = GdkPixbuf.Pixbuf.new_from_data(image_data.tostring(), GdkPixbuf.Colorspace.RGB, False, 8, width, height, depth*width)
 		self._gtk_frame.set_from_pixbuf(pixbuf.copy())
+		self._gtk_frame.show()
 	
 	@guiMethod
 	def clear_image(self):
