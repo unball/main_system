@@ -107,12 +107,10 @@ class elementsPositioner(gui.frameRenderer.frameRenderer):
                     del world.robots[idx]
     
     def frameScroll(self, widget, event):
-        nearRobot = self.findNearRobot()
-        if nearRobot is not None:
-            if event.direction == Gdk.ScrollDirection.DOWN:
-                nearRobot.th = nearRobot.th-5
-            else:
-                nearRobot.th = nearRobot.th+5
+        if self.__selector == "MoveRobot":
+            nearRobot = self.findNearRobot()
+            if nearRobot is not None:
+                nearRobot.th = nearRobot.th+event.delta_y*0.1
             
     def frameRelease(self, widget, event):
         self.__movingRobot = None
@@ -138,7 +136,7 @@ class elementsPositioner(gui.frameRenderer.frameRenderer):
         gui.mainWindow.MainWindow().getObject("world_frame_event").connect("motion-notify-event", self.frameMouseOver)
         gui.mainWindow.MainWindow().getObject("world_frame_event").connect("button-press-event", self.frameClick)
         gui.mainWindow.MainWindow().getObject("world_frame_event").connect("button-release-event", self.frameRelease)
-        gui.mainWindow.MainWindow().getObject("world_frame_event").add_events(Gdk.EventMask.SCROLL_MASK)
+        gui.mainWindow.MainWindow().getObject("world_frame_event").add_events(Gdk.EventMask.SMOOTH_SCROLL_MASK)
         gui.mainWindow.MainWindow().getObject("world_frame_event").connect("scroll-event", self.frameScroll)
         
         return builder.get_object("main")
