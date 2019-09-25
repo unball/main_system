@@ -25,18 +25,20 @@ def blockBallElipse(rb, vb, rr):
     if u.imag == 0:
         r = rb + u*vb
         r_ = r-rm
-        return (r[0], r[1], 0)
-    
-    rr = np.array([-1,0])
-    coefficients = [sum((rr*e)**2), 2*np.dot((rb-rm)*e, rr*e), sum(((rb-rm)*e)**2)-1]
-    roots = np.roots(coefficients)
-    u = min(roots)
-    
-    if u.imag == 0:
-        r = rb + u*rr
-        return (r[0], r[1], 0)
+        o = math.atan2(r_[1], r_[0])
+        t = math.atan2(a*math.sin(o), b*math.cos(o))
+        r_ort = (-a*math.sin(t), b*math.cos(t))
+        r_ort_angle = math.atan2(r_ort[1], r_ort[0])
         
-    return (rm[0],rm[1],0)
+        if rr[1] > r[1] and r_ort_angle > 0: r_ort_angle = r_ort_angle+np.pi
+        if rr[1] < r[1] and r_ort_angle < 0: r_ort_angle = r_ort_angle+np.pi
+        
+        return (r[0], r[1], r_ort_angle)
+    
+    angle = np.pi/2
+    if rr[1] > rb[1]: angle = -np.pi/2
+    
+    return (0.55*world.fieldSide, rb[1], angle)
 
 #def blockBallElipse(goal, ballPos, ballVel, roboty):
 #    try:

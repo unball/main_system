@@ -43,7 +43,9 @@ class elementsPositioner(gui.frameRenderer.frameRenderer):
         
         ellipseCenter = meters2pixel((0.75*world.fieldSide, 0), self.frameShape)
         ellipseAxis = (int(0.4*width/1.6),int(0.2*height/1.3))
-        cv2.ellipse(frame, ellipseCenter, ellipseAxis, 0, 0, 360, (255,255,255), 2)
+        cv2.ellipse(frame, ellipseCenter, ellipseAxis, 0, 0, 360, (100,100,100), 1)
+        blkballline,_ = meters2pixel((0.55*world.fieldSide,0), (height,width))
+        cv2.line(frame, (blkballline,0), (blkballline,height), (100,100,100), 1)
         
         for robot in world.robots:
             if robot.pos[0] is not None and robot.pos[1] is not None:
