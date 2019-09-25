@@ -69,6 +69,7 @@ class elementsPositioner(gui.frameRenderer.frameRenderer):
         bola = world.ball
         ballpos = meters2pixel(bola.pos, (height,width))
         cv2.circle(frame, ballpos, 5, (255,0,0), -1)
+        cv2.arrowedLine(frame, ballpos, (ballpos[0]+int(bola.vel[0]*50), ballpos[1]-int(bola.vel[1]*50)), (255,0,0), 1)
         
         
         return frame
@@ -97,6 +98,7 @@ class elementsPositioner(gui.frameRenderer.frameRenderer):
         elif self.__selector == "Ball":
             position = pixel2meters((int(event.x), int(event.y)), self.frameShape)
             world.ball.update(position[0], position[1])
+            world.ball.vel = (-1,-1)
         elif self.__selector == "MoveRobot":
             nearRobot = self.findNearRobot()
             if nearRobot is not None:
