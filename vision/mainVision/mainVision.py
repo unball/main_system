@@ -7,6 +7,7 @@ import vision.vision
 import gui.mainWindow
 from statics.static_classes import world
 from statics import field
+import math
 
 class Robo():
 	def __init__(self, identificador):
@@ -20,6 +21,7 @@ class Robo():
 class MainVision(vision.vision.Vision):
 	def __init__(self):
 		self.__robos = [Robo(i) for i in range(2*world.number_of_robots)]
+		self.__posicaoIdentificador = [(None,i) for i in range(world.number_of_robots)]
 		self.__n_robos = 2*world.number_of_robots
 		self.__bola = None
 		self.__angles = np.array([0, 90, 180, -90, -180])
@@ -40,6 +42,7 @@ class MainVision(vision.vision.Vision):
 		self.__homography_points = statics.configFile.getValue("homography_points")
 		self.__cont_rect_area_ratio = statics.configFile.getValue("cont_rect_area_ratio", 0.75)
 		self.__min_internal_area_contour = statics.configFile.getValue("min_internal_area_contour", 10)
+		self.__stability_param = statics.configFile.getValue("stability_param", 0.99)
 
 
 	def ui_init(self):
@@ -85,6 +88,10 @@ class MainVision(vision.vision.Vision):
 	@property
 	def minInternalAreaContour(self):
 		return self.__min_internal_area_contour
+		
+	@property
+	def stabilityParam(self):
+		return self.__stability_param
 	
 	def atualizarPretoHSV(self, value, index):
 		self.__preto_hsv[index] = value
@@ -111,6 +118,10 @@ class MainVision(vision.vision.Vision):
 	def atualizarMinInternalArea(self, value):
 		self.__min_internal_area_contour = value
 		statics.configFile.setValue("min_internal_area_contour", value)
+	
+	def atualizarParametroEstabilidade(self, value):
+		self.__stability_param = value
+		statics.configFile.setValue("stability_param", value)
 		
 	def atualizarRobos(self, robos, bola):
 		# Atualiza posição da bola
@@ -118,6 +129,7 @@ class MainVision(vision.vision.Vision):
 		
 		if self.__n_robos != world.number_of_robots:
 			self.__robos = [Robo(i) for i in range(2*world.number_of_robots)]
+			self.__posicaoIdentificador = [(None,i) for i in range(world.number_of_robots)]
 			self.__n_robos = world.number_of_robots
 		
 		for i,r in enumerate(robos):
@@ -175,6 +187,28 @@ class MainVision(vision.vision.Vision):
 			return cv2.warpPerspective(frame, homography_matrix, (frame.shape[1], frame.shape[0]))
 		except:
 			return frame
+	
+	def obterIdentificador(self, center, candidate):
+		minDistance = math.inf
+		nearestIdx = None
+		for idx,(pos,id) in enumerate(self.__posicaoIdentificador):
+			if pos is None:
+				nearestIdx = idx
+				break
+			
+			distance = abs(pos[0]-center[0])+abs(pos[1]-center[1])
+			if distance < minDistance:
+				minDistance = distance
+				nearestIdx = idx
+		
+		if nearestIdx is None:
+			return candidate
+		
+		oldMean = self.__posicaoIdentificador[nearestIdx][1]
+		newMean = self.__stability_param*oldMean+(1-self.__stability_param)*candidate
+		self.__posicaoIdentificador[nearestIdx] = (center,newMean)
+		
+		return round(newMean)
 		
 	
 	def definePoly(self, countor):
@@ -231,9 +265,10 @@ class MainVision(vision.vision.Vision):
 		poligono = self.definePoly(mainShape)
 		
 		# Computa o identificador com base na forma e no número de contornos internos
-		identificador = (0 if poligono == 3 else 2) + countInternalContours -1
+		candidato = (0 if poligono == 3 else 2) + countInternalContours -1
+		if candidato >= self.__n_robos: return None
 		
-		if identificador >= self.__n_robos: return None
+		identificador = self.obterIdentificador(center, candidato)
 		
 		return identificador, estimatedAngle
 	

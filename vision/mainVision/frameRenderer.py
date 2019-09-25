@@ -269,12 +269,17 @@ class parametrosVisao(gui.frameRenderer.frameRenderer):
 	def update_min_internal_area_contour(self, widget):
 		self.parent.atualizarMinInternalArea(widget.get_value())
 	
+	def update_stability_param(self, widget):
+		self.parent.atualizarParametroEstabilidade(widget.get_value())
+	
 	def create_ui_content(self):
 		builder = Gtk.Builder.new_from_file("vision/mainVision/parametrosVisao.ui")
 		builder.get_object("adj_area_cont_rect").set_value(self.parent.areaRatio)
 		builder.get_object("adj_area_cont_rect").connect("value-changed", self.update_area_ratio)
 		builder.get_object("adj_min_area_internal_contour").set_value(self.parent.minInternalAreaContour)
 		builder.get_object("adj_min_area_internal_contour").connect("value-changed", self.update_min_internal_area_contour)
+		builder.get_object("adj_stability_param").set_value(self.parent.stabilityParam)
+		builder.get_object("adj_stability_param").connect("value-changed", self.update_stability_param)
 		
 		return builder.get_object("main")
 
