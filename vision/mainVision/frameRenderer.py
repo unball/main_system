@@ -257,7 +257,7 @@ class parametrosVisao(gui.frameRenderer.frameRenderer):
 		super().__init__(vision, "fr_notebook")
 		
 	def transformFrame(self, frame, originalFrame):
-		processed_frame = self.parent.ui_process(frame)
+		robosAliados, robosAdversariosIdentificados, bola, processed_frame = self.parent.ui_process(frame)
 		return cv2.cvtColor(processed_frame, cv2.COLOR_RGB2BGR)
 
 	def create_ui_label(self):
@@ -287,29 +287,28 @@ class identificarRobos(gui.frameRenderer.frameRenderer):
 	def __init__(self, vision):
 		super().__init__(vision, "fr_notebook")
 		self.__n_robos = None
-		self.fbcs = []
+		self.__uiElements = []
 	
 	@guiMethod
 	def updateRobotsInfo(self, robos, bola):
 		if self.__n_robos != len(robos)/2:
-			for fbc in self.fbcs:
-				self.__timeFlow.remove(fbc)
-			self.fbcs = []
+			for e in self.__uiElements:
+				self.__timeFlow.remove(e["fbc"])
+			self.__uiElements = [None for x in range(0,len(robos))]
 			self.__n_robos = len(robos)/2
-		
+			
 		for idx,robo in enumerate(robos):
-			if robo.ui:
-				robo.ui["idLabel"].set_text("{0}".format(robo.identificador))
-				robo.ui["posicaoLabel"].set_text("Posição: x: {:.2f} m, y: {:.2f} m".format(robo.centro[0], robo.centro[1]))
-				robo.ui["anguloLabel"].set_text("Ângulo {:.1f}º".format(robo.angulo))
-				robo.ui["estadoLabel"].set_text("Estado: " + robo.estado)
-				if robo.estado == "Identificado":
-					robo.ui["fbc"].set_opacity(1)
+			if self.__uiElements[idx] is not None:
+				self.__uiElements[idx]["idLabel"].set_text("{0}".format(robo[0]))
+				self.__uiElements[idx]["posicaoLabel"].set_text("Posição: x: {:.2f} m, y: {:.2f} m".format(robo[1][0], robo[1][1]))
+				self.__uiElements[idx]["anguloLabel"].set_text("Ângulo {:.1f}º".format(robo[2]))
+				self.__uiElements[idx]["estadoLabel"].set_text("Estado: " + "Identificado" if robo[3] else "Não-Identificado")
+				if robo[3]:
+					self.__uiElements[idx]["fbc"].set_opacity(1)
 				else:
-					robo.ui["fbc"].set_opacity(0.5)
+					self.__uiElements[idx]["fbc"].set_opacity(0.5)
 			else:
 				flowBoxChild = Gtk.FlowBoxChild()
-				self.fbcs.append(flowBoxChild)
 				Gtk.StyleContext.add_class(flowBoxChild.get_style_context(), "roboRow")
 				
 				builder = Gtk.Builder.new_from_file("vision/mainVision/robo.ui")
@@ -328,7 +327,7 @@ class identificarRobos(gui.frameRenderer.frameRenderer):
 					self.__timeAdversarioFlow.add(flowBoxChild)
 				
 				flowBoxChild.add(builder.get_object("main"))
-				robo.ui = {"idLabel": idLabel, "posicaoLabel": posicaoLabel, "anguloLabel": anguloLabel, "estadoLabel": estadoLabel, "fbc": flowBoxChild}
+				self.__uiElements[idx] = {"idLabel": idLabel, "posicaoLabel": posicaoLabel, "anguloLabel": anguloLabel, "estadoLabel": estadoLabel, "fbc": flowBoxChild}
 				
 		self.__timeFlow.show_all()
 		self.__timeAdversarioFlow.show_all()
@@ -341,14 +340,11 @@ class identificarRobos(gui.frameRenderer.frameRenderer):
 			
 	
 	def transformFrame(self, frame, originalFrame):
-		processed_frame = self.parent.ui_process(frame)
+		robosAliados, robosAdversariosIdentificados, bola, processed_image = self.parent.ui_process(frame)
 		
-		robos = self.parent.robos
-		bola = self.parent.bola
+		self.updateRobotsInfo(robosAliados+robosAdversariosIdentificados, bola)
 		
-		self.updateRobotsInfo(robos, bola)
-		
-		return cv2.cvtColor(processed_frame, cv2.COLOR_RGB2BGR)
+		return cv2.cvtColor(processed_image, cv2.COLOR_RGB2BGR)
 
 	def create_ui_label(self):
 		return Gtk.Label("Visão em alto nível")
