@@ -90,6 +90,8 @@ class elementsPositioner(gui.frameRenderer.frameRenderer):
             self.__movingRobot.update(position[0], position[1], self.__movingRobot.th)
     
     def frameClick(self, widget, event):
+        if world.manualMode == False: return
+        
         if self.__selector == "Robot":
             newRobot = Robot()
             position = pixel2meters((int(event.x), int(event.y)), self.frameShape)
