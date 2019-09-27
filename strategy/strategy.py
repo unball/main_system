@@ -4,7 +4,7 @@ from strategy.movimentsDecider import Attacker, Defender, Goalkeeper, Midfielder
 from statics.static_classes import world
 
 import strategy.frameRenderer
-
+import statics
 def error():
     """Print the standard error message for STRATEGY scope."""
     print("\nSTRATEGY ERROR:")
@@ -50,6 +50,7 @@ class Strategy(object):
             
     def setTurningRadius(self, radius):
         self.decider.turning_radius = radius
+        statics.configFile.setValue("Turn_Radius", radius)
             
     def setDynamicPossession(self, value):
         self.decider.dynamicPossession = value

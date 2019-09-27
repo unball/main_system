@@ -60,10 +60,17 @@ class parametrosEstrategia(gui.frameRenderer.frameRenderer):
     
     def set_dynamic_possession(self, widget, value):
         self.parent.setDynamicPossession(value)
-    
+
+    def reset_radius(self, widget, spinButton):
+         spinButton.set_value(0.053)
+
+
     def create_ui_content(self):
         builder = Gtk.Builder.new_from_file("strategy/parametrosEstrategia.ui")
-        builder.get_object("min_dubins_radius_spin").connect("value-changed", self.update_turning_radius)
+        spinButton = builder.get_object("min_dubins_radius_spin")
+        spinButton.connect("value-changed", self.update_turning_radius)
+        spinButton.set_value(self.parent.decider.turning_radius)
+        builder.get_object("min_dubins_radius_spin_reset").connect("clicked", self.reset_radius, spinButton)
         builder.get_object("dynamic_possession").connect("state-set", self.set_dynamic_possession)
         
         return builder.get_object("main")
