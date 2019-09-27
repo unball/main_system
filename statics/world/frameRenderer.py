@@ -16,7 +16,7 @@ class elementsPositioner(gui.frameRenderer.frameRenderer):
         self.__selectedRobot = 0
         self.__mousePosition = (0,0)
         self.__selector = "None"
-        self.frameShape = (520,640)
+        self.frameShape = (350,471)
         self.__movingRobot = None
         
         self.__robots = []

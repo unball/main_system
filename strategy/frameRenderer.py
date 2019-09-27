@@ -13,7 +13,7 @@ class parametrosEstrategia(gui.frameRenderer.frameRenderer):
 
     def __init__(self, vision):
         super().__init__(vision, "fr_strategy_notebook")
-        self.frameShape = (520,640)
+        self.frameShape = (350,471)
         
     def draw_rectangle(self, frame, position, size, angle, color=(0,255,0)):
         rect = (position, size, -angle*180/np.pi)
