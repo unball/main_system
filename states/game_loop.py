@@ -3,7 +3,7 @@ from abc import ABC
 
 from strategy.strategy import Strategy
 from controllers.ssRegulator import ssRegulator
-from communication_system.radio_comm import RadioCommunicator
+from communication.radio_comm import RadioCommunicator
 from statics import static_classes
 from vision.mainVision.mainVision import MainVision
 import time
