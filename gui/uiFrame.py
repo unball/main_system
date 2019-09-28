@@ -1,5 +1,6 @@
 from gi.repository import Gdk, GdkPixbuf
 from gui.guiMethod import guiMethod
+import cv2
 
 class uiFrame:
 	
@@ -9,8 +10,9 @@ class uiFrame:
 	
 	@guiMethod
 	def do_update_frame(self, image_data):
-		height, width, depth = image_data.shape
-		pixbuf = GdkPixbuf.Pixbuf.new_from_data(image_data.tostring(), GdkPixbuf.Colorspace.RGB, False, 8, width, height, depth*width)
+		image_sized = cv2.resize(image_data, (471, 350))
+		height, width, depth = image_sized.shape
+		pixbuf = GdkPixbuf.Pixbuf.new_from_data(image_sized.tostring(), GdkPixbuf.Colorspace.RGB, False, 8, width, height, depth*width)
 		self._gtk_frame.set_from_pixbuf(pixbuf.copy())
 		self._gtk_frame.show()
 	

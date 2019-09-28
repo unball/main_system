@@ -3,6 +3,7 @@ import numpy as np
 from abc import ABC, abstractmethod
 import strategy.moviments as moviments
 import sys
+import statics.configFile
 #sys.path.append("../..") # Adds higher directory to python modules path.
 from statics import static_classes 
 from statics.static_classes import world
@@ -81,7 +82,7 @@ class MovimentsDecider():
         self.state = ATT
         self.listEntity = [TestPlayer(), TestPlayer(), TestPlayer()]
         #self.listEntity = [TestPlayer(), TestPlayer(), TestPlayer()]
-        self.turning_radius = 0.0375
+        self.turning_radius = statics.configFile.getValue("Turn_Radius", 0.053)
         self.dynamicPossession = False
 
     def shortestTragectory(self, startPose, endPose, radius):

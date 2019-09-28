@@ -155,11 +155,11 @@ class cortarCampo(gui.frameRenderer.frameRenderer):
 		
 	def cortarCampo_update_points(self, widget, event):
 		if gui.mainWindow.MainWindow().selectedFrameRenderer("fr_notebook") == self:
-			self.update_points([int(event.x), int(event.y)])
+			self.update_points([int(event.x/350*self.__frame_shape[0]), int(event.y/471*self.__frame_shape[1])])
 	
 	def cortarCampo_mouseOver(self, widget, event):
 		if gui.mainWindow.MainWindow().selectedFrameRenderer("fr_notebook") == self:
-			self.set_pointer_position((int(event.x), int(event.y)))
+			self.set_pointer_position([int(event.x/350*self.__frame_shape[0]), int(event.y/471*self.__frame_shape[1])])
 
 	def create_ui_label(self):
 		return Gtk.Label("Cortar Campo")

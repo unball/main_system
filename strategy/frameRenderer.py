@@ -50,7 +50,7 @@ class parametrosEstrategia(gui.frameRenderer.frameRenderer):
 
     def __init__(self, vision):
         super().__init__(vision, "fr_strategy_notebook")
-        self.frameShape = (520,640)
+        self.frameShape = (350,471)
 
     def create_ui_label(self):
         return Gtk.Label("Parâmetros da estratégia")
@@ -64,9 +64,16 @@ class parametrosEstrategia(gui.frameRenderer.frameRenderer):
     def transformFrame(self, frame, originalFrame):
         return strategyFrame(self.frameShape)
     
+    def reset_radius(self, widget, spinButton):
+         spinButton.set_value(0.053)
+
+
     def create_ui_content(self):
         builder = Gtk.Builder.new_from_file("strategy/parametrosEstrategia.ui")
-        builder.get_object("min_dubins_radius_spin").connect("value-changed", self.update_turning_radius)
+        spinButton = builder.get_object("min_dubins_radius_spin")
+        spinButton.connect("value-changed", self.update_turning_radius)
+        spinButton.set_value(self.parent.decider.turning_radius)
+        builder.get_object("min_dubins_radius_spin_reset").connect("clicked", self.reset_radius, spinButton)
         builder.get_object("dynamic_possession").connect("state-set", self.set_dynamic_possession)
         
         return builder.get_object("main")
