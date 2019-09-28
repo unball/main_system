@@ -20,8 +20,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    r = static_classes.world.robots[0]
-    ent = Attacker()
-    path = 0
-    ent.possess(path, r)
-    r.entity.path = MovimentsDecider().shortestTragectory((0,0,0),(1,1,0), 0.01)
