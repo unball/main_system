@@ -9,6 +9,7 @@ gi.require_version('Gtk', '3.0')
 
 import gui.mainWindow
 import cv2
+#TODO: implementar execucao simples sem GUI (iniciar thread com estado de gameloop)
 
 def main():
     print("Usando opencv " + cv2.__version__)
