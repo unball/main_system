@@ -15,7 +15,7 @@ from gui.guiMethod import guiMethod
 from vision.mainVision.mainVision import MainVision
 from strategy.strategy import Strategy
 from controllers.ssRegulator import ssRegulator
-from communication_system.radio_comm import RadioCommunicator
+from communication.radio_comm import RadioCommunicator
 import statics.world.frameRenderer
 
 class GameThread():

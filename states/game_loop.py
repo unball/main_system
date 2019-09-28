@@ -3,7 +3,7 @@ from abc import ABC
 
 from strategy.strategy import Strategy
 from controllers.ssRegulator import ssRegulator
-from communication_system.radio_comm import RadioCommunicator
+from communication.radio_comm import RadioCommunicator
 from statics import static_classes
 from vision.mainVision.mainVision import MainVision
 import time
@@ -17,7 +17,8 @@ class GameLoop(State):
         # Vision System
         t0 = time.time()
         self.thread.visionSystem.update()
-        world.calc_velocities(0.03)
+        #TODO: calcular o tempo de loop pra derivacao das posicoes
+        world.calc_velocities(0.03) # <----- ERRADO
         self.thread.strategySystem.plan()
         targets, spin = self.thread.strategySystem.get_targets()
         velocities = self.thread.controlSystem.actuate(targets, static_classes.world)

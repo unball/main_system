@@ -16,7 +16,7 @@ class elementsPositioner(gui.frameRenderer.frameRenderer):
         self.__selectedRobot = 0
         self.__mousePosition = (0,0)
         self.__selector = "None"
-        self.frameShape = (520,640)
+        self.frameShape = (350,471)
         self.__movingRobot = None
         
         self.__robots = []
@@ -69,6 +69,7 @@ class elementsPositioner(gui.frameRenderer.frameRenderer):
         bola = world.ball
         ballpos = meters2pixel(bola.pos, (height,width))
         cv2.circle(frame, ballpos, 5, (255,0,0), -1)
+        cv2.arrowedLine(frame, ballpos, (ballpos[0]+int(bola.vel[0]*50), ballpos[1]-int(bola.vel[1]*50)), (255,0,0), 1)
         
         
         return frame
@@ -89,6 +90,8 @@ class elementsPositioner(gui.frameRenderer.frameRenderer):
             self.__movingRobot.update(position[0], position[1], self.__movingRobot.th)
     
     def frameClick(self, widget, event):
+        if world.manualMode == False: return
+        
         if self.__selector == "Robot":
             newRobot = Robot()
             position = pixel2meters((int(event.x), int(event.y)), self.frameShape)
@@ -97,6 +100,7 @@ class elementsPositioner(gui.frameRenderer.frameRenderer):
         elif self.__selector == "Ball":
             position = pixel2meters((int(event.x), int(event.y)), self.frameShape)
             world.ball.update(position[0], position[1])
+            world.ball.vel = (-1,-1)
         elif self.__selector == "MoveRobot":
             nearRobot = self.findNearRobot()
             if nearRobot is not None:
@@ -107,12 +111,10 @@ class elementsPositioner(gui.frameRenderer.frameRenderer):
                     del world.robots[idx]
     
     def frameScroll(self, widget, event):
-        nearRobot = self.findNearRobot()
-        if nearRobot is not None:
-            if event.direction == Gdk.ScrollDirection.DOWN:
-                nearRobot.th = nearRobot.th-5
-            else:
-                nearRobot.th = nearRobot.th+5
+        if self.__selector == "MoveRobot":
+            nearRobot = self.findNearRobot()
+            if nearRobot is not None:
+                nearRobot.th = nearRobot.th+event.delta_y*0.1
             
     def frameRelease(self, widget, event):
         self.__movingRobot = None
@@ -138,7 +140,7 @@ class elementsPositioner(gui.frameRenderer.frameRenderer):
         gui.mainWindow.MainWindow().getObject("world_frame_event").connect("motion-notify-event", self.frameMouseOver)
         gui.mainWindow.MainWindow().getObject("world_frame_event").connect("button-press-event", self.frameClick)
         gui.mainWindow.MainWindow().getObject("world_frame_event").connect("button-release-event", self.frameRelease)
-        gui.mainWindow.MainWindow().getObject("world_frame_event").add_events(Gdk.EventMask.SCROLL_MASK)
+        gui.mainWindow.MainWindow().getObject("world_frame_event").add_events(Gdk.EventMask.SMOOTH_SCROLL_MASK)
         gui.mainWindow.MainWindow().getObject("world_frame_event").connect("scroll-event", self.frameScroll)
         
         return builder.get_object("main")

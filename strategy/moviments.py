@@ -10,6 +10,12 @@ def goToBallPlus(ballPos):
     ballTarget = ballPos- finalTarget  
     return (ballPos[0], ballPos[1], np.arctan2(ballTarget[1],ballTarget[0]))
 
+def followBally(rb, rr):
+    angle = np.pi/2
+    if rr[1] > rb[1]: angle = -np.pi/2
+    
+    return (0.55*world.fieldSide, rb[1], angle)
+
 def blockBallElipse(rb, vb, rr):
     a = 0.4
     b = 0.2
@@ -17,10 +23,14 @@ def blockBallElipse(rb, vb, rr):
     e = np.array([1/a, 1/b])
     
     coefficients = [sum((vb*e)**2), 2*np.dot((rb-rm)*e, vb*e), sum(((rb-rm)*e)**2)-1]
-    roots = np.roots(coefficients)
     
+    try:
+        roots = np.roots(coefficients)
+        u = min(roots)
+    except:
+        return followBally(rb, rr)
+        
     #print(roots)
-    u = min(roots)
     
     if u.imag == 0:
         r = rb + u*vb
@@ -35,10 +45,7 @@ def blockBallElipse(rb, vb, rr):
         
         return (r[0], r[1], r_ort_angle)
     
-    angle = np.pi/2
-    if rr[1] > rb[1]: angle = -np.pi/2
-    
-    return (0.55*world.fieldSide, rb[1], angle)
+    return followBally(rb, rr)
 
 #def blockBallElipse(goal, ballPos, ballVel, roboty):
 #    try:

@@ -9,6 +9,7 @@ gi.require_version('Gtk', '3.0')
 
 import gui.mainWindow
 import cv2
+#TODO: implementar execucao simples sem GUI (iniciar thread com estado de gameloop)
 
 def main():
     print("Usando opencv " + cv2.__version__)
@@ -19,8 +20,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    r = static_classes.world.robots[0]
-    ent = Attacker()
-    path = 0
-    ent.possess(path, r)
-    r.entity.path = MovimentsDecider().shortestTragectory((0,0,0),(1,1,0), 0.01)

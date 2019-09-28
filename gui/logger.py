@@ -23,7 +23,7 @@ class uiLogger:
             t = Timer(0.25, self.timeout2)
             t.start()
         self._new_error = True
-        self.logButton.modify_fg(Gtk.StateFlags.NORMAL, Gdk.color_parse("black"))
+        self.logButton.modify_fg(Gtk.StateFlags.NORMAL, None)
         
     def timeout2(self):
         revealerImage = self.revealerImage.set_from_icon_name("emblem-ok-symbolic", Gtk.IconSize.MENU)

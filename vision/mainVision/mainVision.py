@@ -20,10 +20,8 @@ class Robo():
 
 class MainVision(vision.vision.Vision):
 	def __init__(self):
-		self.__robos = [Robo(i) for i in range(2*world.number_of_robots)]
 		self.__posicaoIdentificador = [(None,i) for i in range(world.number_of_robots)]
 		self.__n_robos = 2*world.number_of_robots
-		self.__bola = None
 		self.__angles = np.array([0, 90, 180, -90, -180])
 		self.__homography = None
 		self.__default_preto_hsv = [0,94,163,360,360,360]
@@ -56,14 +54,6 @@ class MainVision(vision.vision.Vision):
 		}
 		#self.selectedFrameRenderer = self.frameRenderers[0]
 		#gui.mainWindow.MainWindow().set_frame_renderer(0)
-	
-	@property
-	def robos(self):
-		return self.__robos
-	
-	@property
-	def bola(self):
-		return self.__bola
 	
 	@property
 	def use_homography(self):
@@ -122,25 +112,6 @@ class MainVision(vision.vision.Vision):
 	def atualizarParametroEstabilidade(self, value):
 		self.__stability_param = value
 		statics.configFile.setValue("stability_param", value)
-		
-	def atualizarRobos(self, robos, bola):
-		# Atualiza posição da bola
-		self.__bola = bola
-		
-		if self.__n_robos != world.number_of_robots:
-			self.__robos = [Robo(i) for i in range(2*world.number_of_robots)]
-			self.__posicaoIdentificador = [(None,i) for i in range(world.number_of_robots)]
-			self.__n_robos = world.number_of_robots
-		
-		for i,r in enumerate(robos):
-			if i >= 2*self.__n_robos: break
-			if r[3] == True:
-				self.__robos[i].centro = r[1]
-				self.__robos[i].centroPixels = r[4]
-				self.__robos[i].angulo = r[2]
-				self.__robos[i].estado = "Identificado"
-			else:
-				self.__robos[i].estado = "Não-Identificado"
 	
 	def getHomography(self, shape):
 		if self.__current_frame_shape != shape:
@@ -295,7 +266,7 @@ class MainVision(vision.vision.Vision):
 
 	def ui_process(self, frame):
 		robos, bola, processed_image = self.process_frame(frame)
-		return processed_image
+		return robos[0:self.__n_robos], robos[self.__n_robos:2*self.__n_robos], bola, processed_image
 	
 	def converterHSV(self, img):
 		img_filtered = cv2.GaussianBlur(img, (5,5), 0)
@@ -320,7 +291,7 @@ class MainVision(vision.vision.Vision):
 	
 	def identificarBola(self, frameToDraw, mask):
 		bolaContours,_ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-		bolaContours = [countor for countor in bolaContours if cv2.contourArea(countor)>=self.__min_internal_area_contour]
+		bolaContours = [countor for countor in bolaContours if cv2.contourArea(countor) > 10]
 
 		if len(bolaContours) != 0:
 			bolaContour = max(bolaContours, key=cv2.contourArea)
@@ -332,6 +303,10 @@ class MainVision(vision.vision.Vision):
 		else: return None
 	
 	def process_frame(self, frame):
+		if self.__n_robos != world.number_of_robots:
+			self.__posicaoIdentificador = [(None,i) for i in range(world.number_of_robots)]
+			self.__n_robos = world.number_of_robots
+
 		# Corta o campo
 		img_warpped = self.warp(frame)
 		
@@ -400,9 +375,6 @@ class MainVision(vision.vision.Vision):
 				self.draw_contour_rectangle(processed_image, camisaContour, (0,0,255))
 				advId = advId + 1
 			
-		# Atualiza listas da visão
-		self.atualizarRobos(robos, bola)
-
 		return robos, bola, processed_image
 	
 	def draw_left_rectangle(self, image, color, thickness=5):

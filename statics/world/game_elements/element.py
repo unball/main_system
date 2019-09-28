@@ -75,7 +75,8 @@ class Element(object):
         return [self.inst_vx, self.inst_vy]
 
     @vel.setter
-    def vel(self, vx, vy):
+    def vel(self, v):
+        vx, vy = v
         self.inst_vx = vx
         self.inst_vy = vy
 

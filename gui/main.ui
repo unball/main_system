@@ -411,6 +411,7 @@
           <object class="GtkStack" id="stack1">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="vexpand">True</property>
             <property name="transition_type">slide-left-right</property>
             <child>
               <object class="GtkBox">
@@ -463,7 +464,7 @@
               <object class="GtkGrid">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="valign">start</property>
+                <property name="vexpand">True</property>
                 <property name="row_homogeneous">True</property>
                 <signal name="map" handler="mainPageChange" object="stack1" swapped="no"/>
                 <child>
@@ -477,7 +478,6 @@
                     <child>
                       <object class="GtkGrid">
                         <property name="width_request">640</property>
-                        <property name="height_request">480</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="row_homogeneous">True</property>
@@ -514,6 +514,8 @@
                       <object class="GtkNotebook" id="fr_notebook">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <property name="vexpand">True</property>
+                        <property name="tab_pos">left</property>
                         <property name="scrollable">True</property>
                         <property name="enable_popup">True</property>
                       </object>

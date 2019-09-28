@@ -3,6 +3,7 @@ import numpy as np
 from abc import ABC, abstractmethod
 import strategy.moviments as moviments
 import sys
+import statics.configFile
 #sys.path.append("../..") # Adds higher directory to python modules path.
 from statics import static_classes 
 from statics.static_classes import world
@@ -57,7 +58,7 @@ class Defender(Entity):
         super().__init__("Defensor")
     def tatic(self, pose):
         roboty = pose[1]
-        self.__target = moviments.blockBallElipse(np.array(static_classes.world.ball.pos), np.array([-1,-1]), np.array(pose))
+        self.__target = moviments.blockBallElipse(np.array(static_classes.world.ball.pos), np.array(static_classes.world.ball.vel), np.array(pose))
         return self.__target
 
 class Midfielder(Entity):
@@ -79,9 +80,9 @@ class MovimentsDecider():
         self.delta_ref = 0.1 * world.field_x_length
         self.ball_vmax = 1.5
         self.state = ATT
-        self.listEntity = [Goalkeeper(), Defender(), Attacker()]
+        self.listEntity = [TestPlayer(), TestPlayer(), TestPlayer()]
         #self.listEntity = [TestPlayer(), TestPlayer(), TestPlayer()]
-        self.turning_radius = 0.0375
+        self.turning_radius = statics.configFile.getValue("Turn_Radius", 0.053)
         self.dynamicPossession = False
 
     def shortestTragectory(self, startPose, endPose, radius):
