@@ -3,9 +3,6 @@
 import numpy as np
 import control
 
-#from communication.msg import robots_speeds_msg
-#from communication.msg import comm_msg
-
 ref_lin_vel = 1
 ref_ang_vel = 1
 
@@ -15,7 +12,6 @@ class ssRegulator():
 
     def __init__(self):
         """Init method."""
-        # self.output_vel = robots_speeds_msg()#
         self.output_vel = [[[], []],
                            [[], []],
                            [[], []]]
@@ -135,7 +131,6 @@ class ssRegulator():
             # K, S, E = control.lqr(self.A[i], self.B[i], self.Q, self.R)
             K = control.place(self.A[i], self.B[i], self.poles[i])
             velocities = np.dot(-K, self.state_vector[i])
-            # self.output_vel.linear_vel[i] = velocities[0]  + np.sign(velocities[0])*0.5
-            # self.output_vel.angular_vel[i] = velocities[1]
             self.output_vel[i][0].append(velocities[0]  + np.sign(velocities[0])*0.5)
             self.output_vel[i][1].append(velocities[1])
+            #TODO: saida do controle como uma lista de dicionarios (v e w)
