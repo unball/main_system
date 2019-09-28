@@ -1,4 +1,4 @@
-from communication_system.communication_system import ROSCommunicator
+from communication.communication import ROSCommunicator
 from main_system.msg import robot_msg
 from speed_converter import speeds2motors
 
