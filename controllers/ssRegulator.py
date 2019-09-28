@@ -79,7 +79,7 @@ class ssRegulator():
                   [0, self.r1]]
 
         # Pole placement regulator closed loop poles
-        self.poles = [[-1, -1, -0.1],
+        self.poles = [[-0.05, -0.05, -0.01],
                       [-0.5, -0.5, -0.6],
                       [-0.5, -0.5, -0.8]]
 

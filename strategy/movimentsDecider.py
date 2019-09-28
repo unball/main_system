@@ -71,7 +71,7 @@ class TestPlayer(Entity):
     def __init__(self):
         super().__init__("TestPlayer")
     def tatic(self, pose):
-        point = pixel2meters(world.mainPoint, (520,640))
+        point = pixel2meters(world.mainPoint, (350,471))
         return (point[0],point[1],0)
 
 

@@ -8,6 +8,7 @@ from statics import static_classes
 from vision.mainVision.mainVision import MainVision
 import time
 from statics.static_classes import world
+import numpy as np
 
 class GameLoop(State):
     def __init__(self, thread):
@@ -21,7 +22,11 @@ class GameLoop(State):
         world.calc_velocities(0.03) # <----- ERRADO
         self.thread.strategySystem.plan()
         targets, spin = self.thread.strategySystem.get_targets()
+        targets = [(-0.56,world.ball.y,np.pi/2),(0,0,0),(0,0,0)]
         velocities = self.thread.controlSystem.actuate(targets, static_classes.world)
+        print(velocities[0])
+
+
         self.thread.radioComm.send(velocities)
         #print(time.time()-t0)
 

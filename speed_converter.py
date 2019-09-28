@@ -6,8 +6,8 @@ from math import fabs
 
 number_of_robots = 3
 
-convertion = (250*19) / 100
-wheel_reduction = 1/3.0
+convertion = (512*19) / 1000
+wheel_reduction = 1
 r = 0.03
 L = 0.075
 
@@ -51,4 +51,4 @@ def speeds2motors(v,w):
 
 		wheels.multiplyEachSide(convertion)
 
-		return int(wheels.left), int(wheels.right)
+		return int(wheels.right), int(wheels.left)
