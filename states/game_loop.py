@@ -22,7 +22,8 @@ class GameLoop(State):
         world.calc_velocities(0.03) # <----- ERRADO
         self.thread.strategySystem.plan()
         targets, spin = self.thread.strategySystem.get_targets()
-        targets = [(-0.56,world.ball.y,np.pi/2),(0,0,0),(0,0,0)]
+        angle = np.arctan2(world.ball.pos[1]-world.robots[0].pos[1], world.ball.pos[0]-world.robots[0].pos[0])
+        targets = [(world.ball.x,world.ball.y,angle),(0,0,0),(0,0,0)]
         velocities = self.thread.controlSystem.actuate(targets, static_classes.world)
         print(velocities[0])
 
