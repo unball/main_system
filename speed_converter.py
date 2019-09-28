@@ -51,4 +51,4 @@ def speeds2motors(v,w):
 
 		wheels.multiplyEachSide(convertion)
 
-		return int(wheels.right), int(wheels.left)
+		return int(wheels.left), int(wheels.right)
