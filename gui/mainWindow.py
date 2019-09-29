@@ -5,7 +5,9 @@ import gui.uiFrame
 import gui.singleton
 import gui.logger
 import states.gameThread
+import roshandler.roshandler as rh
 from gui.guiMethod import guiMethod
+import time
 
 class MainWindow(metaclass=gui.singleton.Singleton):
 
@@ -94,4 +96,6 @@ class MainWindow(metaclass=gui.singleton.Singleton):
 		# Stops threads
 		#self.update_frame_thread.stop()
 		self._gameThread.stop()
-		
+
+		# Kill all subprocess
+		rh.RosHandler().terminateAll()

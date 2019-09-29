@@ -78,6 +78,7 @@ class GameThread():
     
     def stop(self):
         self._state.request_quit()
+        self.thread.join()
     
     def run(self):
         self.thread = Thread(target=self.__loop__)
