@@ -3,6 +3,7 @@ from abc import ABC
 
 from strategy.strategy import Strategy
 from controllers.ssRegulator import ssRegulator
+from controllers.ssRegulator import SpeedPair
 from communication.radio_comm import RadioCommunicator
 from statics import static_classes
 from vision.mainVision.mainVision import MainVision
@@ -31,7 +32,7 @@ class GameLoop(State):
         if world.gameRunning is True:
             self.thread.radioComm.send(velocities)
         else:
-            self.thread.radioComm.send([[[0],[0],[0]] for i in range(3)])
+            self.thread.radioComm.send([SpeedPair() for i in range(3)])
         #print(time.time()-t0)
 
 #    def next_state(self):

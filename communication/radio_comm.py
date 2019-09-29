@@ -21,6 +21,6 @@ class RadioCommunicator(ROSCommunicator):
         self.rh.runProcess("radioSerial") # Asserts radio is listening
 
         for i in range(3):
-            self.msg.MotorA[i], self.msg.MotorB[i] = speeds2motors(msg[i][0][0], msg[i][1][0])
+            self.msg.MotorA[i], self.msg.MotorB[i] = speeds2motors(msg[i].v, msg[i].w)
         self.pub.publish(self.msg)
     
