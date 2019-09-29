@@ -20,7 +20,7 @@ class Robo():
 
 class MainVision(vision.vision.Vision):
 	def __init__(self):
-		self.__posicaoIdentificador = [(None,i) for i in range(world.number_of_robots)]
+		self.__posicaoIdentificador = [(None,None) for i in range(world.number_of_robots)]
 		self.__n_robos = 2*world.number_of_robots
 		self.__angles = np.array([0, 90, 180, -90, -180])
 		self.__homography = None
@@ -28,6 +28,7 @@ class MainVision(vision.vision.Vision):
 		self.__default_time_hsv = [13,0,0,32,360,360]
 		self.__default_bola_hsv = [0, 117, 0, 98, 360, 360]
 		self.__current_frame_shape = None
+		self.__stability_use_current = False
 		super().__init__()
 
 	def config_init(self):
@@ -82,6 +83,9 @@ class MainVision(vision.vision.Vision):
 	@property
 	def stabilityParam(self):
 		return self.__stability_param
+	
+	def usarIdentificadorAtual(self):
+		self.__stability_use_current = True
 	
 	def atualizarPretoHSV(self, value, index):
 		self.__preto_hsv[index] = value
@@ -160,6 +164,10 @@ class MainVision(vision.vision.Vision):
 			return frame
 	
 	def obterIdentificador(self, center, candidate):
+		if self.__stability_use_current is True:
+			self.__posicaoIdentificador = [(None,None) for i in range(world.number_of_robots)]
+			self.__stability_use_current = False
+		
 		minDistance = math.inf
 		nearestIdx = None
 		for idx,(pos,id) in enumerate(self.__posicaoIdentificador):
@@ -176,7 +184,12 @@ class MainVision(vision.vision.Vision):
 			return candidate
 		
 		oldMean = self.__posicaoIdentificador[nearestIdx][1]
-		newMean = self.__stability_param*oldMean+(1-self.__stability_param)*candidate
+
+		if oldMean is None:
+			newMean = candidate
+		else:
+			newMean = self.__stability_param*oldMean+(1-self.__stability_param)*candidate
+		
 		self.__posicaoIdentificador[nearestIdx] = (center,newMean)
 		
 		return round(newMean)
@@ -304,7 +317,7 @@ class MainVision(vision.vision.Vision):
 	
 	def process_frame(self, frame):
 		if self.__n_robos != world.number_of_robots:
-			self.__posicaoIdentificador = [(None,i) for i in range(world.number_of_robots)]
+			self.__posicaoIdentificador = [(None,None) for i in range(world.number_of_robots)]
 			self.__n_robos = world.number_of_robots
 
 		# Corta o campo

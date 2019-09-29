@@ -275,6 +275,9 @@ class parametrosVisao(gui.frameRenderer.frameRenderer):
 	def update_stability_param(self, widget):
 		self.parent.atualizarParametroEstabilidade(widget.get_value())
 	
+	def use_current_identifier(self, widget):
+		self.parent.usarIdentificadorAtual()
+	
 	def create_ui_content(self):
 		builder = Gtk.Builder.new_from_file(resource_filename(__name__, "parametrosVisao.ui"))
 		builder.get_object("adj_area_cont_rect").set_value(self.parent.areaRatio)
@@ -283,6 +286,7 @@ class parametrosVisao(gui.frameRenderer.frameRenderer):
 		builder.get_object("adj_min_area_internal_contour").connect("value-changed", self.update_min_internal_area_contour)
 		builder.get_object("adj_stability_param").set_value(self.parent.stabilityParam)
 		builder.get_object("adj_stability_param").connect("value-changed", self.update_stability_param)
+		builder.get_object("stability_usecurrent").connect("clicked", self.use_current_identifier)
 		
 		return builder.get_object("main")
 
