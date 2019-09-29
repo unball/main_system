@@ -75,7 +75,7 @@ class gameCommands(metaclass=gui.singleton.Singleton):
 			#pub.publish("G")
 			#rate.sleep()
 			
-	def mudarTexto(self):
+	def playPause(self):
 		estadoLabel = gui.mainWindow.MainWindow().getObject("gameCommands_estado")
 		playPouseButton = gui.mainWindow.MainWindow().getObject("gameCommands_playpause")
 		if estadoLabel.get_text() == "O jogo está rodando":
@@ -84,6 +84,7 @@ class gameCommands(metaclass=gui.singleton.Singleton):
 			playPouseButton.set_label("Play")
 			playPouseButton.modify_bg(Gtk.StateFlags.NORMAL, Gdk.color_parse("green"))
 			#pub.publish("P")
+			world.stopGame()
 			#rate.sleep()
 		else:
 			estadoLabel.set_text("O jogo está rodando")
@@ -91,5 +92,6 @@ class gameCommands(metaclass=gui.singleton.Singleton):
 			playPouseButton.set_label("Pause")
 			playPouseButton.modify_bg(Gtk.StateFlags.NORMAL, Gdk.color_parse("red"))
 			#pub.publish("G")
+			world.startGame()
 			#rate.sleep()
 

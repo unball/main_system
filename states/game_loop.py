@@ -28,7 +28,10 @@ class GameLoop(State):
         print(velocities[0])
 
 
-        self.thread.radioComm.send(velocities)
+        if world.gameRunning is True:
+            self.thread.radioComm.send(velocities)
+        else:
+            self.thread.radioComm.send([[[0],[0],[0]] for i in range(3)])
         #print(time.time()-t0)
 
 #    def next_state(self):

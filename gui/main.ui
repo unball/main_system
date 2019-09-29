@@ -478,7 +478,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <signal name="clicked" handler="gameCommands_mudarTexto" swapped="no"/>
+                    <signal name="clicked" handler="gameCommands_playPause" swapped="no"/>
                     <style>
                       <class name="playButton"/>
                     </style>

@@ -45,8 +45,8 @@ class Signals:
     def gameCommands_IniciodeJogo(self, widget):
         interfaces.gamecommands.gameCommands().IniciodeJogo()
     
-    def gameCommands_mudarTexto(self, widget):
-        interfaces.gamecommands.gameCommands().mudarTexto()
+    def gameCommands_playPause(self, widget):
+        interfaces.gamecommands.gameCommands().playPause()
     
     def gameCommands_ally(self, widget):
         interfaces.gamecommands.gameCommands().ally()

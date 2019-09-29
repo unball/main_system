@@ -25,6 +25,7 @@ class World(object):
         self.setSetting(setting)
         self._ball = Ball()
         self.__mainPoint = (0,0)
+        self.__gameRunning = False
         print("World initiated successfully.")
         print("Number of robots: {}".format(self._number_of_robots))
     
@@ -54,6 +55,16 @@ class World(object):
     @property
     def manualMode(self):
         return self._manualMode
+
+    @property
+    def gameRunning(self):
+        return self.__gameRunning
+
+    def startGame(self):
+        self.__gameRunning = True
+
+    def stopGame(self):
+        self.__gameRunning = False
 
     def update(self, vision_message):
         """Follow the 'update' methods from the element's classes."""
