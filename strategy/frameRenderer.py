@@ -19,7 +19,7 @@ def draw_rectangle(frame, position, size, angle, color=(0,255,0)):
     cv2.drawContours(frame,[box],0,color,2)
     cv2.circle(frame, (int(position[0]+size[0]/2*math.cos(-angle)), int(position[1]+size[0]/2*math.sin(-angle))), 3, (255,255,255), -1)
 
-def strategyFrame(frameShape):
+def strategyFrame(frameShape, step=0.01):
     height, width = frameShape
     frame = np.zeros((height,width,3), np.uint8)
     
@@ -38,7 +38,7 @@ def strategyFrame(frameShape):
             if robot.entity is not None:
                 cv2.putText(frame, str(robot.entity)[0], (int(position[0])-7, int(position[1])+5), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (255,255,255))
             
-            robot.discretize(0.01)
+            robot.discretize(step)
             if len(robot.trajectory) > 0:
                 cv2.polylines(frame,[np.array([meters2pixel(x, (height,width)) for x in robot.trajectory[0]])],False,(255,255,255),1)
     
@@ -68,7 +68,7 @@ class parametrosEstrategia(gui.frameRenderer.frameRenderer):
         self.parent.setDynamicPossession(value)
 
     def transformFrame(self, frame, originalFrame):
-        return strategyFrame(self.frameShape)
+        return strategyFrame(self.frameShape, step=self.parent.step)
     
     def reset_radius(self, widget, spinButton):
          spinButton.set_value(0.053)
@@ -99,13 +99,13 @@ class gerenciadorEntidades(gui.frameRenderer.frameRenderer):
 
     def __init__(self, vision):
         super().__init__(vision, "fr_strategy_notebook")
-        self.frameShape = (520,640)
+        self.frameShape = (350,471)
 
     def create_ui_label(self):
         return Gtk.Label("Gerenciador de entidades")
 
     def transformFrame(self, frame, originalFrame):
-        return strategyFrame(self.frameShape)
+        return strategyFrame(self.frameShape, step=self.parent.step)
     
     def create_ui_content(self):
         builder = Gtk.Builder.new_from_file(resource_filename(__name__, "gerenciadorEntidades.ui"))

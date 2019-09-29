@@ -1,5 +1,6 @@
 from gi.repository import Gtk, Gdk
 import gui.frameRenderer
+import gui.mainWindow
 
 from statics.static_classes import world
 from vision.pixel2metric import meters2pixel, pixel2meters
@@ -63,7 +64,7 @@ class elementsPositioner(gui.frameRenderer.frameRenderer):
                 if robot.entity is not None:
                     cv2.putText(frame, str(robot.entity)[0], (int(position[0])-7, int(position[1])+5), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, (255,255,255))
                 
-                robot.discretize(0.01)
+                robot.discretize(gui.mainWindow.MainWindow().gameThread.strategySystem.step)
                 if len(robot.trajectory) > 0:
                     #print(np.array([meters2pixel(x, (height,width)) for x in robot.trajectory[0]]))
                     cv2.polylines(frame,[np.array([meters2pixel(x, (height,width)) for x in robot.trajectory[0]])],False,(255,255,255),1)
