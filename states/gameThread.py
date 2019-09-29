@@ -22,7 +22,7 @@ class GameThread():
     
     def __init__(self):
         # Private
-        self._state = states.config_world.ConfigWorld(self)
+        self._state = states.config_world.GameLoop(self)
         self._events = queue.Queue()
         
         # World frame renderers
