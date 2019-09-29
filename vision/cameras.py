@@ -20,11 +20,10 @@ class uiCamerasList(metaclass=gui.singleton.Singleton):
         # Load configuration file
         self.__camera_index = statics.configFile.getValue("camera", 0)
         self.__frame_scale = statics.configFile.getValue("frame_scale", 1)
-        
         self.__use_test_frame = statics.configFile.getValue("use_test_frame", True)
         
         if self.__frame_scale <= 0: self.set_camera_scale(1)
-        
+
         self.__cap = cv2.VideoCapture(self.__camera_index)
         
         self.ui_config()
@@ -36,14 +35,14 @@ class uiCamerasList(metaclass=gui.singleton.Singleton):
         
     
     def getCameras(self):
-        return set(enumerate(sorted([c for c in listdir("/sys/class/video4linux/")])))
+        return set([c for c in listdir("/sys/class/video4linux/")])
 
     def updateCameras(self, widget_list):
-        for camera in sorted([c for c in self.getCameras().difference(self.__cameras)]):
+        for camera in self.getCameras().difference(self.__cameras):
             self.__cameras.add(camera)
             row = Gtk.ListBoxRow()
-            row.index = camera[0]
-            row.add(Gtk.Label(camera[1]))
+            row.index = int(camera.split("video")[1])
+            row.add(Gtk.Label(camera))
             row.set_size_request(150,30)
             widget_list.insert(row,-1)
             widget_list.show_all()
