@@ -9,6 +9,9 @@ import cv2
 import numpy as np
 import math
 
+from pkg_resources import resource_filename
+
+
 def draw_rectangle(frame, position, size, angle, color=(0,255,0)):
     rect = (position, size, -angle*180/np.pi)
     box = cv2.boxPoints(rect)
@@ -69,7 +72,7 @@ class parametrosEstrategia(gui.frameRenderer.frameRenderer):
 
 
     def create_ui_content(self):
-        builder = Gtk.Builder.new_from_file("strategy/parametrosEstrategia.ui")
+        builder = Gtk.Builder.new_from_file(resource_filename(__name__, "parametrosEstrategia.ui"))
         spinButton = builder.get_object("min_dubins_radius_spin")
         spinButton.connect("value-changed", self.update_turning_radius)
         spinButton.set_value(self.parent.decider.turning_radius)
@@ -92,7 +95,7 @@ class gerenciadorEntidades(gui.frameRenderer.frameRenderer):
         return strategyFrame(self.frameShape)
     
     def create_ui_content(self):
-        builder = Gtk.Builder.new_from_file("strategy/gerenciadorEntidades.ui")
+        builder = Gtk.Builder.new_from_file(resource_filename(__name__, "gerenciadorEntidades.ui"))
         
         return builder.get_object("main")
 

@@ -10,6 +10,9 @@ import gui.frameRenderer
 from gui.guiMethod import guiMethod
 from abc import ABC, abstractmethod
 
+from pkg_resources import resource_filename
+
+
 class clickedPoints(ABC):
 	def __init__(self, configFileVariableName, maxSize):
 		self._points = statics.configFile.getValue(configFileVariableName, [])
@@ -165,7 +168,7 @@ class cortarCampo(gui.frameRenderer.frameRenderer):
 		return Gtk.Label("Cortar Campo")
 	
 	def create_ui_content(self):
-		builder = Gtk.Builder.new_from_file("vision/mainVision/cortarCampo.ui")
+		builder = Gtk.Builder.new_from_file(resource_filename(__name__, "cortarCampo.ui"))
 		builder.get_object("campo_switch").connect("state-set", self.set_show_mode)
 		builder.get_object("homografia_switch").connect("state-set", self.set_crop_mode)
 		builder.get_object("homografia_switch").set_state(self.parent.use_homography)
@@ -193,7 +196,7 @@ class segmentarPreto(gui.frameRenderer.frameRenderer):
 		return Gtk.Label("Segmentar Preto")
 	
 	def create_ui_content(self):
-		builder = Gtk.Builder.new_from_file("vision/mainVision/segmentarPreto.ui")
+		builder = Gtk.Builder.new_from_file(resource_filename(__name__, "segmentarPreto.ui"))
 		for index,name in enumerate(self.__ui_elements):
 			element = builder.get_object(name)
 			element.set_value(self.parent.preto_hsv[index])
@@ -218,7 +221,7 @@ class segmentarTime(gui.frameRenderer.frameRenderer):
 		return Gtk.Label("Segmentar Time")
 	
 	def create_ui_content(self):
-		builder = Gtk.Builder.new_from_file("vision/mainVision/segmentarTime.ui")
+		builder = Gtk.Builder.new_from_file(resource_filename(__name__, "segmentarTime.ui"))
 		for index,name in enumerate(self.__ui_elements):
 			element = builder.get_object(name)
 			element.set_value(self.parent.time_hsv[index])
@@ -243,7 +246,7 @@ class segmentarBola(gui.frameRenderer.frameRenderer):
 		return Gtk.Label("Segmentar Bola")
 		
 	def create_ui_content(self):
-		builder = Gtk.Builder.new_from_file("vision/mainVision/segmentarBola.ui")
+		builder = Gtk.Builder.new_from_file(resource_filename(__name__, "segmentarBola.ui"))
 		for index,name in enumerate(self.__ui_elements):
 			element = builder.get_object(name)
 			element.set_value(self.parent.bola_hsv[index])
@@ -273,7 +276,7 @@ class parametrosVisao(gui.frameRenderer.frameRenderer):
 		self.parent.atualizarParametroEstabilidade(widget.get_value())
 	
 	def create_ui_content(self):
-		builder = Gtk.Builder.new_from_file("vision/mainVision/parametrosVisao.ui")
+		builder = Gtk.Builder.new_from_file(resource_filename(__name__, "parametrosVisao.ui"))
 		builder.get_object("adj_area_cont_rect").set_value(self.parent.areaRatio)
 		builder.get_object("adj_area_cont_rect").connect("value-changed", self.update_area_ratio)
 		builder.get_object("adj_min_area_internal_contour").set_value(self.parent.minInternalAreaContour)
@@ -311,7 +314,7 @@ class identificarRobos(gui.frameRenderer.frameRenderer):
 				flowBoxChild = Gtk.FlowBoxChild()
 				Gtk.StyleContext.add_class(flowBoxChild.get_style_context(), "roboRow")
 				
-				builder = Gtk.Builder.new_from_file("vision/mainVision/robo.ui")
+				builder = Gtk.Builder.new_from_file(resource_filename(__name__, "robo.ui"))
 				idLabel = builder.get_object("idLabel")
 				posicaoLabel = builder.get_object("posicaoLabel")
 				estadoLabel = builder.get_object("estadoLabel")
@@ -350,7 +353,7 @@ class identificarRobos(gui.frameRenderer.frameRenderer):
 		return Gtk.Label("Visão em alto nível")
 	
 	def create_ui_content(self):
-		builder = Gtk.Builder.new_from_file("vision/mainVision/identificarRobos.ui")
+		builder = Gtk.Builder.new_from_file(resource_filename(__name__, "identificarRobos.ui"))
 		self.__timeFlow = builder.get_object("time_flow")
 		self.__timeAdversarioFlow = builder.get_object("time_adversario_flow")
 		self.__bolaEstado = builder.get_object("bola_estado")

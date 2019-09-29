@@ -8,13 +8,14 @@ import cv2
 import time
 import gui.mainWindow
 from gui.guiMethod import guiMethod
+from pkg_resources import resource_filename
 
 class uiCamerasList(metaclass=gui.singleton.Singleton):
     def __init__(self):
         self.__cameras = set()
         self.__camera_changed = False
         self.__cap = None
-        self.__frame = cv2.imread("gui/frame.png")
+        self.__frame = cv2.imread(resource_filename(__name__, "../gui/frame.png"))
         
         # Load configuration file
         self.__camera_index = statics.configFile.getValue("camera", 0)

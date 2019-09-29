@@ -9,6 +9,8 @@ import cv2
 import numpy as np
 import math
 
+from pkg_resources import resource_filename
+
 class elementsPositioner(gui.frameRenderer.frameRenderer):
 
     def __init__(self, vision):
@@ -129,7 +131,7 @@ class elementsPositioner(gui.frameRenderer.frameRenderer):
         world.setManualMode(value)
     
     def create_ui_content(self):
-        builder = Gtk.Builder.new_from_file("statics/world/elementPositioner.ui")
+        builder = Gtk.Builder.new_from_file(resource_filename(__name__, "elementPositioner.ui"))
         
         builder.get_object("manual_mode").connect("state-set", self.setManualMode)
         builder.get_object("adicionar_aliado").connect("toggled", self.setSelector, "Robot")

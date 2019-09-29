@@ -8,6 +8,7 @@ import states.gameThread
 import roshandler.roshandler as rh
 from gui.guiMethod import guiMethod
 import time
+from pkg_resources import resource_filename
 
 class MainWindow(metaclass=gui.singleton.Singleton):
 
@@ -21,7 +22,7 @@ class MainWindow(metaclass=gui.singleton.Singleton):
 	def loadBuilder(self):
 		if self._builder is None:
 			self._builder = Gtk.Builder()
-			self._builder.add_from_file("gui/main.ui")
+			self._builder.add_from_file(resource_filename(__name__, "main.ui"))
 	
 	def getObject(self, name):
 		self.loadBuilder()
@@ -65,7 +66,7 @@ class MainWindow(metaclass=gui.singleton.Singleton):
 		
 		# Load CSS
 		css_provider = Gtk.CssProvider()
-		css_provider.load_from_path("gui/style.css")
+		css_provider.load_from_path(resource_filename(__name__, "style.css"))
 		Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), css_provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 		
 		# Connect signals
