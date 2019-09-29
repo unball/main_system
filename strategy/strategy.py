@@ -20,7 +20,7 @@ class Strategy(object):
         self.decider = MovimentsDecider()
         self.targets = []
         self.spin = [0,0,0]
-        self.step = 0.005
+        self.step = statics.configFile.getValue("strategy_step", 0.005)
         
         self._frameRenderers = {
             "parametrosEstrategia": strategy.frameRenderer.parametrosEstrategia(self),
@@ -52,6 +52,10 @@ class Strategy(object):
     def setTurningRadius(self, radius):
         self.decider.turning_radius = radius
         statics.configFile.setValue("Turn_Radius", radius)
+            
+    def setStep(self, step):
+        self.step = step
+        statics.configFile.setValue("strategy_step", step)
             
     def setDynamicPossession(self, value):
         self.decider.dynamicPossession = value
