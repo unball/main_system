@@ -304,7 +304,7 @@ class MainVision(vision.vision.Vision):
 	
 	def identificarBola(self, frameToDraw, mask):
 		bolaContours,_ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-		bolaContours = [countor for countor in bolaContours if cv2.contourArea(countor) > 10]
+		bolaContours = [countor for countor in bolaContours if cv2.contourArea(countor) >= self.__min_internal_area_contour]
 
 		if len(bolaContours) != 0:
 			bolaContour = max(bolaContours, key=cv2.contourArea)
