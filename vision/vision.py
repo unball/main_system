@@ -38,13 +38,14 @@ class Vision(ABC):
             [r[1][0] for r in robosAliados],
             [r[1][1] for r in robosAliados],
             [r[2]/180*np.pi for r in robosAliados],
-            bola[0][0] if bola is not None else 0, 
-            bola[0][1] if bola is not None else 0,
+            bola[0][0] if bola is not None else world.ball.pos[0], 
+            bola[0][1] if bola is not None else world.ball.pos[1],
             [r[3] for r in robosAliados]
         ))
         
         converted_image = cv2.cvtColor(processed_image, cv2.COLOR_RGB2BGR)
-        gui.mainWindow.MainWindow().ui_frame("gameLoop").do_update_frame(converted_image)
+        strategy_frame = strategy.frameRenderer.strategyFrame((350,471), step=gui.mainWindow.MainWindow().gameThread.strategySystem.step)
+        gui.mainWindow.MainWindow().ui_frame("gameLoop").do_update_frame(strategy_frame)
     
     @abstractmethod
     def ui_init(self):
