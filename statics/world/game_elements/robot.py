@@ -16,7 +16,9 @@ class Robot(Element):
 
     def nextStep(self):
         if len(self.__trajectory) != 0 and len(self.__trajectory[0]) >= 1:
-            return self.__trajectory[0][1]
+            pose = self.__trajectory[0][1]
+            angle = pose[2] - 2*np.pi if pose[2] > np.pi else pose[2]
+            return (pose[0], pose[1], angle)
         # !TODO: Decidir o que fazer quando não há uma trajetória
         else: return (0,0,0)
 
