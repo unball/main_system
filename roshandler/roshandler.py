@@ -21,7 +21,7 @@ class Process():
         
         # Se o processo terminou tenta abrir novamente
         while self.__process.poll() is not None:
-            print("\"" + command + "\" não está rodando, tentando abrir em 5 segundos...")
+            print("\"" + self.__command + "\" não está rodando, tentando abrir em 5 segundos...")
             self.__process = subprocess.Popen(command.split(" "))
             time.sleep(5)
     
