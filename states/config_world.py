@@ -28,10 +28,6 @@ class ConfigWorld(State):
 #        ))
         #time.sleep(0.03)
         
-        
-        if world.manualMode == False:
-            world.calc_velocities(0.03)
-        
         self.thread.strategySystem.plan()
         
         fr = gui.mainWindow.MainWindow().selectedFrameRenderer("fr_world_notebook")
