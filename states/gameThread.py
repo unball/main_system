@@ -16,7 +16,6 @@ from vision.mainVision.mainVision import MainVision
 from strategy.strategy import Strategy
 from controllers.ssRegulator import ssRegulator
 from communication.radio_comm import RadioCommunicator
-import statics.world.frameRenderer
 import signal
 import roshandler.roshandler as rh
 
@@ -26,11 +25,6 @@ class GameThread():
         # Private
         self._state = initialState(self)
         self._events = queue.Queue()
-        
-        # World frame renderers
-        self._frameRenderers = {
-            "elementsPositioner": statics.world.frameRenderer.elementsPositioner(self)
-        }
         
         self._visionSystem = MainVision(self)
         self._strategySystem = Strategy(self)

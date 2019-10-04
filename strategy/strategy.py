@@ -26,7 +26,8 @@ class Strategy(System, object):
         
         self._frameRenderers = {
             "parametrosEstrategia": strategy.frameRenderer.parametrosEstrategia(self),
-            "gerenciadorEntidades": strategy.frameRenderer.gerenciadorEntidades(self)
+            "gerenciadorEntidades": strategy.frameRenderer.gerenciadorEntidades(self),
+            "elementsPositioner": strategy.frameRenderer.elementsPositioner(self)
         }
 
     def plan(self):

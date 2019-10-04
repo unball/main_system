@@ -5,6 +5,7 @@ import cv2
 class frameRenderer(ABC):
 	def __init__(self, parent, notebook_name):
 		self._parent = parent
+		self._notebook_name = notebook_name
 		gui.mainWindow.MainWindow().add_frame_renderer(self, notebook_name)
 
 	@abstractmethod
@@ -22,6 +23,9 @@ class frameRenderer(ABC):
 	@property
 	def parent(self):
 		return self._parent
+
+	def isFrameRendererSelected(self):
+		return gui.mainWindow.MainWindow().selectedFrameRenderer(self._notebook_name) == self
 
 class Identity(frameRenderer):
 
