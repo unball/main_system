@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+import gi
+gi.require_version('Gtk', '3.0')
+
 from statics import static_classes
 from strategy.movimentsDecider import Attacker
 from strategy.movimentsDecider import MovimentsDecider
@@ -10,8 +13,7 @@ import roshandler.roshandler as rh
 import signal
 import states.game_loop
 
-import gi
-gi.require_version('Gtk', '3.0')
+
 
 import gui.mainWindow
 import cv2
