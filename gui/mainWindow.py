@@ -17,6 +17,7 @@ class MainWindow(metaclass=gui.singleton.Singleton):
 		self._frameRenderers = {}
 		self._ui_frame = None
 		self._gameThread = None
+		self.uiLogger = None
 
 	def loadBuilder(self):
 		if self._builder is None:
@@ -57,7 +58,10 @@ class MainWindow(metaclass=gui.singleton.Singleton):
 		return self._gameThread
 		
 	def logErrorMessage(self, message):
-		self.uiLogger.logErrorMessage(message)
+		if self.uiLogger is not None:
+			self.uiLogger.logErrorMessage(message)
+		else:
+			print(message)
 	
 	def run(self):
 		# Load static UI

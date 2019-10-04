@@ -104,7 +104,12 @@ class GameThread():
             loop_time = time.time()
             
             self.runQueuedEvents()
-            self._state.update()
+            
+            try:
+                self._state.update()
+            except Exception as e:
+                gui.mainWindow.MainWindow().logErrorMessage(traceback.format_exc())
+                time.sleep(0.03)
                 
             if self._state.QuitRequested:
                 rh.RosHandler().terminateAll()
