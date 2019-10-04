@@ -17,12 +17,14 @@ from strategy.strategy import Strategy
 from controllers.ssRegulator import ssRegulator
 from communication.radio_comm import RadioCommunicator
 import statics.world.frameRenderer
+import signal
+import roshandler.roshandler as rh
 
 class GameThread():
     
-    def __init__(self):
+    def __init__(self, initialState=states.game_loop.UiGameLoop):
         # Private
-        self._state = states.config_world.GameLoop(self)
+        self._state = initialState(self)
         self._events = queue.Queue()
         
         # World frame renderers
@@ -38,6 +40,8 @@ class GameThread():
         
         self._loop_time = 0
         self._processing_time = 0
+
+        signal.signal(signal.SIGINT, self.exit)
         
     def compute_average(self, v0, v, p=0.1):
         return v0*(1-p) + v*p
@@ -52,7 +56,7 @@ class GameThread():
         if stateName == "mainMenu":
             self._state.request_state_change(states.config_vision.ConfigVision(self))
         elif stateName == "gameLoop":
-            self._state.request_state_change(states.game_loop.GameLoop(self))
+            self._state.request_state_change(states.game_loop.UiGameLoop(self))
         elif stateName == "configStrategy":
             self._state.request_state_change(states.config_strategy.ConfigStrategy(self))
         elif stateName == "configWorld":
@@ -80,9 +84,15 @@ class GameThread():
         self._state.request_quit()
         self.thread.join()
     
+    def exit(self, signum, frame):
+        self._state.request_quit()
+    
     def run(self):
         self.thread = Thread(target=self.__loop__)
         self.thread.start()
+
+    def runBlocking(self):
+        self.__loop__()
         
     def addEvent(self, method, *args):
         self._events.put({"method": method, "args": args})
@@ -100,14 +110,10 @@ class GameThread():
             loop_time = time.time()
             
             self.runQueuedEvents()
-            
-            try:
-                self._state.update()
-            except Exception as e:
-                gui.mainWindow.MainWindow().logErrorMessage(traceback.format_exc())
-                time.sleep(0.03)
+            self._state.update()
                 
             if self._state.QuitRequested:
+                rh.RosHandler().terminateAll()
                 break
             if self._state.StateChangeRequested:
                 self._state = self._state.next_state()

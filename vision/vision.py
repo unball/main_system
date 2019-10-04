@@ -5,7 +5,6 @@ import time
 import gui.mainWindow
 import cv2
 import numpy as np
-import strategy.frameRenderer
 from states.system import System
 
 class VisionMessage():
@@ -47,8 +46,7 @@ class Vision(System, ABC):
         ))
         
         converted_image = cv2.cvtColor(processed_image, cv2.COLOR_RGB2BGR)
-        strategy_frame = strategy.frameRenderer.strategyFrame((350,471), step=gui.mainWindow.MainWindow().gameThread.strategySystem.step)
-        gui.mainWindow.MainWindow().ui_frame("gameLoop").do_update_frame(strategy_frame)
+        return converted_image
     
     @abstractmethod
     def ui_init(self):

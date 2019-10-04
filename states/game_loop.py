@@ -10,6 +10,18 @@ from vision.mainVision.mainVision import MainVision
 import time
 from statics.static_classes import world
 import numpy as np
+import strategy.frameRenderer
+import gui.mainWindow
+
+class UiGameLoop(State):
+    def __init__(self, thread):
+        super().__init__(thread)
+        self.__gameLoop = GameLoop(thread)
+
+    def update(self):
+        self.__gameLoop.update()
+        strategy_frame = strategy.frameRenderer.strategyFrame((350,471), step=self.thread.strategySystem.step)
+        gui.mainWindow.MainWindow().ui_frame("gameLoop").do_update_frame(strategy_frame)
 
 class GameLoop(State):
     def __init__(self, thread):
