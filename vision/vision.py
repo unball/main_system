@@ -5,6 +5,8 @@ import time
 import gui.mainWindow
 import cv2
 import numpy as np
+import strategy.frameRenderer
+from states.system import System
 
 class VisionMessage():
     def __init__(self, x_list, y_list, th_list, ball_x, ball_y, found_list):
@@ -15,8 +17,9 @@ class VisionMessage():
         self.ball_y = ball_y
         self.found = found_list
 
-class Vision(ABC):
-    def __init__(self):
+class Vision(System, ABC):
+    def __init__(self, parent):
+        System.__init__(self, parent)
         self.config_init()
         self.ui_init()
     

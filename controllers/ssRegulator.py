@@ -2,6 +2,8 @@
 """Control system module."""
 import numpy as np
 import control
+import gui.mainWindow
+from states.system import System
 
 ref_lin_vel = 1
 ref_ang_vel = 1
@@ -14,11 +16,12 @@ class SpeedPair():
     def __str__(self):
         return "{" + "v: {0}, w: {1}".format(self.v, self.w) + "}" 
 
-class ssRegulator():
+class ssRegulator(System):
     """Class docstring."""
 
-    def __init__(self):
+    def __init__(self, parent):
         """Init method."""
+        System.__init__(self, parent)
         self.output_vel = [[[], []],
                            [[], []],
                            [[], []]]

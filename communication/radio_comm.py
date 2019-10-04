@@ -8,8 +8,8 @@ import statics.configFile
 import rospy
 
 class RadioCommunicator(ROSCommunicator):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent):
+        ROSCommunicator.__init__(self, parent)
         
         self.rh = rh.RosHandler()
         self.rh.runProcess("roscore") # Asserts roscore is running

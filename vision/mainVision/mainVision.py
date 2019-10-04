@@ -19,7 +19,7 @@ class Robo():
 		self.ui = None
 
 class MainVision(vision.vision.Vision):
-	def __init__(self):
+	def __init__(self, parent):
 		self.__posicaoIdentificador = [(None,None) for i in range(world.number_of_robots)]
 		self.__n_robos = 2*world.number_of_robots
 		self.__angles = np.array([0, 90, 180, -90, -180])
@@ -29,7 +29,7 @@ class MainVision(vision.vision.Vision):
 		self.__default_bola_hsv = [0, 117, 0, 98, 360, 360]
 		self.__current_frame_shape = None
 		self.__stability_use_current = False
-		super().__init__()
+		super().__init__(parent)
 
 	def config_init(self):
 		self.__preto_hsv = np.array(statics.configFile.getValue("preto_hsv_interval", self.__default_preto_hsv))

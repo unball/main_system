@@ -30,10 +30,10 @@ class GameThread():
             "elementsPositioner": statics.world.frameRenderer.elementsPositioner(self)
         }
         
-        self._visionSystem = MainVision()
-        self._strategySystem = Strategy()
-        self._controlSystem = ssRegulator()
-        self._radioComm = RadioCommunicator()
+        self._visionSystem = MainVision(self)
+        self._strategySystem = Strategy(self)
+        self._controlSystem = ssRegulator(self)
+        self._radioComm = RadioCommunicator(self)
         
         
         self._loop_time = 0

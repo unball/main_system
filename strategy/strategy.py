@@ -5,15 +5,17 @@ from statics.static_classes import world
 
 import strategy.frameRenderer
 import statics
+from states.system import System
 def error():
     """Print the standard error message for STRATEGY scope."""
     print("\nSTRATEGY ERROR:")
 
 
-class Strategy(object):
+class Strategy(System, object):
     """Class docstring."""
 
-    def __init__(self):
+    def __init__(self, parent):
+        System.__init__(self, parent)
         """Init method."""
         self.coach = None
         self.tactic = None
