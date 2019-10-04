@@ -36,7 +36,7 @@ class GameLoop(State):
         angle = np.arctan2(world.ball.pos[1]-world.robots[0].pos[1], world.ball.pos[0]-world.robots[0].pos[0])
         targets = [(world.ball.x,world.ball.y,angle),(0,0,0),(0,0,0)]
         velocities = self.thread.controlSystem.actuate(targets, static_classes.world)
-        print(velocities[0])
+        #print(velocities[0])
 
 
         if world.gameRunning is True:

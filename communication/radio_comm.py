@@ -31,7 +31,7 @@ class RadioCommunicator(ROSCommunicator):
     def send(self, msg):
         self.rh.runProcess("roscore") # Asserts roscore is running
         self.rh.runProcess("radioSerial") # Asserts radio is listening
-        print(self.lowCtrlParams)
+        #print(self.lowCtrlParams)
         for i in range(3):
             self.msg.MotorA[i], self.msg.MotorB[i] = speeds2motors(msg[i].v, msg[i].w)
             self.msg.Kp[i]   = self.lowCtrlParams[i][0]
