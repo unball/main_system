@@ -19,8 +19,6 @@ class GameLoop(State):
         # Vision System
         t0 = time.time()
         self.thread.visionSystem.update()
-        #TODO: calcular o tempo de loop pra derivacao das posicoes
-        world.calc_velocities(0.03) # <----- ERRADO
         self.thread.strategySystem.plan()
         targets, spin = self.thread.strategySystem.get_targets()
         angle = np.arctan2(world.ball.pos[1]-world.robots[0].pos[1], world.ball.pos[0]-world.robots[0].pos[0])

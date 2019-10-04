@@ -3,6 +3,7 @@
 from statics.world.game_elements.ball import Ball
 from statics.world.game_elements.robot import Robot
 from statics import field
+import time
 
 MAGIC_NUMBER = 3
 dummy_robot = [{"pos": {"x": -.5, "y": 0}, "th": 0,
@@ -26,6 +27,7 @@ class World(object):
         self._ball = Ball()
         self.__mainPoint = (0,0)
         self.__gameRunning = False
+        self.__referenceTime = 0
         print("World initiated successfully.")
         print("Number of robots: {}".format(self._number_of_robots))
     
@@ -75,6 +77,10 @@ class World(object):
                                        vision_message.y[i],
                                        vision_message.th[i])
         self._ball.update(vision_message.ball_x, vision_message.ball_y)
+
+        dt = time.time()-self.__referenceTime
+        self.calc_velocities(dt)
+        self.__referenceTime = time.time()
 
     def dummy_update(self):
         """Temporary method with a false message from vision.For tests only."""
