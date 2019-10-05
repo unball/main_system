@@ -1,5 +1,4 @@
 *.pyc
 *.vscode
 config.json
-gui/main.ui~
-
+*.ui~
