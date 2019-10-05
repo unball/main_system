@@ -36,6 +36,7 @@ class gameCommands(metaclass=gui.singleton.Singleton):
 			print("Goal")
 			self.goalAlly += 1
 			world.increaseGameScore()
+			world.stopGame()
 			placarLabel.set_text("Placar\nUnBall " + str(self.goalAlly) + " x " + str(self.goalEnemy) + " " + self.oponente)
 			estadoLabel.set_text("O jogo está pausado")
 			estadoLabel.modify_fg(Gtk.StateFlags.NORMAL, Gdk.color_parse("red"))
@@ -53,6 +54,7 @@ class gameCommands(metaclass=gui.singleton.Singleton):
 			print("E Goal")
 			self.goalEnemy += 1
 			world.decreaseGameScore()
+			world.stopGame()
 			placarLabel.set_text("Placar\nUnBall " + str(self.goalAlly) + " x " + str(self.goalEnemy) + " " + self.oponente)
 			estadoLabel.set_text("O jogo está pausado")
 			estadoLabel.modify_fg(Gtk.StateFlags.NORMAL, Gdk.color_parse("red"))
