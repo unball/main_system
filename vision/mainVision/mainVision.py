@@ -322,6 +322,9 @@ class MainVision(vision.vision.Vision):
 
 		# Corta o campo
 		img_warpped = self.warp(frame)
+
+		# Frame zerado a ser renderizado
+		processed_image = np.zeros(img_warpped.shape, np.uint8)
 		
 		# Formata como HSV
 		img_hsv = self.converterHSV(img_warpped)
@@ -334,12 +337,16 @@ class MainVision(vision.vision.Vision):
 		
 		# Segmenta a bola
 		bolaMask = self.obterMascaraBola(img_hsv)
+
+		# Tenta identificar uma bola
+		bola = self.identificarBola(processed_image, bolaMask)
+		
+		mask = cv2.bitwise_and(mask, cv2.bitwise_not(bolaMask))
 		
 		# Encontra componentes conectados e aplica operações de abertura e dilatação
 		components = self.obterComponentesConectados(mask)
 		
 		# Frame zerado a ser renderizado
-		processed_image = np.zeros(img_warpped.shape, np.uint8)
 		for c in components:
 			processed_image = cv2.add(processed_image, cv2.bitwise_and(img_warpped, img_warpped, mask=c))
 		
@@ -350,22 +357,13 @@ class MainVision(vision.vision.Vision):
 		
 		# Listas com aliados e inimigos e bola
 		robos = [(i,(0,0),0,False,(0,0)) for i in range(2*self.__n_robos)]
-		bola = None
 		advId = self.__n_robos
-		
+	
 		# Itera por cada elemento conectado
 		for componentMask in components:
-			# Máscara com a bola
-			componentBolaMask = componentMask & bolaMask
 			
 			b,_ = cv2.findContours(componentMask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 			cv2.drawContours(processed_image, b, -1, (255,255,255), 1)
-			
-			# Tenta identificar uma bola
-			bola_ = self.identificarBola(processed_image, componentBolaMask)
-			if bola_ is not None:
-				bola = bola_
-				continue
 				
 			# Obtém dados do componente como uma camisa
 			centro, centerMeters, angulo, camisaContour = self.detectarCamisa(processed_image, componentMask)

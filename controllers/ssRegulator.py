@@ -26,6 +26,7 @@ class ssRegulator(System):
                            [[], []],
                            [[], []]]
         self.number_of_robots = 3
+        self.output_vel = [SpeedPair() for i in range(self.number_of_robots)]
 
         self.x_i = list(0 for i in range(self.number_of_robots))
         self.y_i = list(0 for i in range(self.number_of_robots))
@@ -89,12 +90,12 @@ class ssRegulator(System):
                   [0, self.r1]]
 
         # Pole placement regulator closed loop poles
-        self.poles = [[-1.5, -1.5, -1],
+        self.poles = [[-50, -50, -0.01],
                       [-0.5, -0.5, -0.6],
                       [-0.5, -0.5, -0.8]]
 
     def actuate(self, references, world):
-        self.output_vel = [SpeedPair() for i in range(self.number_of_robots)]
+        #self.output_vel = [SpeedPair() for i in range(self.number_of_robots)]
         """Control system actuator itself. Receives references and world info."""
         self.updateIntVariables(references, world)
         self.updateDynamicMatrices()
@@ -135,10 +136,15 @@ class ssRegulator(System):
                 self.state_vector[i] = [self.x_e[i], self.y_e[i], self.th_e[i]]
 
     def controlLaw(self):
+        import time
+        dt = 0
         for i in range(self.number_of_robots):
             # K, S, E = control.lqr(self.A[i], self.B[i], self.Q, self.R)
+            t0 = time.time()
             K = control.place(self.A[i], self.B[i], self.poles[i])
+            dt += time.time()-t0
             velocities = np.dot(-K, self.state_vector[i])
-            self.output_vel[i].v = velocities[0] # + np.sign(velocities[0])*0.5)
+            self.output_vel[i].v = velocities[0] #+ np.sign(velocities[0])*0.5
             self.output_vel[i].w = velocities[1]
             #TODO: saida do controle como uma lista de dicionarios (v e w)
+        #print(dt)

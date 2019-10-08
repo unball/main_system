@@ -43,7 +43,7 @@ class Attacker(Entity):
     def __init__(self):
         super().__init__("Atacante")
     def tatic(self, pose):
-        self.__target = moviments.goToBallPlus(static_classes.world.ball.pos)
+        self.__target = moviments.goToBallPlus(static_classes.world.ball.pos, pose)
         return self.__target
 
 class Goalkeeper(Entity):
@@ -80,14 +80,15 @@ class MovimentsDecider():
         self.delta_ref = 0.1 * world.field_x_length
         self.ball_vmax = 1.5
         self.state = ATT
+        #self.listEntity = [Attacker(), Attacker(), TestPlayer()]
         self.listEntity = [TestPlayer(), TestPlayer(), TestPlayer()]
-        #self.listEntity = [TestPlayer(), TestPlayer(), TestPlayer()]
         self.turning_radius = statics.configFile.getValue("Turn_Radius", 0.053)
         self.dynamicPossession = False
 
     def shortestTragectory(self, startPose, endPose, radius):
         altStartPose = (startPose[0], startPose[1], startPose[2] + np.pi)
         path = dubins.shortest_path(startPose, endPose, radius)
+        return path
         path2 = dubins.shortest_path(altStartPose, endPose, radius)
         if(path.path_length() <= path2.path_length()):
             return path

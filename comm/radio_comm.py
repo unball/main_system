@@ -1,8 +1,8 @@
-from communication.communication import ROSCommunicator
-from main_system.msg import robot_msg
+from comm.communication import ROSCommunicator
+from communication.msg import comm_msg
 from speed_converter import speeds2motors
 import roshandler.roshandler as rh
-import communication.frameRenderer
+import comm.frameRenderer
 import statics.configFile
 
 import rospy
@@ -15,13 +15,13 @@ class RadioCommunicator(ROSCommunicator):
         self.rh.runProcess("roscore") # Asserts roscore is running
 
         rospy.init_node('Radio')
-        self.pub = rospy.Publisher("radio_topic", robot_msg, queue_size=1)
-        self.msg = robot_msg()
+        self.pub = rospy.Publisher("radio_topic", comm_msg, queue_size=1)
+        self.msg = comm_msg()
 
         self.lowCtrlParams = statics.configFile.getValue("lowCtrlParams", [[10, 10, 10, 10, 10, 10] for i in range(3)])
 
         self.fr = {
-            "lowLevelCtrl": communication.frameRenderer.controleBaixoNivel(self)
+            "lowLevelCtrl": comm.frameRenderer.controleBaixoNivel(self)
         }
     
     def setLowCtrlParam(self, robot, index, value):
@@ -34,12 +34,12 @@ class RadioCommunicator(ROSCommunicator):
         #print(self.lowCtrlParams)
         for i in range(3):
             self.msg.MotorA[i], self.msg.MotorB[i] = speeds2motors(msg[i].v, msg[i].w)
-            self.msg.Kp[i]   = self.lowCtrlParams[i][0]
-            self.msg.Kp[i+3] = self.lowCtrlParams[i][3]
-            self.msg.Ki[i]   = self.lowCtrlParams[i][1]
-            self.msg.Ki[i+3] = self.lowCtrlParams[i][4]
-            self.msg.Kd[i]   = self.lowCtrlParams[i][2]
-            self.msg.Kd[i+3] = self.lowCtrlParams[i][5]
+            # self.msg.Kp[i]   = self.lowCtrlParams[i][0]
+            # self.msg.Kp[i+3] = self.lowCtrlParams[i][3]
+            # self.msg.Ki[i]   = self.lowCtrlParams[i][1]
+            # self.msg.Ki[i+3] = self.lowCtrlParams[i][4]
+            # self.msg.Kd[i]   = self.lowCtrlParams[i][2]
+            # self.msg.Kd[i+3] = self.lowCtrlParams[i][5]
 
         self.pub.publish(self.msg)
     

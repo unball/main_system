@@ -5,9 +5,12 @@ from statics.static_classes import world
 
 #TODO: implementar spin
 
-def goToBallPlus(ballPos):
+def goToBallPlus(ballPos, robotPose):
     finalTarget = np.array([.75*world.fieldSide, randint(-1, 1) *.2])
     ballTarget = ballPos- finalTarget  
+    distance = np.linalg.norm(ballPos-robotPose[:2])
+    if distance < 0.035:
+        return (finalTarget[0], finalTarget[1], robotPose[2])
     return (ballPos[0], ballPos[1], np.arctan2(ballTarget[1],ballTarget[0]))
 
 def followBally(rb, rr):
