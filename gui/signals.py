@@ -43,19 +43,19 @@ class Signals:
             gameThread.set_state(stack.get_visible_child_name())
     
     def gameCommands_IniciodeJogo(self, widget):
-        self.addEvent(interfaces.gamecommands.gameCommands().IniciodeJogo)
+        interfaces.gamecommands.gameCommands().IniciodeJogo()
     
     def gameCommands_playPause(self, widget):
-        self.addEvent(interfaces.gamecommands.gameCommands().playPause)
+        interfaces.gamecommands.gameCommands().playPause()
     
     def gameCommands_ally(self, widget):
-        self.addEvent(interfaces.gamecommands.gameCommands().ally)
+        interfaces.gamecommands.gameCommands().ally()
     
     def gameCommands_enemy(self, widget):
-        self.addEvent(interfaces.gamecommands.gameCommands().enemy)
+        interfaces.gamecommands.gameCommands().enemy()
     
     def gameCommands_left(self, widget):
-        self.addEvent(interfaces.gamecommands.gameCommands().left)
+        interfaces.gamecommands.gameCommands().left()
     
     def gameCommands_right(self, widget):
-        self.addEvent(interfaces.gamecommands.gameCommands().right)
+        interfaces.gamecommands.gameCommands().right()
