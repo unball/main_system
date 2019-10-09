@@ -59,13 +59,13 @@ class parametrosEstrategia(gui.frameRenderer.frameRenderer):
         return Gtk.Label("Parâmetros da estratégia")
     
     def update_turning_radius(self, widget):
-        self.parent.setTurningRadius(widget.get_value())
+        self.gameThread.addEvent(self.parent.setTurningRadius, widget.get_value())
     
     def update_spin(self, widget):
-        self.parent.setStep(widget.get_value())
+        self.gameThread.addEvent(self.parent.setStep, widget.get_value())
     
     def set_dynamic_possession(self, widget, value):
-        self.parent.setDynamicPossession(value)
+        self.gameThread.addEvent(self.parent.setDynamicPossession, value)
 
     def transformFrame(self, frame, originalFrame):
         return strategyFrame(self.frameShape, step=self.parent.step)
@@ -78,7 +78,7 @@ class parametrosEstrategia(gui.frameRenderer.frameRenderer):
         
     def strategy_setPosition(self, widget, event):
         if not self.isFrameRendererSelected(): return
-        gui.mainWindow.MainWindow().gameThread.addEvent(world.setMainPoint, (int(event.x), int(event.y)))
+        self.gameThread.addEvent(world.setMainPoint, (int(event.x), int(event.y)))
 
     def create_ui_content(self):
         builder = Gtk.Builder.new_from_file(resource_filename(__name__, "parametrosEstrategia.ui"))

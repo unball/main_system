@@ -106,7 +106,7 @@ class cortarCampo(gui.frameRenderer.frameRenderer):
 		self.__show_warpped = value
 	
 	def set_crop_mode(self, widget, value):
-		self.parent.setUseHomography(value)
+		self.gameThread.addEvent(self.parent.setUseHomography, value)
 	
 	def get_point_pixels(self, index):
 		return self.__points.getPointPixels(index, self.__frame_shape)
@@ -158,11 +158,11 @@ class cortarCampo(gui.frameRenderer.frameRenderer):
 		
 	def cortarCampo_update_points(self, widget, event):
 		if gui.mainWindow.MainWindow().selectedFrameRenderer("fr_notebook") == self:
-			self.update_points([int(event.x/350*self.__frame_shape[0]), int(event.y/471*self.__frame_shape[1])])
+			self.gameThread.addEvent(self.update_points, [int(event.x/350*self.__frame_shape[0]), int(event.y/471*self.__frame_shape[1])])
 	
 	def cortarCampo_mouseOver(self, widget, event):
 		if gui.mainWindow.MainWindow().selectedFrameRenderer("fr_notebook") == self:
-			self.set_pointer_position([int(event.x/350*self.__frame_shape[0]), int(event.y/471*self.__frame_shape[1])])
+			self.gameThread.addEvent(self.set_pointer_position, [int(event.x/350*self.__frame_shape[0]), int(event.y/471*self.__frame_shape[1])])
 
 	def create_ui_label(self):
 		return Gtk.Label("Cortar Campo")
@@ -186,7 +186,7 @@ class segmentarPreto(gui.frameRenderer.frameRenderer):
 		self.__ui_elements = ["fundo_hmin", "fundo_smin", "fundo_vmin", "fundo_hmax", "fundo_smax", "fundo_vmax"]
 		
 	def update_hsv_interval(self, widget, index):
-		self.parent.atualizarPretoHSV(int(widget.get_value()), index)
+		self.gameThread.addEvent(self.parent.atualizarPretoHSV, int(widget.get_value()), index)
 	
 	def transformFrame(self, frame, originalFrame):
 		img_warped = self.parent.warp(frame)
@@ -211,7 +211,7 @@ class segmentarTime(gui.frameRenderer.frameRenderer):
 		self.__ui_elements = ["time_hmin", "time_smin", "time_vmin", "time_hmax", "time_smax", "time_vmax"]
 
 	def update_hsv_interval(self, widget, index):
-		self.parent.atualizarTimeHSV(int(widget.get_value()), index)
+		self.gameThread.addEvent(self.parent.atualizarTimeHSV, int(widget.get_value()), index)
 	
 	def transformFrame(self, frame, originalFrame):
 		img_warped = self.parent.warp(frame)
@@ -236,7 +236,7 @@ class segmentarBola(gui.frameRenderer.frameRenderer):
 		self.__ui_elements = ["bola_hmin", "bola_smin", "bola_vmin", "bola_hmax", "bola_smax", "bola_vmax"]
 	
 	def update_hsv_interval(self, widget, index):
-		self.parent.atualizarBolaHSV(int(widget.get_value()), index)
+		self.gameThread.addEvent(self.parent.atualizarBolaHSV, int(widget.get_value()), index)
 	
 	def transformFrame(self, frame, originalFrame):
 		img_warped = self.parent.warp(frame)
@@ -267,16 +267,16 @@ class parametrosVisao(gui.frameRenderer.frameRenderer):
 		return Gtk.Label("Parâmetros da visão")
 	
 	def update_area_ratio(self, widget):
-		self.parent.atualizarAreaRatio(widget.get_value())
+		self.gameThread.addEvent(self.parent.atualizarAreaRatio, widget.get_value())
 	
 	def update_min_internal_area_contour(self, widget):
-		self.parent.atualizarMinInternalArea(widget.get_value())
+		self.gameThread.addEvent(self.parent.atualizarMinInternalArea, widget.get_value())
 	
 	def update_stability_param(self, widget):
-		self.parent.atualizarParametroEstabilidade(widget.get_value())
+		self.gameThread.addEvent(self.parent.atualizarParametroEstabilidade, widget.get_value())
 	
 	def use_current_identifier(self, widget):
-		self.parent.usarIdentificadorAtual()
+		self.gameThread.addEvent(self.parent.usarIdentificadorAtual)
 	
 	def create_ui_content(self):
 		builder = Gtk.Builder.new_from_file(resource_filename(__name__, "parametrosVisao.ui"))

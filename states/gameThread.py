@@ -97,7 +97,7 @@ class GameThread():
                 event = self._events.get_nowait()
                 event["method"](*event["args"])
             except:
-                pass
+                print("Failed to run queued event")
         
     def __loop__(self):
         while True:

@@ -26,7 +26,7 @@ class controleBaixoNivel(gui.frameRenderer.frameRenderer):
 		return Gtk.Label("Controle de baixo nível")
 
 	def update_lowLevelParams(self, widget, idx):
-		self.parent.setLowCtrlParam(0, idx, widget.get_value())
+		self.gameThread.addEvent(self.parent.setLowCtrlParam, 0, idx, widget.get_value())
 	
 	def create_ui_content(self):
 		builder = Gtk.Builder.new_from_file(resource_filename(__name__, "controleBaixoNivel.ui"))

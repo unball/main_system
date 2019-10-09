@@ -7,3 +7,7 @@ class System():
     @property
     def parent(self):
         return self.__parent
+
+    @property
+    def gameThread(self):
+        return self.__parent

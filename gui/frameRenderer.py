@@ -23,6 +23,12 @@ class frameRenderer(ABC):
 	@property
 	def parent(self):
 		return self._parent
+	
+	@property
+	def gameThread(self):
+		if self._parent is not None:
+			return self._parent.gameThread
+		return None
 
 	def isFrameRendererSelected(self):
 		return gui.mainWindow.MainWindow().selectedFrameRenderer(self._notebook_name) == self
