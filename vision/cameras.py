@@ -48,6 +48,7 @@ class uiCamerasList(metaclass=gui.singleton.Singleton):
             widget_list.show_all()
         
     def setCamera(self, index):
+        gui.mainWindow.MainWindow().getObject("test_frame_switch").set_state(False)
         if self.__camera_index == index: return
         self.__camera_index = index
         self.__camera_changed = True
@@ -60,6 +61,10 @@ class uiCamerasList(metaclass=gui.singleton.Singleton):
     
     def use_test_frame(self, value):
         self.__use_test_frame = value
+        if self.__use_test_frame is True and self.__cap is not None:
+            self.__cap.release()
+        elif self.__use_test_frame is False:
+            self.__camera_changed = True
         statics.configFile.setValue("use_test_frame", value)
     
     def getFrame(self):
