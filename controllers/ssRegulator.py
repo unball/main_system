@@ -16,6 +16,67 @@ class SpeedPair():
     def __str__(self):
         return "{" + "v: {0}, w: {1}".format(self.v, self.w) + "}" 
 
+class nonLinearControl(System):
+    def __init__(self, parent):
+        System.__init__(self, parent)
+
+        self.number_of_robots = 3
+        self.output_vel = [SpeedPair() for i in range(self.number_of_robots)]
+        self.th_e_ant = [0 for i in range(self.number_of_robots)]
+        self.th_e =     [0 for i in range(self.number_of_robots)]
+        self.w_ant =    [0 for i in range(self.number_of_robots)]
+        self.int =    [0 for i in range(self.number_of_robots)]
+        self.w_k1 = 0.997
+        self.w_k2 = 0.07
+
+        self.v_k = 0.25
+        self.v_max = 0.8
+        self.v_offset = 0.35
+
+        self.th_i = [0 for i in range(self.number_of_robots)]
+        self.th_r = [0 for i in range(self.number_of_robots)]
+
+
+    def updateIntVariables(self, references, world):
+        for i in range(self.number_of_robots):
+            self.th_i[i] = world.robots[i].th
+            self.th_r[i] = references[i][2]
+
+    def sat(self, x, amp):
+        return max(min(x, amp), -amp)
+
+
+    def updateError(self):
+            self.th_e_ant = list((self.th_e[i] + (self.output_vel[i].w -self.sat(self.output_vel[i].w, 2*np.pi)) for i in range(self.number_of_robots)))
+            self.w_ant = [ov.w for ov in self.output_vel]
+            
+            self.th_e = list((self.th_r[i] - self.th_i[i]) for i in range(self.number_of_robots))
+            for i in range(self.number_of_robots):
+                if np.linalg.norm(self.th_e[i]) > np.pi:
+                    self.th_e[i] = (self.th_e[i] + np.pi) % (2*np.pi) - np.pi
+
+
+    def actuate(self, references, world):
+        #self.output_vel = [SpeedPair() for i in range(self.number_of_robots)]
+        """Control system actuator itself. Receives references and world info."""
+        self.updateIntVariables(references, world)
+        self.updateError()
+        self.controlLaw(world)
+        # print(self.output_vel)
+        return self.output_vel
+
+    def controlLaw(self, world):
+        for i in range(self.number_of_robots):
+            factor = 1*(1-np.e**(-1.5*(world.robots[i].pathLength()-0)))
+            if i==0: print(world.robots[i].pathLength())
+            self.output_vel[i].w = self.th_e[i]*5.5
+            self.int[i] = self.w_k2*( 0.03/2 *(self.th_e[i]+self.th_e_ant[i]) + self.int[i])
+            self.output_vel[i].w = self.sat(self.output_vel[i].w + self.int[i], 2*np.pi)
+            self.output_vel[i].v = min(self.v_k/(abs(self.output_vel[i].w)+0.01)+self.v_offset, self.v_max)*world.robots[i].dir*factor
+
+            #if i==0: print("v: {0}, w: {1}, th: {2}".format(self.output_vel[i].v, self.output_vel[i].w, self.th_e[i]*180/np.pi))
+
+
 class ssRegulator(System):
     """Class docstring."""
 

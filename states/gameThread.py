@@ -14,8 +14,9 @@ import traceback
 from gui.guiMethod import guiMethod
 from vision.mainVision.mainVision import MainVision
 from strategy.strategy import Strategy
-from controllers.ssRegulator import ssRegulator
+from controllers.ssRegulator import ssRegulator, nonLinearControl
 from comm.radio_comm import RadioCommunicator
+from statics.static_classes import world
 import signal
 import roshandler.roshandler as rh
 
@@ -28,7 +29,7 @@ class GameThread():
         
         self._visionSystem = MainVision(self)
         self._strategySystem = Strategy(self)
-        self._controlSystem = ssRegulator(self)
+        self._controlSystem = nonLinearControl(self)
         self._radioComm = RadioCommunicator(self)
         
         
