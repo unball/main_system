@@ -3,6 +3,7 @@ from communication.msg import comm_msg
 from speed_converter import speeds2motors
 import roshandler.roshandler as rh
 import statics.configFile
+from controllers.ssRegulator import SpeedPair
 
 import rospy
 
@@ -26,3 +27,5 @@ class RadioCommunicator(ROSCommunicator):
 
         self.pub.publish(self.msg)
     
+    def sendZero(self):
+        self.send([SpeedPair() for i in range(3)])

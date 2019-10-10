@@ -112,6 +112,7 @@ class GameThread():
                 time.sleep(0.03)
                 
             if self._state.QuitRequested:
+                self._radioComm.sendZero()
                 rh.RosHandler().terminateAll()
                 break
             if self._state.StateChangeRequested:
