@@ -13,6 +13,7 @@ class Robot(Element):
         self.__trajectory = [] 
         self.entity = None
         self.spin = 0
+        self.dir = 1
 
     def nextStep(self):
         if len(self.__trajectory) != 0 and len(self.__trajectory[0]) >= 1:

@@ -81,18 +81,34 @@ class MovimentsDecider():
         self.ball_vmax = 1.5
         self.state = ATT
         #self.listEntity = [Attacker(), Attacker(), TestPlayer()]
-        self.listEntity = [TestPlayer(), TestPlayer(), TestPlayer()]
-        self.turning_radius = statics.configFile.getValue("Turn_Radius", 0.053)
+        self.listEntity = [Attacker(), TestPlayer(), TestPlayer()]
+        self.turning_radius = statics.configFile.getValue("Turn_Radius", 0.060)
         self.dynamicPossession = False
 
-    def shortestTragectory(self, startPose, endPose, radius):
+    def shortestTragectory(self, startPose, endPose, radius, robot):
         altStartPose = (startPose[0], startPose[1], startPose[2] + np.pi)
         path = dubins.shortest_path(startPose, endPose, radius)
-        return path
+        #return path
         path2 = dubins.shortest_path(altStartPose, endPose, radius)
-        if(path.path_length() <= path2.path_length()):
+        # !TODO: NÃO ALTERAR robot.dir aqui
+        HIST = 0.10
+        diff = path.path_length()-path2.path_length()
+        if(robot.dir == 1):
+            if(diff > HIST):
+                print("troquei para 2")
+                robot.dir = -1
+                return path2
             return path
-        return path2
+        else:
+            if(diff < -HIST):
+                print("troquei para 1")
+                robot.dir = 1
+                return path
+            return path2
+
+        #if(path.path_length() <= path2.path_length()):
+        #    return path
+        #return path2
     
     @property
     def delta(self):
@@ -123,7 +139,7 @@ class MovimentsDecider():
             for indx,robot in enumerate(static_classes.world.robots):
                 if(indx >= len(self.listEntity)): break
                 target = self.listEntity[indx].tatic(robot.pose)
-                path = self.shortestTragectory(robot.pose, target, self.turning_radius) 
+                path = self.shortestTragectory(robot.pose, target, self.turning_radius, robot) 
                 self.listEntity[indx].possess(path, robot)
             return
 
@@ -136,7 +152,7 @@ class MovimentsDecider():
                 if robot in possessed:
                     continue
                 target = entity.tatic(robot.pose)
-                path = self.shortestTragectory(robot.pose, target, self.turning_radius) 
+                path = self.shortestTragectory(robot.pose, target, self.turning_radius, robot.dir) 
                 cost = path.path_length()
                 if cost < minCost:
                     minCost = cost
