@@ -151,7 +151,7 @@ class ssRegulator(System):
                   [0, self.r1]]
 
         # Pole placement regulator closed loop poles
-        self.poles = [[-0.5, -0.5, -0.6],
+        self.poles = [[-5, -5, -0.1],
                       [-0.5, -0.5, -0.6],
                       [-0.5, -0.5, -0.8]]
 
@@ -161,7 +161,7 @@ class ssRegulator(System):
         self.updateIntVariables(references, world)
         self.updateDynamicMatrices()
         self.updateStateVector()
-        self.controlLaw()
+        self.controlLaw(world)
         # print(self.output_vel)
         return self.output_vel
 
@@ -189,23 +189,30 @@ class ssRegulator(System):
             self.th_e = list((self.th_i[i] - self.th_r[i]) for i in range(self.number_of_robots))
 
             for i in range(self.number_of_robots):
-                if np.linalg.norm(self.th_e[i]) > np.pi/2:
-                    self.th_e[i] = (self.th_e[i] + np.pi/2) % (np.pi) - np.pi/2
-                    self.x_e[i] = (-1) * self.x_e[i]
-                    self.y_e[i] = (-1) * self.y_e[i]
+                if np.linalg.norm(self.th_e[i]) > np.pi:
+                    self.th_e[i] = (self.th_e[i] + np.pi) % (2*np.pi) - np.pi
+                    #self.x_e[i] = (-1) * self.x_e[i]
+                    #self.y_e[i] = (-1) * self.y_e[i]
 
                 self.state_vector[i] = [self.x_e[i], self.y_e[i], self.th_e[i]]
 
-    def controlLaw(self):
+    def controlLaw(self, world):
         import time
         dt = 0
         for i in range(self.number_of_robots):
             # K, S, E = control.lqr(self.A[i], self.B[i], self.Q, self.R)
             t0 = time.time()
-            K = control.place(self.A[i], self.B[i], self.poles[i])
+            #K = control.place(self.A[i], self.B[i], self.poles[i])
             dt += time.time()-t0
-            velocities = np.dot(-K, self.state_vector[i])
-            self.output_vel[i].v = velocities[0] #+ np.sign(velocities[0])*0.5
-            self.output_vel[i].w = velocities[1]
+            #velocities = np.dot(-K, self.state_vector[i])
+            factor = 4*(1-np.e**(-4*(world.robots[i].pathLength()-0)))
+            factor = factor if factor > 0 else 0
+            #if i == 0: print(factor)
+            #self.output_vel[i].v = 0.7*world.robots[i].pathLength() #+ np.sign(velocities[0])*0.5
+            #self.output_vel[i].w = -self.th_e[i]*factor*2
+            
+            self.output_vel[i].w = -self.th_e[i]*4.5
+            self.output_vel[i].v = min(0.5/abs(self.output_vel[i].w)+0.25, 1.1) #+ np.sign(velocities[0])*0.5
+            if i==0: print("v: {0}, w: {1}, th: {2}".format(self.output_vel[i].v, self.output_vel[i].w, self.th_e[i]*180/np.pi))
             #TODO: saida do controle como uma lista de dicionarios (v e w)
         #print(dt)
