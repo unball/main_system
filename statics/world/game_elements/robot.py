@@ -14,6 +14,14 @@ class Robot(Element):
         self.entity = None
         self.spin = 0
         self.dir = 1
+        self.nearTarget = False
+
+    def pathLength(self):
+        if self.nearTarget == True:
+            return self.distanceToTarget()
+        if self.entity is not None and self.entity._path is not None:
+            return self.entity._path.path_length()
+        return 0
 
     def nextStep(self):
         if len(self.__trajectory) != 0 and len(self.__trajectory[0]) >= 1:
@@ -23,9 +31,20 @@ class Robot(Element):
         # !TODO: Decidir o que fazer quando não há uma trajetória
         else: return (0,0,0)
 
+    def distanceToTarget(self):
+        r = self.__trajectory[0][0]
+        rtar = self.__trajectory[0][-1]
+        return abs(r[0]-rtar[0]) + abs(r[1]-rtar[1])
+
     def discretize(self, step):
         if self.entity is not None and self.entity._path is not None:
             self.__trajectory =  self.entity._path.sample_many(step)
+            
+            #if self.entity.__str__() == "Defensor": print("d: {0}".format(self.distanceToTarget()))
+            if self.distanceToTarget() < 0.09:
+                self.nearTarget = True
+                self.__trajectory = [[self.__trajectory[0][0], self.__trajectory[0][-1]]]
+            else: self.nearTarget = False
 
     @property
     def trajectory(self):
