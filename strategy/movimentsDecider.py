@@ -82,7 +82,7 @@ class MovimentsDecider():
         self.state = ATT
         #self.listEntity = [Attacker(), Attacker(), TestPlayer()]
         self.listEntity = [Attacker(), TestPlayer(), TestPlayer()]
-        self.turning_radius = statics.configFile.getValue("Turn_Radius", 0.060)
+        self.turning_radius = statics.configFile.getValue("Turn_Radius", 0.070)
         self.dynamicPossession = False
 
     def shortestTragectory(self, startPose, endPose, radius, robot):

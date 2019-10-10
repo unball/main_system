@@ -22,7 +22,7 @@ class Strategy(System, object):
         self.decider = MovimentsDecider()
         self.targets = []
         self.spin = [0,0,0]
-        self.step = statics.configFile.getValue("strategy_step", 0.005)
+        self.step = statics.configFile.getValue("strategy_step", 0.030)
         
         self._frameRenderers = {
             "parametrosEstrategia": strategy.frameRenderer.parametrosEstrategia(self),
