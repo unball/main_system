@@ -20,6 +20,7 @@ def followBally(rb, rr):
     return (0.55*world.fieldSide, rb[1], angle)
 
 def blockBallElipse(rb, vb, rr):
+    return followBally(rb, rr)
     a = 0.2
     b = 0.4
     rm = np.array([0.75*world.fieldSide, 0])
