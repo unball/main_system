@@ -29,6 +29,8 @@ class GameThread():
         
         self._visionSystem = MainVision(self)
         self._strategySystem = Strategy(self)
+
+        #self._controlSystem = ssRegulator(self)
         self._controlSystem = nonLinearControl(self)
         self._radioComm = RadioCommunicator(self)
         

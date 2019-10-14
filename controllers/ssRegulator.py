@@ -25,6 +25,12 @@ class nonLinearControl(System):
         self.th_e_ant = [0 for i in range(self.number_of_robots)]
         self.th_e =     [0 for i in range(self.number_of_robots)]
         self.w_ant =    [0 for i in range(self.number_of_robots)]
+        self.x_i = list(0 for i in range(self.number_of_robots))
+        self.y_i = list(0 for i in range(self.number_of_robots))
+
+        self.x_r = list(0 for i in range(self.number_of_robots))
+        self.y_r = list(0 for i in range(self.number_of_robots))
+
         self.int =    [0 for i in range(self.number_of_robots)]
         self.w_k1 = 0.997
         self.w_k2 = 0.07
@@ -40,14 +46,20 @@ class nonLinearControl(System):
     def updateIntVariables(self, references, world):
         for i in range(self.number_of_robots):
             self.th_i[i] = world.robots[i].th
+            self.x_i[i] = world.robots[i].x
+            self.y_i[i] = world.robots[i].y
             self.th_r[i] = references[i][2]
+            self.x_r[i] = references[i][0]
+            self.y_r[i] = references[i][1]
 
     def sat(self, x, amp):
         return max(min(x, amp), -amp)
 
 
     def updateError(self):
-            self.th_e_ant = list((self.th_e[i] + (self.output_vel[i].w -self.sat(self.output_vel[i].w, 2*np.pi)) for i in range(self.number_of_robots)))
+            self.th_e_ant = list((self.th_e[i] + (self.output_vel[i].w -self.sat(self.output_vel[i].w, 4*np.pi)) for i in range(self.number_of_robots)))
+            self.x_e = list((self.x_r[i]-self.x_i[i]) for i in range(self.number_of_robots))
+            self.y_e = list((self.y_r[i]-self.y_i[i]) for i in range(self.number_of_robots))
             self.w_ant = [ov.w for ov in self.output_vel]
             
             self.th_e = list((self.th_r[i] - self.th_i[i]) for i in range(self.number_of_robots))
@@ -68,13 +80,17 @@ class nonLinearControl(System):
     def controlLaw(self, world):
         for i in range(self.number_of_robots):
             factor = 1*(1-np.e**(-1.5*(world.robots[i].pathLength()-0)))
-            if i==0: print(world.robots[i].pathLength())
-            self.output_vel[i].w = self.th_e[i]*5.5
-            self.int[i] = self.w_k2*( 0.03/2 *(self.th_e[i]+self.th_e_ant[i]) + self.int[i])
-            self.output_vel[i].w = self.sat(self.output_vel[i].w + self.int[i], 2*np.pi)
-            self.output_vel[i].v = min(self.v_k/(abs(self.output_vel[i].w)+0.01)+self.v_offset, self.v_max)*world.robots[i].dir*factor
+            #if i==0: print(world.robots[i].pathLength())
+            self.output_vel[i].w = 4*self.th_e[i] + 20*np.sin(self.th_e[i])*np.cos(self.th_e[i]) #(self.th_e[i] -  .997 * self.th_e_ant[i]) + self.output_vel[i].w
+            
+            #self.int[i] = self.w_k2*( 0.03/2 *(self.th_e[i]+self.th_e_ant[i]) + self.int[i])
+            self.output_vel[i].w = self.sat(self.output_vel[i].w, 4*np.pi)
+            self.output_vel[i].v = 50* np.sqrt(self.x_e[i]**2+self.y_e[i]**2) * abs(np.cos(self.th_e[i])) *  world.robots[i].dir#min(self.v_k/(abs(self.output_vel[i].w)+0.01), self.v_max)*world.robots[i].dir
+            if i==0: print("erro: "+ str(np.sqrt(self.x_e[i]**2+self.y_e[i]**2)))
+            #self.output_vel[i].v = (0.15/abs(self.output_vel[i].w))*  world.robots[i].dir#min(self.v_k/(abs(self.output_vel[i].w)+0.01), self.v_max)*world.robots[i].dir
+            #self.output_vel[i].v = 0.1*world.robots[i].dir # min(self.v_k/(abs(np.sin( self.th_e[i]))+0.01), self.v_max)*world.robots[i].dir
 
-            #if i==0: print("v: {0}, w: {1}, th: {2}".format(self.output_vel[i].v, self.output_vel[i].w, self.th_e[i]*180/np.pi))
+            if i==0: print("v: {0}, w: {1}, th: {2}".format(self.output_vel[i].v, self.output_vel[i].w, self.th_e[i]*180/np.pi))
 
 
 class ssRegulator(System):
@@ -191,28 +207,18 @@ class ssRegulator(System):
             for i in range(self.number_of_robots):
                 if np.linalg.norm(self.th_e[i]) > np.pi:
                     self.th_e[i] = (self.th_e[i] + np.pi) % (2*np.pi) - np.pi
-                    #self.x_e[i] = (-1) * self.x_e[i]
-                    #self.y_e[i] = (-1) * self.y_e[i]
+                    self.x_e[i] = (-1) * self.x_e[i]
+                    self.y_e[i] = (-1) * self.y_e[i]
 
                 self.state_vector[i] = [self.x_e[i], self.y_e[i], self.th_e[i]]
+                #print(self.state_vector)
 
     def controlLaw(self, world):
         import time
         dt = 0
         for i in range(self.number_of_robots):
             # K, S, E = control.lqr(self.A[i], self.B[i], self.Q, self.R)
-            t0 = time.time()
-            #K = control.place(self.A[i], self.B[i], self.poles[i])
-            dt += time.time()-t0
-            #velocities = np.dot(-K, self.state_vector[i])
-            factor = 4*(1-np.e**(-4*(world.robots[i].pathLength()-0)))
-            factor = factor if factor > 0 else 0
-            #if i == 0: print(factor)
-            #self.output_vel[i].v = 0.7*world.robots[i].pathLength() #+ np.sign(velocities[0])*0.5
-            #self.output_vel[i].w = -self.th_e[i]*factor*2
-            
-            self.output_vel[i].w = -self.th_e[i]*4.5
-            self.output_vel[i].v = min(0.5/abs(self.output_vel[i].w)+0.25, 1.1) #+ np.sign(velocities[0])*0.5
-            if i==0: print("v: {0}, w: {1}, th: {2}".format(self.output_vel[i].v, self.output_vel[i].w, self.th_e[i]*180/np.pi))
-            #TODO: saida do controle como uma lista de dicionarios (v e w)
-        #print(dt)
+            K = control.place(self.A[i], self.B[i], self.poles[i])
+            velocities = np.dot(-K, self.state_vector[i])
+            self.output_vel[i][0] = velocities[0]
+            self.output_vel[i][1] = velocities[1]

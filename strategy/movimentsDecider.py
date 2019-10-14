@@ -88,10 +88,10 @@ class MovimentsDecider():
     def shortestTragectory(self, startPose, endPose, radius, robot):
         altStartPose = (startPose[0], startPose[1], startPose[2] + np.pi)
         path = dubins.shortest_path(startPose, endPose, radius)
-        #return path
+        return path
         path2 = dubins.shortest_path(altStartPose, endPose, radius)
         # !TODO: NÃO ALTERAR robot.dir aqui
-        HIST = 0.10
+        HIST = 0.05
         diff = path.path_length()-path2.path_length()
         if(robot.dir == 1):
             if(diff > HIST):
