@@ -8,6 +8,7 @@ import statics.configFile
 from statics import static_classes 
 from statics.static_classes import world
 from vision.pixel2metric import pixel2meters
+import math
 
 ATT = 0
 DEF = 1
@@ -81,14 +82,102 @@ class MovimentsDecider():
         self.ball_vmax = 1.5
         self.state = ATT
         #self.listEntity = [Attacker(), Attacker(), TestPlayer()]
-        self.listEntity = [Attacker(), TestPlayer(), TestPlayer()]
+        self.listEntity = [Attacker(), Goalkeeper(), TestPlayer()]
         self.turning_radius = statics.configFile.getValue("Turn_Radius", 0.070)
         self.dynamicPossession = False
 
+    def endPoseDeltaTrajectory(self, startPose, endPose, radius, delta=45*np.pi/180):
+
+        startPose = (startPose[0], startPose[1], startPose[2])
+        endPoseMax = (endPose[0], endPose[1], endPose[2] + delta)
+        endPoseMin = (endPose[0], endPose[1], endPose[2] - delta)
+
+        pathCenter = dubins.shortest_path(startPose, endPose, radius)
+        pathMax = dubins.shortest_path(startPose, endPoseMax, radius)
+        pathMin = dubins.shortest_path(startPose, endPoseMin, radius)
+
+        return [pathCenter, pathMax, pathMin]
+
+    def trajectoryCost(self, trajectory, robot):
+        if trajectory is None:
+            return math.inf
+        
+        angleCost = trajectory.path_endpoint()[2]-robot.th
+
+        return trajectory.path_length()#**2+angleCost**2
+
+    def chooseMinTrajectory(self, trajectoryList, radius, robot):
+        #if trajectoryList[0].path_length() > np.pi*radius:
+        #    return trajectoryList[0]
+        if len(trajectoryList) == 0: return None
+        path = min(trajectoryList, key=lambda x: self.trajectoryCost(x, robot))
+
+        return path
+
+    def filterTrajectories(self, trajectoryList):
+        filtered = []
+        for trajectory in trajectoryList:
+            discretized = np.array(trajectory.sample_many(0.01)[0])[:,:2]
+            insidePoints = abs(discretized) > [world.field_x_length/2*0.9, world.field_y_length/2]
+            if np.sum(insidePoints[:,0] | insidePoints[:,1]) == 0:
+                filtered.append(trajectory)
+        
+        return filtered
+        
+
     def shortestTragectory(self, startPose, endPose, radius, robot):
         altStartPose = (startPose[0], startPose[1], startPose[2] + np.pi)
-        path = dubins.shortest_path(startPose, endPose, radius)
-        #return path
+
+        trajectories = self.endPoseDeltaTrajectory(startPose, endPose, radius)
+        altTrajectories = self.endPoseDeltaTrajectory(altStartPose, endPose, radius)
+        
+        trajectoriesInsideField = self.filterTrajectories(trajectories)
+        altTrajectoriesInsideField = self.filterTrajectories(altTrajectories)
+
+        best = self.chooseMinTrajectory(trajectoriesInsideField, radius, robot)
+        altBest = self.chooseMinTrajectory(altTrajectoriesInsideField, radius, robot)
+
+        bestCost = self.trajectoryCost(best, robot)
+        altBestCost = self.trajectoryCost(altBest, robot)
+        
+        HIST = 0.3
+        diff = bestCost-altBestCost
+        print(diff)
+
+        if(robot.dir == 1):
+            if(diff > HIST):
+                robot.dir = -1
+                return altBest
+            return best
+        else:
+            if(diff < -HIST):
+                robot.dir = 1
+                return best
+            return altBest
+
+
+        return best
+
+        altTrajectories = self.endPoseDeltaTrajectory(altStartPose, endPose, radius)
+
+        HIST = 0.2
+        diff = trajectories[0].path_length()-altTrajectories[0].path_length()
+
+        if(robot.dir == 1):
+            if(diff > HIST):
+                robot.dir = -1
+                return self.chooseMinTrajectory(altTrajectories, radius)
+            return self.chooseMinTrajectory(trajectories, radius)
+        else:
+            if(diff < -HIST):
+                robot.dir = 1
+                return self.chooseMinTrajectory(trajectories, radius)
+            return self.chooseMinTrajectory(altTrajectories, radius)
+
+
+
+        return path
+
         path2 = dubins.shortest_path(altStartPose, endPose, radius)
         # # !TODO: NÃO ALTERAR robot.dir aqui
         HIST = 0.09
