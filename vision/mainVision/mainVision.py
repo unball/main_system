@@ -339,7 +339,7 @@ class MainVision(vision.vision.Vision):
 		bolaMask = self.obterMascaraBola(img_hsv)
 
 		# Tenta identificar uma bola
-		bola = self.identificarBola(processed_image, bolaMask)
+		bola = self.identificarBola(processed_image, bolaMask & mask)
 		
 		mask = cv2.bitwise_and(mask, cv2.bitwise_not(bolaMask))
 		

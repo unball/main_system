@@ -50,7 +50,7 @@ class Goalkeeper(Entity):
     def __init__(self):
         super().__init__("Goleiro")
     def tatic(self, pose):
-       self.__target =  moviments.goalkeep(static_classes.world.ball.pos, static_classes.world.ball.vel)
+       self.__target =  moviments.goalkeep(static_classes.world.ball.pos, static_classes.world.ball.vel, pose)
        return self.__target
 
 class Defender(Entity):
@@ -88,11 +88,17 @@ class MovimentsDecider():
     def shortestTragectory(self, startPose, endPose, radius, robot):
         altStartPose = (startPose[0], startPose[1], startPose[2] + np.pi)
         path = dubins.shortest_path(startPose, endPose, radius)
-        return path
+        #return path
         path2 = dubins.shortest_path(altStartPose, endPose, radius)
-        # !TODO: NÃO ALTERAR robot.dir aqui
-        HIST = 0.05
+        # # !TODO: NÃO ALTERAR robot.dir aqui
+        HIST = 0.09
         diff = path.path_length()-path2.path_length()
+
+        if abs(robot.w) > np.pi/2 and np.linalg.norm(np.array(robot.vel)) > 0.1:
+            print("oi fui executado")
+            if(robot.dir == 1): return path
+            else: return path2
+        
         if(robot.dir == 1):
             if(diff > HIST):
                 print("troquei para 2")
@@ -106,9 +112,13 @@ class MovimentsDecider():
                 return path
             return path2
 
-        #if(path.path_length() <= path2.path_length()):
-        #    return path
-        #return path2
+        # if(path.path_length() <= path2.path_length()):
+        #     print("frente")
+        #     robot.dir = 1
+        #     return path
+        # print("trás")
+        # robot.dir = -1
+        # return path2
     
     @property
     def delta(self):

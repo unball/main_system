@@ -34,16 +34,23 @@ class Robot(Element):
     def distanceToTarget(self):
         r = self.__trajectory[0][0]
         rtar = self.__trajectory[0][-1]
-        return abs(r[0]-rtar[0]) + abs(r[1]-rtar[1])
+        return np.sqrt((r[0]-rtar[0])**2 + (r[1]-rtar[1])**2)
+
+    def distanceToTargetAngle(self):
+        r = self.__trajectory[0][0]
+        rtar = self.__trajectory[0][-1]
+        return abs(r[2]-rtar[2])
 
     def discretize(self, step):
         if self.entity is not None and self.entity._path is not None:
             self.__trajectory =  self.entity._path.sample_many(step)
             
             #if self.entity.__str__() == "Defensor": print("d: {0}".format(self.distanceToTarget()))
-            if self.distanceToTarget() < 0.09:
+
+            # Chegou no target!!!!
+            if self.distanceToTarget() < 0.08 and self.distanceToTargetAngle() < 0.26:
                 self.nearTarget = True
-                self.__trajectory = [[self.__trajectory[0][0], self.__trajectory[0][-1]]]
+                self.__trajectory = [[self.__trajectory[0][0], self.__trajectory[0][0]]]
             else: self.nearTarget = False
 
     @property

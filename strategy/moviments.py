@@ -8,10 +8,15 @@ from statics.static_classes import world
 def goToBallPlus(ballPos, robotPose):
     finalTarget = np.array([.75*world.fieldSide, 0])
     ballTarget = finalTarget-ballPos  
-    distance = np.linalg.norm(ballPos-robotPose[:2])
-    if distance > 0.075:
-        return (ballPos[0], ballPos[1], np.arctan2(ballTarget[1],ballTarget[0]))
-    return (finalTarget[0], finalTarget[1], np.arctan2(ballTarget[1],ballTarget[0]))
+    ballRobot = ballPos-robotPose[:2]
+    distance = np.linalg.norm(ballRobot)
+    if distance < 0.1:
+        angle = abs(np.arctan2(ballTarget[1],ballTarget[0])-robotPose[2])  % (np.pi)
+        print(angle)
+        if angle > 0.5: return (ballPos[0], ballPos[1], robotPose[2] if abs(np.arctan2(ballRobot[1],ballRobot[0])-robotPose[2]) % (np.pi) < np.pi/2 else robotPose[2] + np.pi)
+        else: return (finalTarget[0], finalTarget[1], np.arctan2(ballTarget[1],ballTarget[0]))
+        
+    return (ballPos[0], ballPos[1], np.arctan2(ballTarget[1],ballTarget[0]))
 
 def followBally(rb, rr):
     angle = np.pi/2
@@ -71,15 +76,16 @@ def blockBallElipse(rb, vb, rr):
 #    except:
 #        return (0,0,0)
 
-def goalkeep(ballPos, ballVel):
-    xGoal = world.fieldSide * .72
+def goalkeep(ballPos, ballVel, robotPose):
+    xGoal = world.fieldSide * .6
     #testar velocidade minima (=.15?)
-    if ((ballVel[0]*world.fieldSide) > .15) and  ((ballPos[0]*world.fieldSide)> .15):
+    angle = np.pi/2 if robotPose[1] <= ballPos[1] else -np.pi/2
+    if ((ballVel[0]*world.fieldSide) > .05) and  ((ballPos[0]*world.fieldSide)> .15):
         #verificar se a projeção está no gol
         #projetando vetor até um xGoal-> y = (xGoal-Xball) * Vyball/Vxball + yBall 
-        return (xGoal, (((xGoal-ballPos[0])/ballVel[0])*ballVel[1])+ballPos[1], np.pi/2)
+        return (xGoal, max(min((((xGoal-ballPos[0])/ballVel[0])*ballVel[1])+ballPos[1],0.35),-.35), angle)
     #Se não acompanha o y
-    return np.array([xGoal, ballPos[1], np.pi/2])
+    return np.array([xGoal, max(min(ballPos[1],.35),-.35), angle])
 
 def mirrorPos(posDom):
     radiusMin = .1                      #raio minimo para simetria
