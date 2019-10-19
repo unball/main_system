@@ -118,7 +118,7 @@ class MovimentsDecider():
         filtered = []
         for trajectory in trajectoryList:
             discretized = np.array(trajectory.sample_many(0.01)[0])[:,:2]
-            insidePoints = abs(discretized) > [world.field_x_length/2*0.9, world.field_y_length/2]
+            insidePoints = abs(discretized) > [world.field_x_length/2*0.93, world.field_y_length/2]
             if np.sum(insidePoints[:,0] | insidePoints[:,1]) == 0:
                 filtered.append(trajectory)
         
@@ -140,9 +140,9 @@ class MovimentsDecider():
         bestCost = self.trajectoryCost(best, robot)
         altBestCost = self.trajectoryCost(altBest, robot)
         
-        HIST = 0.3
+        HIST = 0.1
         diff = bestCost-altBestCost
-        print(diff)
+        #print(diff)
 
         if(robot.dir == 1):
             if(diff > HIST):

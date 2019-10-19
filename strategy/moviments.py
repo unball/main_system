@@ -10,7 +10,7 @@ def goToBallPlus(ballPos, robotPose):
     ballTarget = finalTarget-ballPos  
     ballRobot = ballPos-robotPose[:2]
     distance = np.linalg.norm(ballRobot)
-    if distance < 0.1:
+    if distance < 0.07 and robotPose[0]*world.fieldSide < ballPos[0]*world.fieldSide:
         return (finalTarget[0], finalTarget[1], np.arctan2(ballTarget[1],ballTarget[0]))
         
     return (ballPos[0], ballPos[1], np.arctan2(ballTarget[1],ballTarget[0]))
@@ -74,15 +74,16 @@ def blockBallElipse(rb, vb, rr):
 #        return (0,0,0)
 
 def goalkeep(ballPos, ballVel, robotPose):
-    xGoal = world.fieldSide * .6
+    xGoal = world.fieldSide * .4
     #testar velocidade minima (=.15?)
-    angle = np.pi/2 if robotPose[1] <= ballPos[1] else -np.pi/2
+    yTarget = max(min(ballPos[1],.35),-.35)
+    angle = np.pi/2 if robotPose[1] <= yTarget else -np.pi/2
     if ((ballVel[0]*world.fieldSide) > .05) and  ((ballPos[0]*world.fieldSide)> .15):
         #verificar se a projeção está no gol
         #projetando vetor até um xGoal-> y = (xGoal-Xball) * Vyball/Vxball + yBall 
         return (xGoal, max(min((((xGoal-ballPos[0])/ballVel[0])*ballVel[1])+ballPos[1],0.35),-.35), angle)
     #Se não acompanha o y
-    return np.array([xGoal, max(min(ballPos[1],.35),-.35), angle])
+    return np.array([xGoal, yTarget, angle])
 
 def mirrorPos(posDom):
     radiusMin = .1                      #raio minimo para simetria
