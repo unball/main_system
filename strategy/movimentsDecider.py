@@ -24,6 +24,7 @@ class Entity(ABC):
         self.__target = np.array([0,0,0])
         self._path = None
         self.__name = name
+        self.acceptableAngleError = 0.26
         
     def __str__(self):
         return self.__name
@@ -50,6 +51,7 @@ class Attacker(Entity):
 class Goalkeeper(Entity):
     def __init__(self):
         super().__init__("Goleiro")
+        self.acceptableAngleError = math.inf
     def tatic(self, pose):
        self.__target =  moviments.goalkeep(static_classes.world.ball.pos, static_classes.world.ball.vel, pose)
        return self.__target

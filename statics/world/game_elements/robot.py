@@ -48,7 +48,7 @@ class Robot(Element):
             #if self.entity.__str__() == "Defensor": print("d: {0}".format(self.distanceToTarget()))
 
             # Chegou no target!!!!
-            if self.distanceToTarget() < 0.08 and self.distanceToTargetAngle() < 0.26:
+            if self.distanceToTarget() < 0.08 and self.distanceToTargetAngle() < self.entity.acceptableAngleError:
                 self.nearTarget = True
                 self.__trajectory = [[self.__trajectory[0][0], self.__trajectory[0][0]]]
             else: self.nearTarget = False
