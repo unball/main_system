@@ -74,7 +74,7 @@ def blockBallElipse(rb, vb, rr):
 #        return (0,0,0)
 
 def goalkeep(ballPos, ballVel, robotPose):
-    xGoal = world.fieldSide * .4
+    xGoal = world.fieldSide * .65
     #testar velocidade minima (=.15?)
     ytarget = max(min(ballPos[1],.35),-.35)
     angle = np.pi/2 if robotPose[1]*world.fieldSide < ytarget*world.fieldSide else -np.pi/2
