@@ -8,6 +8,7 @@ import gui.mainWindow
 from statics.static_classes import world
 from statics import field
 import math
+from gui.drawing import Drawing
 
 class Robo():
 	def __init__(self, identificador):
@@ -351,9 +352,7 @@ class MainVision(vision.vision.Vision):
 			processed_image = cv2.add(processed_image, cv2.bitwise_and(img_warpped, img_warpped, mask=c))
 		
 		# Desenha lado do campo
-		self.draw_left_rectangle(processed_image, (0,255,0) if world.fieldSide == field.LEFT else (0,0,255))
-		self.draw_right_rectangle(processed_image, (0,255,0) if world.fieldSide == field.RIGHT else (0,0,255))
-		self.draw_middle_line(processed_image)
+		Drawing.draw_field(processed_image)
 		
 		# Listas com aliados e inimigos e bola
 		robos = [(i,(0,0),0,False,(0,0)) for i in range(2*self.__n_robos)]
@@ -387,23 +386,8 @@ class MainVision(vision.vision.Vision):
 				advId = advId + 1
 			
 		return robos, bola, processed_image
-	
-	def draw_left_rectangle(self, image, color, thickness=5):
-		height, width, _ = image.shape
-		cv2.line(image, (int(width/2)-thickness,0), (0,0), color, thickness)
-		cv2.line(image, (0,0), (0, height), color, thickness)
-		cv2.line(image, (int(width/2)-thickness,height), (0, height), color, thickness)
+
 		
-	def draw_right_rectangle(self, image, color, thickness=5):
-		height, width, _ = image.shape
-		cv2.line(image, (int(width/2)+thickness,0), (width,0), color, thickness)
-		cv2.line(image, (width,0), (width, height), color, thickness)
-		cv2.line(image, (width, height), (int(width/2)+thickness, height), color, thickness)
-	
-	def draw_middle_line(self, image):
-		height, width, _ = image.shape
-		cv2.line(image, (int(width/2),0), (int(width/2),height), (100,100,100), 1)
-	
 	def draw_contour_rectangle(self, image, contour, color=(255,0,0)):
 		# Encontra o menor retângulo que se inscreve no contorno
 		rectangle = cv2.minAreaRect(contour)

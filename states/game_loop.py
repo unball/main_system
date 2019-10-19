@@ -1,6 +1,7 @@
 from states.state import State
 from abc import ABC
 
+import cv2
 from strategy.strategy import Strategy
 from controllers.ssRegulator import ssRegulator
 from controllers.ssRegulator import SpeedPair
@@ -21,6 +22,7 @@ class UiGameLoop(State):
     def update(self):
         self.__gameLoop.update()
         strategy_frame = strategy.frameRenderer.strategyFrame((350,471), step=self.thread.strategySystem.step)
+        strategy_frame = cv2.cvtColor(strategy_frame, cv2.COLOR_RGB2BGR)
         gui.mainWindow.MainWindow().ui_frame("gameLoop").do_update_frame(strategy_frame)
 
 class GameLoop(State):

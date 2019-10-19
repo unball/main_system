@@ -1,6 +1,7 @@
 from gi.repository import Gtk, Gdk
 import gui.frameRenderer
 
+from gui.drawing import Drawing
 from statics.static_classes import world
 from vision.pixel2metric import meters2pixel, pixel2meters
 from statics.world.game_elements.robot import Robot
@@ -23,6 +24,8 @@ def strategyFrame(frameShape, step=0.01):
     height, width = frameShape
     frame = np.zeros((height,width,3), np.uint8)
     
+    Drawing.draw_field(frame)
+
     ellipseCenter = meters2pixel((0.75*world.fieldSide, 0), frameShape)
     ellipseAxis = (int(0.2*width/1.6),int(0.4*height/1.3))
     cv2.ellipse(frame, ellipseCenter, ellipseAxis, 0, 0, 360, (100,100,100), 1)
@@ -69,7 +72,8 @@ class parametrosEstrategia(gui.frameRenderer.frameRenderer):
         self.gameThread.addEvent(self.parent.setDynamicPossession, value)
 
     def transformFrame(self, frame, originalFrame):
-        return strategyFrame(self.frameShape, step=self.parent.step)
+        processed_image = strategyFrame(self.frameShape, step=self.parent.step)
+        return cv2.cvtColor(processed_image, cv2.COLOR_RGB2BGR)
     
     def reset_radius(self, widget, spinButton):
          spinButton.set_value(0.053)
