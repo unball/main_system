@@ -82,12 +82,9 @@ class nonLinearControl(System):
         kp = 5.6
         ka = 4
         for i in range(self.number_of_robots):
-            factor = 1*(1-np.e**(-1.5*(world.robots[i].pathLength()-0)))
-
             self.output_vel[i].w = kp*np.sin(self.th_e[i])*np.cos(self.th_e[i]) + ka*self.th_e[i]
             self.output_vel[i].w = self.sat(self.output_vel[i].w, 4*np.pi)
 
-            self.output_vel[i].v = 15/1* np.sqrt(self.x_e[i]**2+self.y_e[i]**2) * abs(np.cos(self.th_e[i])) *  world.robots[i].dir
             self.output_vel[i].v = kp * np.cos(self.th_e[i]) * np.sqrt(self.x_e[i]**2+self.y_e[i]**2) * world.robots[i].dir
             if i==0: print("v: {0}, w: {1}, th: {2}".format(self.output_vel[i].v, self.output_vel[i].w, self.th_e[i]))
 
