@@ -24,7 +24,7 @@ def followBally(rb, rr):
     angle = np.pi/2
     if rr[1] > rb[1]: angle = -np.pi/2
     
-    return (0.55*world.fieldSide, rb[1], angle)
+    return (0.40*world.fieldSide, rb[1], angle)
 
 def blockBallElipse(rb, vb, rr):
     return followBally(rb, rr)
