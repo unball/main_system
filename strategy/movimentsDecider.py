@@ -41,6 +41,14 @@ class Entity(ABC):
 
 #update possession
 
+def spinKick(pose, host):
+    if host is not None:
+        distance = np.sqrt((pose[0]-static_classes.world.ball.pos[0])**2+(pose[1]-static_classes.world.ball.pos[1])**2)
+        if distance < 0.06: 
+            host.spin = -1 if pose[1]*world.fieldSide > 0 else 1
+            host.spin = host.spin * np.sign(pose[0]-static_classes.world.ball.pos[0]) * world.fieldSide
+        else: host.spin = 0
+
 class Attacker(Entity):
     def __init__(self):
         super().__init__("Atacante")
@@ -53,8 +61,9 @@ class Goalkeeper(Entity):
         super().__init__("Goleiro")
         self.acceptableAngleError = math.inf
     def tatic(self, pose):
-       self.__target =  moviments.goalkeep(static_classes.world.ball.pos, static_classes.world.ball.vel, pose)
-       return self.__target
+        self.__target =  moviments.goalkeep(static_classes.world.ball.pos, static_classes.world.ball.vel, pose)
+        spinKick(pose, self.host)
+        return self.__target
 
 class Defender(Entity):
     def __init__(self):
@@ -62,6 +71,7 @@ class Defender(Entity):
     def tatic(self, pose):
         roboty = pose[1]
         self.__target = moviments.blockBallElipse(np.array(static_classes.world.ball.pos), np.array(static_classes.world.ball.vel), np.array(pose))
+        spinKick(pose, self.host)
         return self.__target
 
 class Midfielder(Entity):

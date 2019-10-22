@@ -48,9 +48,10 @@ class Strategy(System, object):
 #            self.decider.calcPath()
 
         self.targets = []
-        for robot in world.robots:
+        for i,robot in enumerate(world.robots):
             robot.discretize(self.step)
             self.targets.append(robot.nextStep())
+            self.spin[i] = robot.spin
             
     def setTurningRadius(self, radius):
         self.decider.turning_radius = radius

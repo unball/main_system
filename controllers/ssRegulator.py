@@ -69,13 +69,22 @@ class nonLinearControl(System):
                     self.th_e[i] = (self.th_e[i] + np.pi/2) % (np.pi) - np.pi/2
 
 
-    def actuate(self, references, world):
+    def actuate(self, references, spinList, world):
         #self.output_vel = [SpeedPair() for i in range(self.number_of_robots)]
         """Control system actuator itself. Receives references and world info."""
         self.updateIntVariables(references, world)
         self.updateError()
         self.controlLaw(world)
         # print(self.output_vel)
+
+        # Spin bypass
+        for i,spin in enumerate(spinList):
+            if spin != 0:
+                self.output_vel[i].w = spin*4*np.pi
+                self.output_vel[i].v = 0
+
+        print("v: {0}, w: {1}, th: {2}".format(self.output_vel[2].v, self.output_vel[2].w, self.th_e[2]))
+        
         return self.output_vel
 
     def controlLaw(self, world):
@@ -91,7 +100,6 @@ class nonLinearControl(System):
             #self.output_vel[i].v = (0.15/abs(self.output_vel[i].w))*  world.robots[i].dir#min(self.v_k/(abs(self.output_vel[i].w)+0.01), self.v_max)*world.robots[i].dir
             #self.output_vel[i].v = 0.1*world.robots[i].dir # min(self.v_k/(abs(np.sin( self.th_e[i]))+0.01), self.v_max)*world.robots[i].dir
 
-            if i==0: print("v: {0}, w: {1}, th: {2}".format(self.output_vel[i].v, self.output_vel[i].w, self.th_e[i]))
 
 
 class ssRegulator(System):
