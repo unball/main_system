@@ -84,7 +84,7 @@ class MovimentsDecider():
         self.ball_vmax = 1.5
         self.state = ATT
         #self.listEntity = [Attacker(), Attacker(), TestPlayer()]
-        self.listEntity = [Goalkeeper(), Goalkeeper(), TestPlayer()]
+        self.listEntity = [Attacker(), Goalkeeper(), Defender()]
         self.turning_radius = statics.configFile.getValue("Turn_Radius", 0.070)
         self.dynamicPossession = False
 
@@ -120,7 +120,7 @@ class MovimentsDecider():
         filtered = []
         for trajectory in trajectoryList:
             discretized = np.array(trajectory.sample_many(0.01)[0])[:,:2]
-            insidePoints = abs(discretized) > [world.field_x_length/2*0.93, world.field_y_length/2]
+            insidePoints = abs(discretized) > [world.field_x_length/2*0.95, world.field_y_length/2]
             if np.sum(insidePoints[:,0] | insidePoints[:,1]) == 0:
                 filtered.append(trajectory)
         
@@ -156,60 +156,6 @@ class MovimentsDecider():
                 robot.dir = 1
                 return best
             return altBest
-
-
-        return best
-
-        altTrajectories = self.endPoseDeltaTrajectory(altStartPose, endPose, radius)
-
-        HIST = 0.2
-        diff = trajectories[0].path_length()-altTrajectories[0].path_length()
-
-        if(robot.dir == 1):
-            if(diff > HIST):
-                robot.dir = -1
-                return self.chooseMinTrajectory(altTrajectories, radius)
-            return self.chooseMinTrajectory(trajectories, radius)
-        else:
-            if(diff < -HIST):
-                robot.dir = 1
-                return self.chooseMinTrajectory(trajectories, radius)
-            return self.chooseMinTrajectory(altTrajectories, radius)
-
-
-
-        return path
-
-        path2 = dubins.shortest_path(altStartPose, endPose, radius)
-        # # !TODO: NÃO ALTERAR robot.dir aqui
-        HIST = 0.09
-        diff = path.path_length()-path2.path_length()
-
-        if abs(robot.w) > np.pi/2 and np.linalg.norm(np.array(robot.vel)) > 0.1:
-            print("oi fui executado")
-            if(robot.dir == 1): return path
-            else: return path2
-        
-        if(robot.dir == 1):
-            if(diff > HIST):
-                print("troquei para 2")
-                robot.dir = -1
-                return path2
-            return path
-        else:
-            if(diff < -HIST):
-                print("troquei para 1")
-                robot.dir = 1
-                return path
-            return path2
-
-        # if(path.path_length() <= path2.path_length()):
-        #     print("frente")
-        #     robot.dir = 1
-        #     return path
-        # print("trás")
-        # robot.dir = -1
-        # return path2
     
     @property
     def delta(self):

@@ -5,14 +5,19 @@ from statics.static_classes import world
 
 #TODO: implementar spin
 
+def projectBall(ballPos, ballVel, dt=0.03):
+    dt = world.timeInterval
+    return (ballPos[0]+dt*ballVel[0], ballPos[1]+dt*ballVel[1])
+
 def goToBallPlus(ballPos, robotPose):
-    finalTarget = np.array([.75*world.fieldSide, 0])
+    ballPos = projectBall(ballPos, world.ball.vel)
+    finalTarget = np.array([-.75*world.fieldSide, 0])
     ballTarget = finalTarget-ballPos  
     ballRobot = ballPos-robotPose[:2]
     distance = np.linalg.norm(ballRobot)
-    if distance < 0.07 and robotPose[0]*world.fieldSide < ballPos[0]*world.fieldSide:
+    if distance < 0.08 and robotPose[0]*world.fieldSide > (ballPos[0])*world.fieldSide+0.03*world.fieldSide and abs(robotPose[1]-ballPos[1]) < 0.03:
         return (finalTarget[0], finalTarget[1], np.arctan2(ballTarget[1],ballTarget[0]))
-        
+    
     return (ballPos[0], ballPos[1], np.arctan2(ballTarget[1],ballTarget[0]))
 
 def followBally(rb, rr):
@@ -77,7 +82,7 @@ def goalkeep(ballPos, ballVel, robotPose):
     xGoal = world.fieldSide * .65
     #testar velocidade minima (=.15?)
     ytarget = max(min(ballPos[1],.35),-.35)
-    angle = np.pi/2 if robotPose[1]*world.fieldSide < ytarget*world.fieldSide else -np.pi/2
+    angle = np.pi/2 if robotPose[1] < ytarget*world.fieldSide else -np.pi/2
     if ((ballVel[0]*world.fieldSide) > .05) and  ((ballPos[0]*world.fieldSide)> .15):
         #verificar se a projeção está no gol
         #projetando vetor até um xGoal-> y = (xGoal-Xball) * Vyball/Vxball + yBall 

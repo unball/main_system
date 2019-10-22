@@ -28,6 +28,7 @@ class World(object):
         self.__mainPoint = (0,0)
         self.__gameRunning = False
         self.__referenceTime = 0
+        self.__dt = 0
         print("World initiated successfully.")
         print("Number of robots: {}".format(self._number_of_robots))
     
@@ -57,6 +58,10 @@ class World(object):
     @property
     def manualMode(self):
         return self._manualMode
+        
+    @property
+    def timeInterval(self):
+        return self.__dt
 
     @property
     def gameRunning(self):
@@ -80,6 +85,7 @@ class World(object):
 
         dt = time.time()-self.__referenceTime
         self.calc_velocities(dt)
+        self.__dt = dt
         self.__referenceTime = time.time()
 
     def dummy_update(self):
