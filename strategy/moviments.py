@@ -6,7 +6,7 @@ from statics.static_classes import world
 #TODO: implementar spin
 
 def projectBall(ballPos, ballVel, dt=0.03):
-    dt = world.timeInterval
+    dt = 3*world.timeInterval
     return (ballPos[0]+dt*ballVel[0], ballPos[1]+dt*ballVel[1])
 
 def goToBallPlus(ballPos, robotPose):
