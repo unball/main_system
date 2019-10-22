@@ -40,6 +40,10 @@ class nonLinearControl(System):
         self.v_max = 0.8
         self.v_offset = 0.35
 
+        self.ka = np.array([4/1.5, 4/1.5, 4/1.5, 4/1.5, 4/1.5])
+        self.kp = np.array([3.75, 3.75, 3.75, 3.75, 3.75])
+        self.kp_l = np.array([18, 18, 18, 18, 18])
+
         self.th_i = [0 for i in range(self.number_of_robots)]
         self.th_r = [0 for i in range(self.number_of_robots)]
 
@@ -89,17 +93,11 @@ class nonLinearControl(System):
 
     def controlLaw(self, world):
         for i in range(self.number_of_robots):
-            factor = 1*(1-np.e**(-1.5*(world.robots[i].pathLength()-0)))
-            #if i==0: print(world.robots[i].pathLength())
-            self.output_vel[i].w = 4/1.5*(self.th_e[i] + 1.4*np.sin(self.th_e[i])*np.cos(self.th_e[i])) #(self.th_e[i] -  .997 * self.th_e_ant[i]) + self.output_vel[i].w
-            
-            #self.int[i] = self.w_k2*( 0.03/2 *(self.th_e[i]+self.th_e_ant[i]) + self.int[i])
+            self.output_vel[i].w = ( self.kp[i] * np.sin(self.th_e[i]) * np.cos(self.th_e[i]) ) + (self.ka[i] * self.th_e[i])
             self.output_vel[i].w = self.sat(self.output_vel[i].w, 4*np.pi)
-            self.output_vel[i].v = 15/1* np.sqrt(self.x_e[i]**2+self.y_e[i]**2) * abs(np.cos(self.th_e[i])) *  world.robots[i].dir#min(self.v_k/(abs(self.output_vel[i].w)+0.01), self.v_max)*world.robots[i].dir
-            #f i==0: print("erro: "+ str(np.sqrt(self.x_e[i]**2+self.y_e[i]**2)))
-            #self.output_vel[i].v = (0.15/abs(self.output_vel[i].w))*  world.robots[i].dir#min(self.v_k/(abs(self.output_vel[i].w)+0.01), self.v_max)*world.robots[i].dir
-            #self.output_vel[i].v = 0.1*world.robots[i].dir # min(self.v_k/(abs(np.sin( self.th_e[i]))+0.01), self.v_max)*world.robots[i].dir
 
+            self.output_vel[i].v = self.kp_l[i] * np.cos(self.th_e[i]) * np.sqrt(self.x_e[i]**2+self.y_e[i]**2) * world.robots[i].dir
+            if i==0: print("v: {0}, w: {1}, th: {2}".format(self.output_vel[i].v, self.output_vel[i].w, self.th_e[i]))
 
 
 class ssRegulator(System):
