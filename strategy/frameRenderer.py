@@ -32,7 +32,7 @@ def strategyFrame(frameShape, step=0.01):
     blkballline,_ = meters2pixel((0.55*world.fieldSide,0), (height,width))
     cv2.line(frame, (blkballline,0), (blkballline,height), (100,100,100), 1)
     
-    for robot in world.robots[:2]:
+    for robot in world.robots[:3]:
         if robot.pos[0] is not None and robot.pos[1] is not None:
             position = meters2pixel(robot.pos, (height,width))
             
