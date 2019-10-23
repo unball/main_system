@@ -176,7 +176,7 @@ class MainVision(vision.vision.Vision):
 				nearestIdx = idx
 				break
 			
-			distance = abs(pos[0]-center[0])+abs(pos[1]-center[1])
+			distance = (pos[0]-center[0])**2+(pos[1]-center[1])**2
 			if distance < minDistance:
 				minDistance = distance
 				nearestIdx = idx

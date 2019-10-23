@@ -44,7 +44,7 @@ class Entity(ABC):
 def spinKick(pose, host):
     if host is not None:
         distance = np.sqrt((pose[0]-static_classes.world.ball.pos[0])**2+(pose[1]-static_classes.world.ball.pos[1])**2)
-        if distance < 0.06: 
+        if distance < 0.07: 
             host.spin = -1 if pose[1]*world.fieldSide > 0 else 1
             host.spin = host.spin * np.sign(pose[0]-static_classes.world.ball.pos[0]) * world.fieldSide
         else: host.spin = 0
@@ -94,7 +94,7 @@ class MovimentsDecider():
         self.ball_vmax = 1.5
         self.state = ATT
         #self.listEntity = [Attacker(), Attacker(), TestPlayer()]
-        self.listEntity = [Attacker(), Goalkeeper(), Defender()]
+        self.listEntity = [Attacker(), Defender(), Goalkeeper()]
         self.turning_radius = statics.configFile.getValue("Turn_Radius", 0.070)
         self.dynamicPossession = False
 
@@ -130,7 +130,7 @@ class MovimentsDecider():
         filtered = []
         for trajectory in trajectoryList:
             discretized = np.array(trajectory.sample_many(0.01)[0])[:,:2]
-            insidePoints = abs(discretized) > [world.field_x_length/2*0.95, world.field_y_length/2]
+            insidePoints = abs(discretized) > [(world.field_x_length-0.16)/2*1, world.field_y_length/2*0.98]
             if np.sum(insidePoints[:,0] | insidePoints[:,1]) == 0:
                 filtered.append(trajectory)
         

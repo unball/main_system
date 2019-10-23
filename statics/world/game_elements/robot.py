@@ -52,7 +52,7 @@ class Robot(Element):
                 self.nearTarget = False
                 pass
             else:
-                if self.distanceToTarget() < 0.08:# and self.distanceToTargetAngle() < self.entity.acceptableAngleError:
+                if self.distanceToTarget() < 0.06:# and self.distanceToTargetAngle() < self.entity.acceptableAngleError:
                     self.nearTarget = True
                     atualPose = self.__trajectory[0][0]
                     angle = self.__trajectory[0][-1][2]

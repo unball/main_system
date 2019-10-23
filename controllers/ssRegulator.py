@@ -40,9 +40,9 @@ class nonLinearControl(System):
         self.v_max = 0.8
         self.v_offset = 0.35
 
-        self.ka = np.array([4/1.5, 4/1.5, 4/1.5, 4/1.5, 4/1.5])
+        self.ka = np.array([4, 3, 3, 4, 4])
         self.kp = np.array([3.75, 3.75, 3.75, 3.75, 3.75])
-        self.kp_l = np.array([18, 18, 18, 18, 18])
+        self.kp_l = np.array([18, 15, 15, 18, 18])
 
         self.th_i = [0 for i in range(self.number_of_robots)]
         self.th_r = [0 for i in range(self.number_of_robots)]
@@ -84,10 +84,10 @@ class nonLinearControl(System):
         # Spin bypass
         for i,spin in enumerate(spinList):
             if spin != 0:
-                self.output_vel[i].w = spin*4*np.pi
+                self.output_vel[i].w = spin*4*np.pi*10
                 self.output_vel[i].v = 0
 
-        print("v: {0}, w: {1}, th: {2}".format(self.output_vel[2].v, self.output_vel[2].w, self.th_e[2]))
+        print("v: {0}, w: {1}, th: {2}".format(self.output_vel[1].v, self.output_vel[1].w, self.th_e[1]))
         
         return self.output_vel
 
@@ -97,7 +97,7 @@ class nonLinearControl(System):
             self.output_vel[i].w = self.sat(self.output_vel[i].w, 4*np.pi)
 
             self.output_vel[i].v = self.kp_l[i] * np.cos(self.th_e[i]) * np.sqrt(self.x_e[i]**2+self.y_e[i]**2) * world.robots[i].dir
-            if i==0: print("v: {0}, w: {1}, th: {2}".format(self.output_vel[i].v, self.output_vel[i].w, self.th_e[i]))
+            #if i==0: print("v: {0}, w: {1}, th: {2}".format(self.output_vel[i].v, self.output_vel[i].w, self.th_e[i]))
 
 
 class ssRegulator(System):

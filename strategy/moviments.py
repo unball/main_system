@@ -11,7 +11,7 @@ def projectBall(ballPos, ballVel, dt=0.03):
 
 def goToBallPlus(ballPos, robotPose):
     ballPos = projectBall(ballPos, world.ball.vel)
-    finalTarget = np.array([-.75*world.fieldSide, 0])
+    finalTarget = np.array([.75*world.fieldSide, 0])
     ballTarget = finalTarget-ballPos  
     ballRobot = ballPos-robotPose[:2]
     distance = np.linalg.norm(ballRobot)
@@ -26,12 +26,21 @@ def followBally(rb, rr):
     
     return (0.40*world.fieldSide, rb[1], angle)
 
+def insideEllipse(r, a, b, rm):
+    return ((r[0]-rm[0])/a)**2+((r[1]-rm[1])/b)**2 < 1
+
 def blockBallElipse(rb, vb, rr):
-    return followBally(rb, rr)
-    a = 0.2
+    #return followBally(rb, rr)
+    rb = projectBall(rb, vb)
+    a = 0.3
     b = 0.4
     rm = np.array([0.75*world.fieldSide, 0])
     e = np.array([1/a, 1/b])
+    finalTarget = np.array([.75*world.fieldSide, 0])
+
+    if insideEllipse(rb, a, b, rm):
+        vb = finalTarget-(rb[0], -rb[1])
+    else: vb = finalTarget-rb
     
     coefficients = [sum((vb*e)**2), 2*np.dot((rb-rm)*e, vb*e), sum(((rb-rm)*e)**2)-1]
     
@@ -81,13 +90,15 @@ def blockBallElipse(rb, vb, rr):
 def goalkeep(ballPos, ballVel, robotPose):
     xGoal = world.fieldSide * .65
     #testar velocidade minima (=.15?)
-    ytarget = max(min(ballPos[1],.35),-.35)
-    angle = np.pi/2 if robotPose[1] < ytarget*world.fieldSide else -np.pi/2
-    if ((ballVel[0]*world.fieldSide) > .05) and  ((ballPos[0]*world.fieldSide)> .15):
+    if ((ballVel[0]*world.fieldSide) > .1) and  ((ballPos[0]*world.fieldSide)> .15):
         #verificar se a projeção está no gol
         #projetando vetor até um xGoal-> y = (xGoal-Xball) * Vyball/Vxball + yBall 
-        return (xGoal, max(min((((xGoal-ballPos[0])/ballVel[0])*ballVel[1])+ballPos[1],0.35),-.35), angle)
+        ytarget = max(min((((xGoal-ballPos[0])/ballVel[0])*ballVel[1])+ballPos[1],0.23),-0.23)
+        angle = np.pi/2 if robotPose[1] < ytarget else -np.pi/2
+        return (xGoal, ytarget, angle)
     #Se não acompanha o y
+    ytarget = max(min(ballPos[1],0.23),-0.23)
+    angle = np.pi/2 if robotPose[1] < ytarget else -np.pi/2
     return np.array([xGoal, ytarget, angle])
 
 def mirrorPos(posDom):
