@@ -24,7 +24,11 @@ class Entity(ABC):
         self.__target = np.array([0,0,0])
         self._path = None
         self.__name = name
+        self.target2 = np.array([0,0,0])
         self.acceptableAngleError = 0.26
+
+    def initialPose(self):
+        return (0,0,0)
         
     def __str__(self):
         return self.__name
@@ -34,6 +38,10 @@ class Entity(ABC):
         self.host = robot
         robot.target = self.__target
         robot.entity = self
+
+    @property
+    def target(self):
+        return self.__target
 
     @abstractmethod
     def tatic(self,pose):
@@ -52,9 +60,26 @@ def spinKick(pose, host):
 class Attacker(Entity):
     def __init__(self):
         super().__init__("Atacante")
+        self.exploredAttack = False
+        self.goalSide = 0
     def tatic(self, pose):
-        self.__target = moviments.goToBallPlus(static_classes.world.ball.pos, pose)
+        self.chooseGoalSide()
+        self.__target = moviments.goToBallPlus(static_classes.world.ball.pos, pose, self.goalSide)
+        self.target2 = self.__target
         return self.__target
+    def initialPose(self):
+        if world.getInitPos == -1:
+            return (world.attacker_init_def_pos_x*world.fieldSide, 0, 0)
+        if world.getInitPos == 1:
+            return (0.04*world.fieldSide, 0, 0)
+    def chooseGoalSide(self):
+        if world.ball.x*world.fieldSide > 0:
+            if self.exploredAttack == True:
+                self.exploredAttack = False
+                self.goalSide = .15*np.random.randint(-1,2)
+        else:
+            self.exploredAttack = True
+                
 
 class Goalkeeper(Entity):
     def __init__(self):
@@ -62,8 +87,12 @@ class Goalkeeper(Entity):
         self.acceptableAngleError = math.inf
     def tatic(self, pose):
         self.__target =  moviments.goalkeep(static_classes.world.ball.pos, static_classes.world.ball.vel, pose)
+        self.target2 = self.__target
         spinKick(pose, self.host)
         return self.__target
+    def initialPose(self):
+        if world.getInitPos != 0:
+            return (world.goalkeeper_init_pos_x*world.fieldSide, 0, np.pi/2)
 
 class Defender(Entity):
     def __init__(self):
@@ -71,8 +100,13 @@ class Defender(Entity):
     def tatic(self, pose):
         roboty = pose[1]
         self.__target = moviments.blockBallElipse(np.array(static_classes.world.ball.pos), np.array(static_classes.world.ball.vel), np.array(pose))
+        self.target2 = self.__target
+        #print("tatic: {0}".format(self.__target[2]))
         spinKick(pose, self.host)
         return self.__target
+    def initialPose(self):
+        if world.getInitPos != 0:
+            return (world.defender_init_pos_x*world.fieldSide, 0, np.pi/2)
 
 class Midfielder(Entity):
     def __init__(self):
@@ -130,8 +164,8 @@ class MovimentsDecider():
         filtered = []
         for trajectory in trajectoryList:
             discretized = np.array(trajectory.sample_many(0.01)[0])[:,:2]
-            insidePoints = abs(discretized) > [(world.field_x_length-0.16)/2*1, world.field_y_length/2*0.98]
-            if np.sum(insidePoints[:,0] | insidePoints[:,1]) == 0:
+            outsidePoints = np.logical_and(abs(discretized) > [world.internal_limit_x, world.internal_limit_y], np.logical_not(abs(discretized) < np.array([world.internal_limit_x+world.internal_x_goal,world.internal_y_goal])) )
+            if np.sum(outsidePoints[:,0] | outsidePoints[:,1]) == 0:
                 filtered.append(trajectory)
         
         return filtered
@@ -191,12 +225,20 @@ class MovimentsDecider():
                         self.listEntity = [Attacker(), Midfielder(), Goalkeeper()]
                     self.state = ATT
 
+    def initialUpdateHost(self):
+        for robot in static_classes.world.robots:
+            if robot.entity is not None:
+                path = self.shortestTragectory(robot.pose, robot.entity.initialPose(), self.turning_radius, robot) 
+                robot.entity.possess(path, robot)
+
+
     def updadeHost(self):
         if self.dynamicPossession == False:
             for indx,robot in enumerate(static_classes.world.robots):
                 if(indx >= len(self.listEntity)): break
                 target = self.listEntity[indx].tatic(robot.pose)
                 path = self.shortestTragectory(robot.pose, target, self.turning_radius, robot) 
+                #if indx == 1: print("path: {0}".format(path.path_endpoint()))
                 self.listEntity[indx].possess(path, robot)
             return
 

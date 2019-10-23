@@ -6,26 +6,22 @@ import gui.singleton
 from statics.static_classes import world
 from statics import field
 
+
 class gameCommands(metaclass=gui.singleton.Singleton):
 	def __init__(self):
 		self.goalAlly = 0
 		self.goalEnemy = 0
 		self.oponente = "Oponente"
+		self.initPos = 0
 		#rospy.init_node('game_commands')
 		#pub = rospy.Publisher('game_commands', String, queue_size=1)
 		#rate = rospy.Rate(30)
 		
 	def left(self):
-		print ("L")
 		world.change_field_side(field.LEFT)
-		#pub.publish("L")
-		#rate.sleep()
 	
 	def right(self):
 		world.change_field_side(field.RIGHT)
-		print ("R")
-		#pub.publish("R")
-		#rate.sleep()
 	
 	def ally(self):
 		estadoLabel = gui.mainWindow.MainWindow().getObject("gameCommands_estado")
@@ -42,8 +38,6 @@ class gameCommands(metaclass=gui.singleton.Singleton):
 			estadoLabel.modify_fg(Gtk.StateFlags.NORMAL, Gdk.color_parse("red"))
 			playPouseButton.set_label("Play")
 			playPouseButton.modify_bg(Gtk.StateFlags.NORMAL, Gdk.color_parse("green"))
-			#pub.publish("P")
-			#rate.sleep()
 	
 	def enemy(self):
 		estadoLabel = gui.mainWindow.MainWindow().getObject("gameCommands_estado")
@@ -51,7 +45,6 @@ class gameCommands(metaclass=gui.singleton.Singleton):
 		playPouseButton = gui.mainWindow.MainWindow().getObject("gameCommands_playpause")
 		
 		if estadoLabel.get_text() == "O jogo está rodando":
-			print("E Goal")
 			self.goalEnemy += 1
 			world.decreaseGameScore()
 			world.stopGame()
@@ -60,22 +53,20 @@ class gameCommands(metaclass=gui.singleton.Singleton):
 			estadoLabel.modify_fg(Gtk.StateFlags.NORMAL, Gdk.color_parse("red"))
 			playPouseButton.set_label("Play")
 			playPouseButton.modify_bg(Gtk.StateFlags.NORMAL, Gdk.color_parse("green"))
-			#pub.publish("P")
-			#rate.sleep()
 
 	def fimdejogo(self, event):
 		print ("Q")
 	
-	def IniciodeJogo(self):
+	def IniciodeJogo(self, typ):
 		estadoLabel = gui.mainWindow.MainWindow().getObject("gameCommands_estado")
 		playPouseButton = gui.mainWindow.MainWindow().getObject("gameCommands_playpause")
-		if estadoLabel.get_text() == "Equipe UnBall":
-			estadoLabel.set_text("O jogo está rodando")
-			estadoLabel.modify_fg(Gtk.StateFlags.NORMAL, Gdk.color_parse("blue"))
-			playPouseButton.set_label("Pause")
-			playPouseButton.modify_bg(Gtk.StateFlags.NORMAL, Gdk.color_parse("red"))
-			#pub.publish("G")
-			#rate.sleep()
+		estadoLabel.set_text("O jogo está rodando")
+		estadoLabel.modify_fg(Gtk.StateFlags.NORMAL, Gdk.color_parse("blue"))
+		playPouseButton.set_label("Pause")
+		playPouseButton.modify_bg(Gtk.StateFlags.NORMAL, Gdk.color_parse("red"))
+		world.startGame()
+		world.go2initPos(typ)
+
 			
 	def playPause(self):
 		estadoLabel = gui.mainWindow.MainWindow().getObject("gameCommands_estado")
@@ -85,15 +76,13 @@ class gameCommands(metaclass=gui.singleton.Singleton):
 			estadoLabel.modify_fg(Gtk.StateFlags.NORMAL, Gdk.color_parse("red"))
 			playPouseButton.set_label("Play")
 			playPouseButton.modify_bg(Gtk.StateFlags.NORMAL, Gdk.color_parse("green"))
-			#pub.publish("P")
 			world.stopGame()
-			#rate.sleep()
+			world.stopGoingInitPos()
 		else:
 			estadoLabel.set_text("O jogo está rodando")
 			estadoLabel.modify_fg(Gtk.StateFlags.NORMAL, Gdk.color_parse("blue"))
 			playPouseButton.set_label("Pause")
 			playPouseButton.modify_bg(Gtk.StateFlags.NORMAL, Gdk.color_parse("red"))
-			#pub.publish("G")
 			world.startGame()
-			#rate.sleep()
+			world.stopGoingInitPos()
 

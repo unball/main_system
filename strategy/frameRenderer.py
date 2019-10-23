@@ -26,8 +26,16 @@ def strategyFrame(frameShape, step=0.01):
     
     Drawing.draw_field(frame)
 
+    # Desenha area interna do campo
+    mainPt1 = meters2pixel((-world.internal_limit_x, world.internal_limit_y), frameShape)
+    mainPt2 = meters2pixel((world.internal_limit_x, -world.internal_limit_y), frameShape)
+    cv2.rectangle(frame,mainPt1,mainPt2,(50,50,50),-1)
+    mainGaolPt1 = meters2pixel((-(world.internal_limit_x+world.internal_x_goal), world.internal_y_goal), frameShape)
+    mainGaolPt2 = meters2pixel(((world.internal_limit_x+world.internal_x_goal), -world.internal_y_goal), frameShape)
+    cv2.rectangle(frame,mainGaolPt1,mainGaolPt2,(50,50,50),-1)
+
     ellipseCenter = meters2pixel((0.75*world.fieldSide, 0), frameShape)
-    ellipseAxis = (int(0.2*width/1.6),int(0.4*height/1.3))
+    ellipseAxis = (int(0.3*width/1.6),int(0.4*height/1.3))
     cv2.ellipse(frame, ellipseCenter, ellipseAxis, 0, 0, 360, (100,100,100), 1)
     blkballline,_ = meters2pixel((0.55*world.fieldSide,0), (height,width))
     cv2.line(frame, (blkballline,0), (blkballline,height), (100,100,100), 1)
@@ -66,6 +74,7 @@ class parametrosEstrategia(gui.frameRenderer.frameRenderer):
         self.gameThread.addEvent(self.parent.setTurningRadius, widget.get_value())
     
     def update_spin(self, widget):
+        print("EXECUTEI")
         self.gameThread.addEvent(self.parent.setStep, widget.get_value())
     
     def set_dynamic_possession(self, widget, value):
@@ -157,7 +166,7 @@ class elementsPositioner(gui.frameRenderer.frameRenderer):
             cv2.circle(frame, self.__mousePosition, 5, (255,0,0), -1)
         
         ellipseCenter = meters2pixel((0.75*world.fieldSide, 0), self.frameShape)
-        ellipseAxis = (int(0.2*width/1.6),int(0.4*height/1.3))
+        ellipseAxis = (int(0.3*width/1.6),int(0.4*height/1.3))
         cv2.ellipse(frame, ellipseCenter, ellipseAxis, 0, 0, 360, (100,100,100), 1)
         blkballline,_ = meters2pixel((0.55*world.fieldSide,0), (height,width))
         cv2.line(frame, (blkballline,0), (blkballline,height), (100,100,100), 1)

@@ -29,6 +29,7 @@ class World(object):
         self.__gameRunning = False
         self.__referenceTime = 0
         self.__dt = 0
+        self.__initPos = 0
         print("World initiated successfully.")
         print("Number of robots: {}".format(self._number_of_robots))
     
@@ -37,11 +38,27 @@ class World(object):
             self._number_of_robots = setting['number_of_robots']
             self._field_x_length = setting['field_x_length']
             self._field_y_length = setting['field_y_length']
+            self._attacker_init_def_pos_x = setting['attacker_init_def_pos_x']
+            self._goalkeeper_init_pos_x = setting['goalkeeper_init_pos_x']
+            self._defender_init_pos_x = setting['defender_init_pos_x']
+
+            self._internal_limit_x = setting['internal_limit_x']
+            self._internal_limit_y = setting['internal_limit_y']
+            self._internal_y_goal = setting['internal_y_goal']
+            self._internal_x_goal = setting['internal_x_goal']
+
             self._robots = list(Robot() for robot in range(self._number_of_robots))
         else:
             self._number_of_robots = None
             self._field_x_length = None
             self._field_y_length = None
+            self._attacker_init_def_pos_x = None
+            self._goalkeeper_init_pos_x = None
+            self._defender_init_pos_x = None
+            self._internal_limit_x = None
+            self._internal_limit_y = None
+            self._internal_y_goal = None
+            self._internal_x_goal = None
             print("WARNING: no setting of world defined!")
             return None
         
@@ -66,6 +83,16 @@ class World(object):
     @property
     def gameRunning(self):
         return self.__gameRunning
+
+    @property
+    def getInitPos(self):
+        return self.__initPos
+
+    def go2initPos(self, typ):
+        self.__initPos = typ
+
+    def stopGoingInitPos(self):
+        self.__initPos = 0
 
     def startGame(self):
         self.__gameRunning = True
@@ -162,6 +189,31 @@ class World(object):
     @property
     def field_y_length(self):
         return self._field_y_length
+        
+    @property
+    def attacker_init_def_pos_x(self):
+        return self._attacker_init_def_pos_x
+        
+    @property
+    def goalkeeper_init_pos_x(self):
+        return self._goalkeeper_init_pos_x
+        
+    @property
+    def defender_init_pos_x(self):
+        return self._defender_init_pos_x
+
+    @property
+    def internal_limit_x(self):
+        return self._internal_limit_x
+    @property
+    def internal_limit_y(self):
+        return self._internal_limit_y
+    @property
+    def internal_y_goal(self):
+        return self._internal_y_goal
+    @property
+    def internal_x_goal(self):
+        return self._internal_x_goal
 
     @property
     def isPaused(self):

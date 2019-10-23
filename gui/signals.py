@@ -42,8 +42,11 @@ class Signals:
         if gameThread is not None:
             gameThread.set_state(stack.get_visible_child_name())
     
-    def gameCommands_IniciodeJogo(self, widget):
-        interfaces.gamecommands.gameCommands().IniciodeJogo()
+    def gameCommands_IniciodeJogoDefesa(self, widget):
+        interfaces.gamecommands.gameCommands().IniciodeJogo(-1)
+    
+    def gameCommands_IniciodeJogoAtaque(self, widget):
+        interfaces.gamecommands.gameCommands().IniciodeJogo(1)
     
     def gameCommands_playPause(self, widget):
         interfaces.gamecommands.gameCommands().playPause()

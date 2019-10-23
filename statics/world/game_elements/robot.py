@@ -24,12 +24,13 @@ class Robot(Element):
         return 0
 
     def nextStep(self):
-        if len(self.__trajectory) != 0 and len(self.__trajectory[0]) >= 1:
+        if len(self.__trajectory) != 0 and len(self.__trajectory[0]) > 1:
             pose = self.__trajectory[0][1]
             angle = pose[2] - 2*np.pi if pose[2] > np.pi else pose[2]
             return (pose[0], pose[1], angle)
         # !TODO: Decidir o que fazer quando não há uma trajetória
-        else: return (0,0,0)
+        else: 
+            return self.pose
 
     def distanceToTarget(self):
         r = self.__trajectory[0][0]
@@ -54,8 +55,9 @@ class Robot(Element):
             else:
                 if self.distanceToTarget() < 0.06:# and self.distanceToTargetAngle() < self.entity.acceptableAngleError:
                     self.nearTarget = True
-                    atualPose = self.__trajectory[0][0]
-                    angle = self.__trajectory[0][-1][2]
+                    atualPose = self.pose
+                    angle = self.entity.target2[2]
+                    #if self.entity.__str__() == "Defensor": print(angle)
                     newPose = (atualPose[0], atualPose[1], angle)
                     self.__trajectory = [[newPose, newPose]]
                 else: self.nearTarget = False

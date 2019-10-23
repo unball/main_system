@@ -9,16 +9,23 @@ def projectBall(ballPos, ballVel, dt=0.03):
     dt = 3*world.timeInterval
     return (ballPos[0]+dt*ballVel[0], ballPos[1]+dt*ballVel[1])
 
-def goToBallPlus(ballPos, robotPose):
+def goToBallPlus(ballPos, robotPose, goalSide):
     ballPos = projectBall(ballPos, world.ball.vel)
-    finalTarget = np.array([.75*world.fieldSide, 0])
+    finalTarget = np.array([.75*world.fieldSide, goalSide])
     ballTarget = finalTarget-ballPos  
     ballRobot = ballPos-robotPose[:2]
+
+
+    if abs(ballPos[1]) > 0.9*world.field_y_length:
+        if world.fieldSide == -1: angle = 0
+        else: angle = np.pi
+    else: angle = np.arctan2(ballTarget[1],ballTarget[0])
+
     distance = np.linalg.norm(ballRobot)
     if distance < 0.08 and robotPose[0]*world.fieldSide > (ballPos[0])*world.fieldSide+0.03*world.fieldSide and abs(robotPose[1]-ballPos[1]) < 0.03:
-        return (finalTarget[0], finalTarget[1], np.arctan2(ballTarget[1],ballTarget[0]))
+        return (finalTarget[0], finalTarget[1], angle)
     
-    return (ballPos[0], ballPos[1], np.arctan2(ballTarget[1],ballTarget[0]))
+    return (ballPos[0], ballPos[1], angle)
 
 def followBally(rb, rr):
     angle = np.pi/2
@@ -38,7 +45,7 @@ def blockBallElipse(rb, vb, rr):
     e = np.array([1/a, 1/b])
     finalTarget = np.array([.75*world.fieldSide, 0])
 
-    if insideEllipse(rb, a, b, rm):
+    if insideEllipse(rb, 0.25, 0.33, rm):
         vb = finalTarget-(rb[0], -rb[1])
     else: vb = finalTarget-rb
     
@@ -88,7 +95,7 @@ def blockBallElipse(rb, vb, rr):
 #        return (0,0,0)
 
 def goalkeep(ballPos, ballVel, robotPose):
-    xGoal = world.fieldSide * .65
+    xGoal = world.fieldSide * .68
     #testar velocidade minima (=.15?)
     if ((ballVel[0]*world.fieldSide) > .1) and  ((ballPos[0]*world.fieldSide)> .15):
         #verificar se a projeção está no gol
