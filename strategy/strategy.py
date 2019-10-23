@@ -6,6 +6,8 @@ from statics.static_classes import world
 import strategy.frameRenderer
 import statics
 from states.system import System
+
+
 def error():
     """Print the standard error message for STRATEGY scope."""
     print("\nSTRATEGY ERROR:")
@@ -43,7 +45,10 @@ class Strategy(System, object):
         #self.decider.setFormation()
         
         #if self.dynamicPossession:
-        self.decider.updadeHost()
+        if world.SetInitPos == True:
+            self.decider.initialUpdateHost()
+        else:
+            self.decider.updadeHost()
 #        else:
 #            self.decider.calcPath()
 

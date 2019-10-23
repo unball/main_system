@@ -235,6 +235,15 @@ class MovimentsDecider():
                         self.listEntity = [Attacker(), Midfielder(), Goalkeeper()]
                     self.state = ATT
 
+    def initialUpdateHost(self):
+        for indx,robot in enumerate(static_classes.world.robots):
+            if(indx >= len(self.listEntity)): break
+            target = [-0.4 + 0.2*math.pow(-1, indx), -.2 + 0.2*indx, 0]
+            path = self.shortestTragectory(robot.pose, target, self.turning_radius, robot) 
+            self.listEntity[indx].possess(path, robot)
+        return
+
+
     def updadeHost(self):
         if self.dynamicPossession == False:
             for indx,robot in enumerate(static_classes.world.robots):

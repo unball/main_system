@@ -28,6 +28,7 @@ class World(object):
         self.__mainPoint = (0,0)
         self.__gameRunning = False
         self.__referenceTime = 0
+        self.__initPos = 0
         print("World initiated successfully.")
         print("Number of robots: {}".format(self._number_of_robots))
     
@@ -61,6 +62,16 @@ class World(object):
     @property
     def gameRunning(self):
         return self.__gameRunning
+
+    @property
+    def SetInitPos(self):
+        return self.__initPos
+
+    def go2initPos(self):
+        self.__initPos = True
+
+    def stopGoingInitPos(self):
+        self.__initPos = False
 
     def startGame(self):
         self.__gameRunning = True
