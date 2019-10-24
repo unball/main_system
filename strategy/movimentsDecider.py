@@ -165,8 +165,10 @@ class MovimentsDecider():
         filtered = []
         for trajectory in trajectoryList:
             discretized = np.array(trajectory.sample_many(0.01)[0])[:,:2]
-            outsidePoints = np.logical_and(abs(discretized) > [world.internal_limit_x, world.internal_limit_y], np.logical_not(abs(discretized) < np.array([world.internal_limit_x+world.internal_x_goal,world.internal_y_goal])) )
-            if np.sum(outsidePoints[:,0] | outsidePoints[:,1]) == 0:
+            #outsidePoints = np.logical_and(abs(discretized) > [world.internal_limit_x, world.internal_limit_y], (abs(discretized) > np.array([mat.inf,world.internal_y_goal])) )
+            outsidePoints = (abs(discretized[:,1]) > world.internal_y_goal)
+            outsidePoints = np.logical_and(outsidePoints, np.logical_or(abs(discretized[:,0]) > world.internal_limit_x, abs(discretized[:,1]) > world.internal_limit_y))
+            if np.sum(outsidePoints) == 0:
                 filtered.append(trajectory)
         
         return filtered
