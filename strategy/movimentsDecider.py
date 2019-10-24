@@ -77,7 +77,7 @@ class Attacker(Entity):
         if world.ball.x*world.fieldSide > 0:
             if self.exploredAttack == True:
                 self.exploredAttack = False
-                self.goalSide = .15*np.random.randint(-1,2)
+                self.goalSide = 0.05*np.random.randint(-1,2)
         else:
             self.exploredAttack = True
                 
