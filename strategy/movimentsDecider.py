@@ -64,7 +64,8 @@ class Attacker(Entity):
         self.goalSide = 0
     def tatic(self, pose):
         self.chooseGoalSide()
-        self.__target = moviments.goToBallPlus(static_classes.world.ball.pos, pose, self.goalSide)
+        if static_classes.world.ball.x*world.fieldSide > 0.55: return moviments.followBally(static_classes.world.ball.pose, pose)
+        self.__target = moviments.goToBallPlus(static_classes.world.ball.pos, pose, self.goalSide, self.host)
         self.target2 = self.__target
         return self.__target
     def initialPose(self):
