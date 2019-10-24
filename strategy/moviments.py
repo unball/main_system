@@ -6,13 +6,14 @@ from statics.static_classes import world
 #TODO: implementar spin
 
 def projectBall(ballPos, ballVel, dt=0.03):
-    dt = 3*world.timeInterval
+    dt = 0*world.timeInterval
     return (ballPos[0]+dt*ballVel[0], ballPos[1]+dt*ballVel[1])
 
 def goToBallPlus(ballPos, robotPose, goalSide, robot):
     ballPos = projectBall(ballPos, world.ball.vel)
-    finalTarget = np.array([-.75*world.fieldSide, goalSide])
+    finalTarget = np.array([-.80*world.fieldSide, goalSide])
     ballTarget = finalTarget-ballPos  
+    robotTarget = finalTarget-robotPose[:2]  
     ballRobot = ballPos-robotPose[:2]
 
 
@@ -21,12 +22,12 @@ def goToBallPlus(ballPos, robotPose, goalSide, robot):
         else: angle = np.pi
     else: angle = np.arctan2(ballTarget[1],ballTarget[0])
 
-    if robot is not None: robot.step = 0.035
+    #if robot is not None: robot.step = 0.035
 
     distance = np.linalg.norm(ballRobot)
     if distance < 0.09 and robotPose[0]*world.fieldSide > (ballPos[0])*world.fieldSide+0.03*world.fieldSide:# and abs(robotPose[1]-ballPos[1]) < 0.03:
-        if robot is not None: robot.step = robot.step * 3
-        return (finalTarget[0], finalTarget[1], np.arctan2(ballRobot[1],ballRobot[0]))
+        #if robot is not None: robot.step = robot.step * 3
+        return (finalTarget[0], finalTarget[1], np.arctan2(robotTarget[1],robotTarget[0]))
     
     return (ballPos[0], ballPos[1], angle)
 

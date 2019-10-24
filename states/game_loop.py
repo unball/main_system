@@ -39,7 +39,7 @@ class GameLoop(State):
         #targets = [(world.ball.x,world.ball.y,angle),(0,0,0),(0,0,0)]
         velocities = self.thread.controlSystem.actuate(targets, spin, static_classes.world)
         #print(targets[0][2]-world.robots[0].pose[2])
-        print(targets[1][2])
+        #print(targets[1][2])
         #print(velocities[0])
 
 

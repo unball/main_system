@@ -40,9 +40,9 @@ class nonLinearControl(System):
         self.v_max = 0.8
         self.v_offset = 0.35
 
-        self.ka = np.array([1.3*3, 3, 3, 4, 4])
-        self.kp = np.array([1.1*3, 3.75, 3.75, 3.75, 3.75])
-        self.kp_l = np.array([4*3, 15, 15, 18, 18])
+        self.ka = np.array([3, 3, 3, 4, 4])
+        self.kp = np.array([3.85, 3.75, 3.75, 3.75, 3.75])
+        self.kp_l = np.array([15, 15, 13, 18, 18])
 
         self.th_i = [0 for i in range(self.number_of_robots)]
         self.th_r = [0 for i in range(self.number_of_robots)]

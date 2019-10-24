@@ -16,6 +16,7 @@ class Robot(Element):
         self.dir = 1
         self.nearTarget = False
         self.step = 0.035
+        self.radius = 0.06
 
     def pathLength(self):
         if self.nearTarget == True:
@@ -48,11 +49,17 @@ class Robot(Element):
             self.__trajectory =  self.entity._path.sample_many(step)
             
             #if self.entity.__str__() == "Defensor": print("d: {0}".format(self.distanceToTarget()))
-
+            
             # Chegou no target!!!!
             if self.entity.__str__() == "Atacante":
                 self.nearTarget = False
-                pass
+                
+                if self.entity._path.segment_length(0) < np.pi*30/180*self.radius and self.entity._path.path_length() > np.pi*180/180*self.radius:
+                    #normalized = 0.1*self.entity._path.segment_length(1)/(self.entity._path.path_length()-self.entity._path.segment_length(1))
+                    normalized = 1#self.entity._path.segment_length(1)/self.entity._path.path_length()
+                    if self.entity.__str__() == "Atacante": print("adsf: " + str(normalized))
+                    step = min(3.5*step*normalized, self.entity._path.path_length()/2.001)
+            
             else:
                 if self.distanceToTarget() < 0.06:# and self.distanceToTargetAngle() < self.entity.acceptableAngleError:
                     self.nearTarget = True

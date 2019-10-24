@@ -33,11 +33,12 @@ class Entity(ABC):
     def __str__(self):
         return self.__name
 
-    def possess(self, path, robot):
+    def possess(self, path, robot, radius):
         self._path = path
         self.host = robot
         robot.target = self.__target
         robot.entity = self
+        robot.radius = radius
 
     @property
     def target(self):
@@ -129,7 +130,7 @@ class MovimentsDecider():
         self.ball_vmax = 1.5
         self.state = ATT
         #self.listEntity = [Attacker(), Attacker(), TestPlayer()]
-        self.listEntity = [Defender(), Attacker(), Goalkeeper()]
+        self.listEntity = [Attacker(), Defender(), Goalkeeper()]
         self.turning_radius = statics.configFile.getValue("Turn_Radius", 0.070)
         self.dynamicPossession = False
 
@@ -189,7 +190,9 @@ class MovimentsDecider():
         bestCost = self.trajectoryCost(best, robot)
         altBestCost = self.trajectoryCost(altBest, robot)
         
+        distanceToTarget = np.linalg.norm(np.array(startPose)-np.array(endPose))
         HIST = 0.1
+        #if robot.entity.__str__() == "Atacante": print("histerese: {0}".format(HIST))
         diff = bestCost-altBestCost
         #print(diff)
 
@@ -232,7 +235,7 @@ class MovimentsDecider():
         for robot in static_classes.world.robots:
             if robot.entity is not None:
                 path = self.shortestTragectory(robot.pose, robot.entity.initialPose(), self.turning_radius, robot) 
-                robot.entity.possess(path, robot)
+                robot.entity.possess(path, robot, self.turning_radius)
 
 
     def updadeHost(self):
@@ -242,7 +245,7 @@ class MovimentsDecider():
                 target = self.listEntity[indx].tatic(robot.pose)
                 path = self.shortestTragectory(robot.pose, target, self.turning_radius, robot) 
                 #if indx == 1: print("path: {0}".format(path.path_endpoint()))
-                self.listEntity[indx].possess(path, robot)
+                self.listEntity[indx].possess(path, robot, self.turning_radius)
             return
 
         possessed = []
@@ -262,7 +265,7 @@ class MovimentsDecider():
                     host = robot
             if host is not None:
                 possessed.append(host)
-                entity.possess(minPath, host)
+                entity.possess(minPath, host, self.turning_radius)
 
     def calcPath(self):
         for robot in static_classes.world.robots:
