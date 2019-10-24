@@ -9,9 +9,9 @@ def projectBall(ballPos, ballVel, dt=0.03):
     dt = 3*world.timeInterval
     return (ballPos[0]+dt*ballVel[0], ballPos[1]+dt*ballVel[1])
 
-def goToBallPlus(ballPos, robotPose, goalSide):
+def goToBallPlus(ballPos, robotPose, goalSide, robot):
     ballPos = projectBall(ballPos, world.ball.vel)
-    finalTarget = np.array([.75*world.fieldSide, goalSide])
+    finalTarget = np.array([-.75*world.fieldSide, goalSide])
     ballTarget = finalTarget-ballPos  
     ballRobot = ballPos-robotPose[:2]
 
