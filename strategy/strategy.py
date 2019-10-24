@@ -54,7 +54,7 @@ class Strategy(System, object):
 
         self.targets = []
         for i,robot in enumerate(world.robots):
-            robot.discretize(self.step)
+            robot.discretize(robot.step)
             self.targets.append(robot.nextStep())
             self.spin[i] = robot.spin
             

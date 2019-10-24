@@ -15,6 +15,7 @@ class Robot(Element):
         self.spin = 0
         self.dir = 1
         self.nearTarget = False
+        self.step = 0.035
 
     def pathLength(self):
         if self.nearTarget == True:
