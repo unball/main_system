@@ -27,12 +27,7 @@ def strategyFrame(frameShape, step=0.01):
     Drawing.draw_field(frame)
 
     # Desenha area interna do campo
-    mainPt1 = meters2pixel((-world.internal_limit_x, world.internal_limit_y), frameShape)
-    mainPt2 = meters2pixel((world.internal_limit_x, -world.internal_limit_y), frameShape)
-    cv2.rectangle(frame,mainPt1,mainPt2,(50,50,50),-1)
-    mainGaolPt1 = meters2pixel((-(world.internal_limit_x+world.internal_x_goal), world.internal_y_goal), frameShape)
-    mainGaolPt2 = meters2pixel(((world.internal_limit_x+world.internal_x_goal), -world.internal_y_goal), frameShape)
-    cv2.rectangle(frame,mainGaolPt1,mainGaolPt2,(50,50,50),-1)
+    Drawing.draw_internal_field(frame, frameShape)
 
     ellipseCenter = meters2pixel((0.75*world.fieldSide, 0), frameShape)
     ellipseAxis = (int(0.3*width/1.6),int(0.4*height/1.3))
@@ -159,6 +154,8 @@ class elementsPositioner(gui.frameRenderer.frameRenderer):
     def transformFrame(self, frame, originalFrame):
         height, width = self.frameShape
         frame = np.zeros((height,width,3), np.uint8)
+
+        Drawing.draw_internal_field(frame, self.frameShape)
         
         if self.__selector == "Robot":
             self.draw_rectangle(frame, self.__mousePosition, (25,25), 0, color=(0,200,0))
