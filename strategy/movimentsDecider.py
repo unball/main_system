@@ -129,7 +129,7 @@ class MovimentsDecider():
         self.ball_vmax = 1.5
         self.state = ATT
         #self.listEntity = [Attacker(), Attacker(), TestPlayer()]
-        self.listEntity = [Attacker(), Defender(), Goalkeeper()]
+        self.listEntity = [Defender(), Attacker(), Goalkeeper()]
         self.turning_radius = statics.configFile.getValue("Turn_Radius", 0.070)
         self.dynamicPossession = False
 
