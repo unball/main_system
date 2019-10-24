@@ -133,7 +133,7 @@ class MovimentsDecider():
         self.turning_radius = statics.configFile.getValue("Turn_Radius", 0.070)
         self.dynamicPossession = False
 
-    def endPoseDeltaTrajectory(self, startPose, endPose, radius, delta=45*np.pi/180):
+    def endPoseDeltaTrajectory(self, startPose, endPose, radius, delta=1*np.pi/180):
 
         startPose = (startPose[0], startPose[1], startPose[2])
         endPoseMax = (endPose[0], endPose[1], endPose[2] + delta)
