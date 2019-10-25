@@ -50,7 +50,7 @@ def blockBallElipse(rb, vb, rr):
     e = np.array([1/a, 1/b])
     finalTarget = np.array([.75*world.fieldSide, 0])
 
-    if insideEllipse(rb, 0.25, 0.33, rm):
+    if insideEllipse(rb, 0.25, 0.33, rm) and False:
         vb = finalTarget-(rb[0], -rb[1])
     else: vb = finalTarget-rb
     
