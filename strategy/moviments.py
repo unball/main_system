@@ -25,7 +25,8 @@ def goToBallPlus(ballPos, robotPose, goalSide, robot):
     #if robot is not None: robot.step = 0.035
 
     distance = np.linalg.norm(ballRobot)
-    if distance < 0.09 and robotPose[0]*world.fieldSide > (ballPos[0])*world.fieldSide+0.03*world.fieldSide:# and abs(robotPose[1]-ballPos[1]) < 0.03:
+    angleBallRobot = np.arctan2(ballRobot[1],ballRobot[0])
+    if distance < 0.09 and robotPose[0]*world.fieldSide > (ballPos[0])*world.fieldSide+0.03*world.fieldSide and (angleBallRobot-robotPose[2]+np.pi)%(2*np.pi)-np.pi < 20*np.pi/180:# and abs(robotPose[1]-ballPos[1]) < 0.03:
         #if robot is not None: robot.step = robot.step * 3
         return (finalTarget[0], finalTarget[1], np.arctan2(robotTarget[1],robotTarget[0]))
     

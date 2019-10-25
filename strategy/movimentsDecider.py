@@ -54,8 +54,28 @@ def spinKick(pose, host):
     if host is not None:
         distance = np.sqrt((pose[0]-static_classes.world.ball.pos[0])**2+(pose[1]-static_classes.world.ball.pos[1])**2)
         if distance < 0.07: 
-            host.spin = -1 if pose[1]*world.fieldSide > 0 else 1
-            host.spin = host.spin * np.sign(pose[0]-static_classes.world.ball.pos[0]) * world.fieldSide
+            host.spin = 1 if pose[1]*world.fieldSide > 0 else -1
+            #host.spin = host.spin * np.sign(pose[0]-static_classes.world.ball.pos[0]) * world.fieldSide
+        else: host.spin = 0
+
+def spinAttacker(pose, host):
+    if host is not None:
+        distanceToBall = np.sqrt((pose[0]-static_classes.world.ball.pos[0])**2+(pose[1]-static_classes.world.ball.pos[1])**2)
+        #yProj = pose[1]+(-world.field_x_length*world.fieldSide/2-pose[0])*np.tan(pose[2])
+        ballRobot = world.ball.pos-pose[:2]
+        angleBallRobot = np.arctan2(ballRobot[1], ballRobot[0])
+        t = (-world.field_x_length/2*world.fieldSide-pose[0])/(world.ball.x-pose[0]) if world.ball.x-pose[0] != 0 else math.inf
+        yProj = pose[1]+(world.ball.y-pose[1])*t
+        print(np.arccos(np.cos(angleBallRobot-pose[2])))
+        if distanceToBall < 0.072:
+            #if pose[1] > world.field_y_length/2-0.06: 
+            #    host.spin = -1
+            #elif pose[1] < -(world.field_y_length/2-0.06):
+            #    host.spin = 1
+            if (abs(yProj) > 0.2 or np.arccos(np.cos(angleBallRobot-pose[2])) > 20*np.pi/180) and abs(pose[1]) < 0.17 and abs(-world.field_x_length*world.fieldSide/2-pose[0]) < 0.45:
+                host.spin = -np.sign(pose[1]-world.ball.y)*world.fieldSide
+            else: host.spin = 0
+
         else: host.spin = 0
 
 class Attacker(Entity):
@@ -65,6 +85,8 @@ class Attacker(Entity):
         self.goalSide = 0
     def tatic(self, pose):
         self.chooseGoalSide()
+        spinAttacker(pose, self.host)
+        if self.host is not None: print(self.host.spin)
         if static_classes.world.ball.x*world.fieldSide > 0.55: return moviments.followBally(static_classes.world.ball.pose, pose)
         self.__target = moviments.goToBallPlus(static_classes.world.ball.pos, pose, self.goalSide, self.host)
         self.target2 = self.__target
