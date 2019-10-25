@@ -46,7 +46,7 @@ class nonLinearControl(System):
 
         self.th_i = [0 for i in range(self.number_of_robots)]
         self.th_r = [0 for i in range(self.number_of_robots)]
-
+        self.side = [1 for i in range(self.number_of_robots)]
 
     def updateIntVariables(self, references, world):
         for i in range(self.number_of_robots):
@@ -71,6 +71,8 @@ class nonLinearControl(System):
             for i in range(self.number_of_robots):
                 if np.linalg.norm(self.th_e[i]) > np.pi/2:
                     self.th_e[i] = (self.th_e[i] + np.pi/2) % (np.pi) - np.pi/2
+                    self.side[i] = -1*self.side[i]
+
 
 
     def actuate(self, references, spinList, world):
@@ -96,8 +98,11 @@ class nonLinearControl(System):
             self.output_vel[i].w = ( self.kp[i] * np.sin(self.th_e[i]) * np.cos(self.th_e[i]) ) + (self.ka[i] * self.th_e[i])
             self.output_vel[i].w = self.sat(self.output_vel[i].w, 4*np.pi)
 
-            self.output_vel[i].v = self.kp_l[i] * abs(np.cos(self.th_e[i])) * np.sqrt(self.x_e[i]**2+self.y_e[i]**2) * world.robots[i].dir
-            #if i==0: print("v: {0}, w: {1}, th: {2}".format(self.output_vel[i].v, self.output_vel[i].w, self.th_e[i]))
+            side =  world.robots[i].dir if  world.robots[i].entity.__str__()!="Atacante" else self.side[i]
+            self.output_vel[i].v = self.kp_l[i] * abs(np.cos(self.th_e[i])) * np.sqrt(self.x_e[i]**2+self.y_e[i]**2) * side
+            
+            #self.output_vel[i].v = self.kp_l[i] * abs(np.cos(self.th_e[i])) * np.sqrt(self.x_e[i]**2+self.y_e[i]**2) * world.robots[i].dir
+            if i==0: print("v: {0}, w: {1}, th: {2}".format(self.output_vel[i].v, self.output_vel[i].w, self.th_e[i]))
 
 
 class ssRegulator(System):

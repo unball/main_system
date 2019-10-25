@@ -4,7 +4,8 @@ from statics.world.game_elements.element import Element
 import statics.static_classes
 import numpy as np
 import math
-
+from strategy import UVF
+from statics import static_classes
 
 class Robot(Element):
     """Robot class child of Element()."""
@@ -28,6 +29,16 @@ class Robot(Element):
         return 0
 
     def nextStep(self):
+        if self.entity.__str__() == "Atacante":
+            print('-')
+            ballRobot = np.array(static_classes.world.ball.pos)-self.pose[:2]
+            p,s = UVF.UVFPath(static_classes.world.fieldSide, self.pose, np.array(static_classes.world.ball.pos))
+            distance = np.linalg.norm(ballRobot)
+            angleBallRobot = np.arctan2(ballRobot[1],ballRobot[0])
+            if distance < 0.09 and self.pose[0]*static_classes.world.fieldSide > (static_classes.world.ball.pos[0])*static_classes.world.fieldSide+0.03*static_classes.world.fieldSide and (angleBallRobot-self.pose[2]+np.pi)%(2*np.pi)-np.pi < 20*np.pi/180:# and abs(self.pose[1]-ballPos[1]) < 0.03:
+                return s
+            else:
+                return p
         if len(self.__trajectory) != 0 and len(self.__trajectory[0]) > 1:
             pose = self.__trajectory[0][1]
             angle = pose[2] - 2*np.pi if pose[2] > np.pi else pose[2]
