@@ -9,8 +9,8 @@ class uiFrame:
 		event_frame.add_events(Gdk.EventMask.POINTER_MOTION_MASK)
 	
 	@guiMethod
-	def do_update_frame(self, image_data):
-		image_sized = cv2.resize(image_data, (471, 350))
+	def do_update_frame(self, image_data, shape=(471, 350)):
+		image_sized = cv2.resize(image_data, shape)
 		height, width, depth = image_sized.shape
 		pixbuf = GdkPixbuf.Pixbuf.new_from_data(image_sized.tostring(), GdkPixbuf.Colorspace.RGB, False, 8, width, height, depth*width)
 		self._gtk_frame.set_from_pixbuf(pixbuf.copy())
