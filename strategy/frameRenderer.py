@@ -47,6 +47,8 @@ def strategyFrame(frameShape, step=0.01):
             robot.discretize(step)
             if len(robot.trajectory) > 0:
                 cv2.polylines(frame,[np.array([meters2pixel(x, (height,width)) for x in robot.trajectory[0]])],False,(255,255,255),1)
+                for x in robot.trajectory[0]:
+                    cv2.circle(frame, meters2pixel(x, (height,width)), 3, (0,255,0), -1)
     
     bola = world.ball
     ballpos = meters2pixel(bola.pos, (height,width))
@@ -186,6 +188,8 @@ class elementsPositioner(gui.frameRenderer.frameRenderer):
                 if len(robot.trajectory) > 0:
                     #print(np.array([meters2pixel(x, (height,width)) for x in robot.trajectory[0]]))
                     cv2.polylines(frame,[np.array([meters2pixel(x, (height,width)) for x in robot.trajectory[0]])],False,(255,255,255),1)
+                    for x in robot.trajectory[0]:
+                        cv2.circle(frame, meters2pixel(x, (height,width)), 3, (0,255,0), -1)
         
         bola = world.ball
         ballpos = meters2pixel(bola.pos, (height,width))
